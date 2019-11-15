@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/editar"
+        android:title="Editar"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/pedidos"
+        android:title="Pedidos"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/cobro"
+        android:title="Cobro"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/foto"
+        android:title="Foto"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/reubica"
+        android:title="Reubica"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/agenda"
+        android:title="Agenda"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/comentario"
+        android:title="Comentario"
+        app:showAsAction="never" />
+</menu>
