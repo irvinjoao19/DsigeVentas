@@ -95,6 +95,30 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun saveSync(s: Sync): Completable {
         return Completable.fromAction {
 
+            val i: List<Identidad>? = s.identidades
+            if (i != null) {
+                dataBase.identidadDao().insertIdentidadListTask(i)
+            }
+
+            val d: List<Departamento>? = s.departamentos
+            if (d != null) {
+                dataBase.departamentoDao().insertDepartamentoListTask(d)
+            }
+
+            val p : List<Provincia>? = s.provincias
+            if (p != null){
+                dataBase.provinciaDao().insertProvinciaListTask(p)
+            }
+
+            val t : List<Distrito>? =s.distritos
+            if (t != null){
+                dataBase.distritoDao().insertDistritoListTask(t)
+            }
+
+            val n : List<GiroNegocio>? = s.negocios
+            if (n != null){
+                dataBase.giroNegocioDao().insertGiroNegocioListTask(n)
+            }
         }
     }
 

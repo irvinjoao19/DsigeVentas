@@ -8,11 +8,6 @@
             android:title="@string/pedidos"
             app:showAsAction="ifRoom" />
         <item
-            android:id="@+id/cobro"
-            android:icon="@drawable/ic_credit_card"
-            android:title="@string/cobros"
-            app:showAsAction="ifRoom" />
-        <item
             android:id="@+id/foto"
             android:icon="@drawable/ic_menu_camera"
             android:title="@string/foto"
@@ -21,10 +16,5 @@
             android:id="@+id/reubica"
             android:icon="@drawable/ic_map"
             android:title="@string/reubica"
-            app:showAsAction="ifRoom" />
-        <item
-            android:id="@+id/comentario"
-            android:icon="@drawable/ic_comment"
-            android:title="@string/comentario"
             app:showAsAction="ifRoom" />
 </menu>

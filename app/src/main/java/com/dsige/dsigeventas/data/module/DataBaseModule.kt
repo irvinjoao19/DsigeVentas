@@ -49,10 +49,39 @@ class DataBaseModule {
         return appDataBase.productoDao()
     }
 
+    @Provides
+    internal fun provideCategoriaDao(appDataBase: AppDataBase): CategoriaDao {
+        return appDataBase.categoriaDao()
+    }
 
     @Provides
-    internal fun provideCheckListDao(appDataBase: AppDataBase): CategoriaDao {
-        return appDataBase.categoriaDao()
+    internal fun provideDepartamentoDao(appDataBase: AppDataBase): DepartamentoDao {
+        return appDataBase.departamentoDao()
+    }
+
+    @Provides
+    internal fun provideDistritoDao(appDataBase: AppDataBase): DistritoDao {
+        return appDataBase.distritoDao()
+    }
+
+    @Provides
+    internal fun provideGiroNegocioDao(appDataBase: AppDataBase): GiroNegocioDao {
+        return appDataBase.giroNegocioDao()
+    }
+
+    @Provides
+    internal fun provideIdentidadDao(appDataBase: AppDataBase): IdentidadDao {
+        return appDataBase.identidadDao()
+    }
+
+    @Provides
+    internal fun provideProvinciaDao(appDataBase: AppDataBase): ProvinciaDao {
+        return appDataBase.provinciaDao()
+    }
+
+    @Provides
+    internal fun provideStockDao(appDataBase: AppDataBase): StockDao {
+        return appDataBase.stockDao()
     }
 
     @Provides

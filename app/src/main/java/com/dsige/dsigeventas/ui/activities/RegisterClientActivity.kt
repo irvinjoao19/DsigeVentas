@@ -1,7 +1,6 @@
 package com.dsige.dsigeventas.ui.activities
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -26,23 +25,25 @@ import com.dsige.dsigeventas.databinding.ActivityRegisterClientBinding
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.adapters.MenuAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
+import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_register_client.*
 import java.util.ArrayList
 import javax.inject.Inject
 
-class RegisterClientActivity : AppCompatActivity(), OnItemClickListener {
+class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
 
-    override fun onClick(view: View) {
-        when (view.id) {
+    override fun onClick(v: View) {
+        when (v.id) {
             R.id.editTextTipo -> dialogSpinner()
             R.id.editTextVisita ->
-                Util.getDateDialog(this, view, binding.editTextVisita)
+                Util.getDateDialog(this, v, binding.editTextVisita)
         }
     }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var clienteViewModel: ClienteViewModel
-    lateinit var cliente: Cliente
+    lateinit var c: Cliente
 
     lateinit var binding: ActivityRegisterClientBinding
 
@@ -69,7 +70,7 @@ class RegisterClientActivity : AppCompatActivity(), OnItemClickListener {
 
         val b = intent.extras
         if (b != null) {
-            cliente = Cliente()
+            c = Cliente()
             bindUI(b.getInt("clienteId"))
             message()
         }
@@ -82,11 +83,12 @@ class RegisterClientActivity : AppCompatActivity(), OnItemClickListener {
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.editTextVisita.setText(Util.getFecha())
         binding.listener = this
-        binding.cliente = clienteViewModel
+        binding.c = clienteViewModel
 
-        clienteViewModel.getClienteById(id).observe(this, Observer<Cliente> { c ->
-            if (c != null) {
-
+        clienteViewModel.getClienteById(id).observe(this, Observer<Cliente> { cliente ->
+            if (cliente != null) {
+                c = cliente
+                clienteViewModel.setCliente(c)
             }
         })
     }
@@ -95,6 +97,7 @@ class RegisterClientActivity : AppCompatActivity(), OnItemClickListener {
         clienteViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)
+                finish()
             }
         })
 
@@ -143,6 +146,16 @@ class RegisterClientActivity : AppCompatActivity(), OnItemClickListener {
     }
 
     private fun formRegisterCliente() {
-
+        c.tipo = editTextTipo.text.toString()
+        c.documento = editTextDocumento.text.toString()
+        c.nombre = editTextNombre.text.toString()
+        c.pago = editTextPago.text.toString()
+        c.departamento = editTextDepartamento.text.toString()
+        c.distrito = editTextDistrito.text.toString()
+        c.direccion = editTextDireccion.text.toString()
+        c.telefono = editTextTelefono.text.toString()
+        c.email = editTextEmail.text.toString()
+        c.fechaVisita = editTextVisita.text.toString()
+        clienteViewModel.validateCliente(c)
     }
 }

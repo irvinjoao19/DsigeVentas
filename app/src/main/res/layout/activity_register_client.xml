@@ -7,7 +7,7 @@
             type="com.dsige.dsigeventas.ui.listeners.OnItemClickListener" />
 
         <variable
-            name="cliente"
+            name="c"
             type="com.dsige.dsigeventas.data.viewModel.ClienteViewModel" />
     </data>
 
@@ -83,7 +83,7 @@
                                 android:inputType="text"
                                 android:lines="1"
                                 android:onClick="@{listener::onClick}"
-                                android:text="@={cliente.tipo}" />
+                                android:text="@={c.cliente.tipo}" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -101,7 +101,7 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="number"
                                 android:lines="1"
-                                android:text="@={cliente.documento}" />
+                                android:text="@={c.cliente.documento}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -130,7 +130,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="text"
-                                android:text="@={cliente.nombre}" />
+                                android:text="@={c.cliente.nombre}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -160,7 +160,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:drawableEnd="@drawable/ic_down"
-                                android:text="@={cliente.pago}" />
+                                android:text="@={c.cliente.pago}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -196,7 +196,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:drawableEnd="@drawable/ic_down"
-                                android:text="@={cliente.departamento}" />
+                                android:text="@={c.cliente.departamento}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -224,8 +224,8 @@
                                 android:id="@+id/editTextDistrito"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="text"
-                                android:text="@={cliente.distrito}" />
+                                android:drawableEnd="@drawable/ic_down"
+                                android:text="@={c.cliente.distrito}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -254,7 +254,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="text"
-                                android:text="@={cliente.direccion}" />
+                                android:text="@={c.cliente.direccion}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -290,7 +290,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="number"
-                                android:text="@={cliente.telefono}" />
+                                android:text="@={c.cliente.telefono}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -321,7 +321,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:inputType="text"
-                                android:text="@={cliente.email}" />
+                                android:text="@={c.cliente.email}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -353,7 +353,7 @@
                                 android:layout_height="wrap_content"
                                 android:focusable="false"
                                 android:onClick="@{listener::onClick}"
-                                android:text="@={cliente.fechaVisita}" />
+                                android:text="@={c.cliente.fechaVisita}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </LinearLayout>

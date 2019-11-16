@@ -31,7 +31,10 @@ class ClientePagingAdapter(private var listener: OnItemClickListener.ClienteList
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         internal fun bind(s: Cliente, listener: OnItemClickListener.ClienteListener) =
             with(itemView) {
-
+                textViewNombre.text = s.nombre
+                textViewDocumento.text = s.documento
+                textViewDireccion.text = s.direccion
+                textViewVisita.text = String.format("Ultima Visita : %s", s.fechaVisita)
                 itemView.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
                 imageViewMap.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
             }

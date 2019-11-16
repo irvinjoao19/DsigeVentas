@@ -1,5 +1,6 @@
 package com.dsige.dsigeventas.ui.listeners
 
+import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import com.dsige.dsigeventas.data.local.model.Categoria
@@ -35,5 +36,5 @@ interface OnItemClickListener {
         fun onItemClick(m: MenuPrincipal, view: View, position: Int)
     }
 
-    fun onClick(view: View)
+    fun onClick(v: View)
 }

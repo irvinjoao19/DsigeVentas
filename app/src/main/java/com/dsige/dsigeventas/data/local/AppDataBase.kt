@@ -14,7 +14,13 @@ import com.dsige.dsigeventas.data.local.model.*
         Personal::class,
         Pedido::class,
         Cliente::class,
-        Categoria::class
+        Categoria::class,
+        Departamento::class,
+        Distrito::class,
+        GiroNegocio::class,
+        Identidad::class,
+        Provincia::class,
+        Stock::class
     ],
     version = 1,
     exportSchema = false
@@ -27,6 +33,12 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun productoDao(): ProductoDao
     abstract fun categoriaDao(): CategoriaDao
     abstract fun pedidoDao(): PedidoDao
+    abstract fun departamentoDao(): DepartamentoDao
+    abstract fun distritoDao(): DistritoDao
+    abstract fun giroNegocioDao(): GiroNegocioDao
+    abstract fun identidadDao(): IdentidadDao
+    abstract fun provinciaDao(): ProvinciaDao
+    abstract fun stockDao(): StockDao
 
     companion object {
         @Volatile

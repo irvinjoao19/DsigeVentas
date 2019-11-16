@@ -7,6 +7,7 @@ import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.Cliente
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
+import com.dsige.dsigeventas.helper.Util
 import io.reactivex.CompletableObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -20,6 +21,8 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
 
+    val cliente: MutableLiveData<Cliente> = MutableLiveData()
+
     fun setError(s: String) {
         mensajeError.value = s
     }
@@ -32,7 +35,22 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         return roomRepository.getClienteById(id)
     }
 
-    fun insertOrUpdateCliente(c: Cliente) {
+    fun setCliente(c: Cliente) {
+        cliente.value = c
+    }
+
+
+    fun validateCliente(c: Cliente) {
+
+        if (c.nombre.isEmpty()){
+            mensajeError.value = "Ingrese Nombre"
+            return
+        }
+
+        insertOrUpdateCliente(c)
+    }
+
+    private fun insertOrUpdateCliente(c: Cliente) {
         roomRepository.insertOrUpdateCliente(c)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
