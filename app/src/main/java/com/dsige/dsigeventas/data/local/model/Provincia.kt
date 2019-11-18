@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 @Entity
 open class Provincia {
     @PrimaryKey
+    var provinciaId : Int = 0
     var codigo: String = ""
-    var provinciaId: String = ""
+    var provincia: String = ""
     var codigoDeparmento: String = ""
 }

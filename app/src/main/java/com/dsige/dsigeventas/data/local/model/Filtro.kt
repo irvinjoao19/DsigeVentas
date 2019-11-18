@@ -10,12 +10,17 @@ open class Filtro {
     var pass: String = ""
     var imei: String = ""
     var version: String = ""
+    var departamentoId: String = ""
+    var provinciaId: String = ""
+    var distritoId: String = ""
+
+    constructor()
 
     constructor(login: String) {
         this.login = login
     }
 
-    constructor(login: String, pass: String, imei: String,version:String) {
+    constructor(login: String, pass: String, imei: String, version: String) {
         this.login = login
         this.pass = pass
         this.imei = imei

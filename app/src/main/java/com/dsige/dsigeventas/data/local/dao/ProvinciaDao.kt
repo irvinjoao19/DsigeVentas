@@ -25,8 +25,8 @@ interface ProvinciaDao {
     @Query("SELECT * FROM Provincia")
     fun getProvincia(): Provincia
 
-    @Query("SELECT * FROM Provincia")
-    fun getProvinciaById(): LiveData<Provincia>
+    @Query("SELECT * FROM Provincia WHERE codigoDeparmento=:id")
+    fun getProvinciasById(id: String): LiveData<List<Provincia>>
 
     @Query("DELETE FROM Provincia")
     fun deleteAll()

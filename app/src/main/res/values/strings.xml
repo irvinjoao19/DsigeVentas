@@ -177,4 +177,7 @@
     <string name="comentario">Comentario</string>
     <string name="reubica">Reubica</string>
     <string name="buscar">Buscar</string>
+    <string name="provincia">Provincia</string>
+    <string name="motivo_no_comprar">Motivo no Comprar</string>
+    <string name="producto_de_interes">Producto de Interés</string>
 </resources>

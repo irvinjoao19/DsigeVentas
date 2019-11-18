@@ -1,30 +1,45 @@
 package com.dsige.dsigeventas.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 import com.dsige.dsigeventas.R
-import com.dsige.dsigeventas.data.local.model.Cliente
+import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
+import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.FileClientActivity
 import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
-import com.dsige.dsigeventas.ui.adapters.ClientePagingAdapter
+import com.dsige.dsigeventas.ui.adapters.*
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_client.*
+import java.util.ArrayList
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class ClientFragment : DaggerFragment() {
+class ClientFragment : DaggerFragment(), View.OnClickListener {
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.editTextDepartamento -> dialogSpinner("Departamento", 1)
+            R.id.editTextProvincia -> dialogSpinner("Provincia", 2)
+            R.id.editTextDistrito -> dialogSpinner("Distrito", 3)
+        }
+    }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -34,30 +49,44 @@ class ClientFragment : DaggerFragment() {
     private var param2: String? = null
     var activeOrClose: Int = 0
     var topMenu: Menu? = null
+    lateinit var f: Filtro
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         topMenu = menu
-//        menu.findItem(R.id.add).setVisible(false).isEnabled = false
         menu.findItem(R.id.pedidos).setVisible(false).isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.add -> startActivity(
-                Intent(context, RegisterClientActivity::class.java).putExtra("clienteId", 0)
-            )
+            R.id.add -> {
+                when (activeOrClose) {
+                    0 -> {
+                        startActivity(
+                            Intent(context, RegisterClientActivity::class.java)
+                                .putExtra("clienteId", 0)
+                        )
+                    }
+                    1 -> {
+
+
+                    }
+                }
+            }
             R.id.filter -> {
                 val menu = topMenu!!.findItem(R.id.filter)
+                val menu2 = topMenu!!.findItem(R.id.add)
                 when (activeOrClose) {
                     0 -> {
                         cardviewFiltro.visibility = View.VISIBLE
                         menu.icon = ContextCompat.getDrawable(context!!, R.drawable.ic_close)
+                        menu2.icon = ContextCompat.getDrawable(context!!, R.drawable.ic_done)
                         activeOrClose = 1
                     }
                     1 -> {
                         cardviewFiltro.visibility = View.GONE
                         menu.icon = ContextCompat.getDrawable(context!!, R.drawable.ic_search_white)
+                        menu2.icon = ContextCompat.getDrawable(context!!, R.drawable.ic_add)
                         activeOrClose = 0
                     }
                 }
@@ -68,6 +97,7 @@ class ClientFragment : DaggerFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        f = Filtro()
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -83,6 +113,9 @@ class ClientFragment : DaggerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        editTextDepartamento.setOnClickListener(this)
+        editTextProvincia.setOnClickListener(this)
+        editTextDistrito.setOnClickListener(this)
         bindUI()
     }
 
@@ -105,6 +138,7 @@ class ClientFragment : DaggerFragment() {
         recyclerView.adapter = clientePagingAdapter
         clienteViewModel.getCliente()
             .observe(this, Observer(clientePagingAdapter::submitList))
+        clienteViewModel.search.value = ""
     }
 
     companion object {
@@ -116,5 +150,85 @@ class ClientFragment : DaggerFragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    private fun dialogSpinner(title: String, tipo: Int) {
+        val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(context).inflate(R.layout.dialog_spinner, null)
+        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        builder.setView(view)
+        val dialogSpinner = builder.create()
+        dialogSpinner.setCanceledOnTouchOutside(false)
+        dialogSpinner.show()
+
+        val layoutManager = LinearLayoutManager(context)
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                recyclerView.context, DividerItemDecoration.VERTICAL
+            )
+        )
+        recyclerView.layoutManager = layoutManager
+        textViewTitle.text = title
+
+        when (tipo) {
+            1 -> {
+                val departamentoAdapter =
+                    DepartamentoAdapter(object : OnItemClickListener.DepartamentoListener {
+                        override fun onItemClick(d: Departamento, v: View, position: Int) {
+                            f.departamentoId = d.codigo
+                            editTextDepartamento.setText(d.departamento)
+                            editTextProvincia.text = null
+                            editTextDistrito.text = null
+                            dialogSpinner.dismiss()
+                        }
+                    })
+                recyclerView.adapter = departamentoAdapter
+
+                clienteViewModel.getDepartamentos()
+                    .observe(this, Observer<List<Departamento>> { d ->
+                        if (d != null) {
+                            departamentoAdapter.addItems(d)
+                        }
+                    })
+            }
+            2 -> {
+                val provinciaAdapter =
+                    ProvinciAdapter(object : OnItemClickListener.ProvinciaListener {
+                        override fun onItemClick(p: Provincia, v: View, position: Int) {
+                            f.provinciaId = p.codigo
+                            editTextProvincia.setText(p.provincia)
+                            editTextDistrito.text = null
+                            dialogSpinner.dismiss()
+                        }
+                    })
+                recyclerView.adapter = provinciaAdapter
+
+                clienteViewModel.getProvinciasById(f.departamentoId)
+                    .observe(this, Observer<List<Provincia>> { d ->
+                        if (d != null) {
+                            provinciaAdapter.addItems(d)
+                        }
+                    })
+            }
+            3 -> {
+                val distritoAdapter =
+                    DistritoAdapter(object : OnItemClickListener.DistritoListener {
+                        override fun onItemClick(d: Distrito, v: View, position: Int) {
+                            editTextDistrito.setText(d.nombre)
+                            dialogSpinner.dismiss()
+                        }
+                    })
+                recyclerView.adapter = distritoAdapter
+                clienteViewModel.getDistritosById(f.departamentoId, f.provinciaId)
+                    .observe(this, Observer<List<Distrito>> { d ->
+                        if (d != null) {
+                            distritoAdapter.addItems(d)
+                        }
+                    })
+            }
+        }
     }
 }

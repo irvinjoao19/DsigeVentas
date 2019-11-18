@@ -105,19 +105,29 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 dataBase.departamentoDao().insertDepartamentoListTask(d)
             }
 
-            val p : List<Provincia>? = s.provincias
-            if (p != null){
+            val p: List<Provincia>? = s.provincias
+            if (p != null) {
                 dataBase.provinciaDao().insertProvinciaListTask(p)
             }
 
-            val t : List<Distrito>? =s.distritos
-            if (t != null){
+            val t: List<Distrito>? = s.distritos
+            if (t != null) {
                 dataBase.distritoDao().insertDistritoListTask(t)
             }
 
-            val n : List<GiroNegocio>? = s.negocios
-            if (n != null){
+            val n: List<GiroNegocio>? = s.negocios
+            if (n != null) {
                 dataBase.giroNegocioDao().insertGiroNegocioListTask(n)
+            }
+
+            val st: List<Stock>? = s.productos
+            if (st != null) {
+                dataBase.stockDao().insertStockListTask(st)
+            }
+
+            val cl: List<Cliente>? = s.clientes
+            if (cl != null) {
+                dataBase.clienteDao().insertClienteListTask(cl)
             }
         }
     }
@@ -128,6 +138,17 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getCliente(): LiveData<PagedList<Cliente>> {
         return dataBase.clienteDao().getCliente().toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
+
+    override fun getCliente(
+        d: Int, p: Int, s: Int, search: String
+    ): LiveData<PagedList<Cliente>> {
+        return dataBase.clienteDao().getCliente(d, p, s, search).toLiveData(
             Config(
                 pageSize = 20,
                 enablePlaceholders = true
@@ -147,5 +168,17 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 dataBase.clienteDao().updateClienteTask(c)
             }
         }
+    }
+
+    override fun getDepartamentos(): LiveData<List<Departamento>> {
+        return dataBase.departamentoDao().getDepartamentos()
+    }
+
+    override fun getProvinciasById(id: String): LiveData<List<Provincia>> {
+        return dataBase.provinciaDao().getProvinciasById(id)
+    }
+
+    override fun getDistritosById(dId: String, pId: String): LiveData<List<Distrito>> {
+        return dataBase.distritoDao().getDistritosById(dId, pId)
     }
 }

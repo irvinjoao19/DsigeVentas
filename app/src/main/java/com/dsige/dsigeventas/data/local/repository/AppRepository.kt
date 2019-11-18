@@ -36,7 +36,15 @@ interface AppRepository {
 
     fun getCliente(): LiveData<PagedList<Cliente>>
 
+    fun getCliente(d: Int, p: Int, s: Int, search: String): LiveData<PagedList<Cliente>>
+
     fun getClienteById(id: Int): LiveData<Cliente>
 
     fun insertOrUpdateCliente(c: Cliente): Completable
+
+    fun getDepartamentos(): LiveData<List<Departamento>>
+
+    fun getProvinciasById(id: String): LiveData<List<Provincia>>
+
+    fun getDistritosById(dId: String, pId: String): LiveData<List<Distrito>>
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <variable
             name="listener"
@@ -14,9 +16,7 @@
             type="com.dsige.dsigeventas.data.viewModel.ClienteViewModel" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/background_light"
@@ -116,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="@={c.cliente.nombre}"
+                    android:text="@={c.cliente.nombreCliente}"
                     app:layout_constraintStart_toEndOf="@+id/imageView2"
                     app:layout_constraintTop_toBottomOf="@+id/textViewTipo" />
 
@@ -139,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="@={c.cliente.pago}"
+                    android:text="@={c.cliente.nombreGiroNegocio}"
                     app:layout_constraintStart_toEndOf="@+id/imageView5"
                     app:layout_constraintTop_toBottomOf="@+id/textViewNombre" />
 
@@ -160,7 +160,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:text="@={c.cliente.departamento}"
+                    android:text="@={c.cliente.nombreDepartamento}"
                     app:layout_constraintStart_toEndOf="@+id/imageView6"
                     app:layout_constraintTop_toBottomOf="@+id/textViewPago" />
 
@@ -170,9 +170,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:text="@={c.cliente.distrito}"
+                    android:text="@={c.cliente.nombreDistrito}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textViewPago" />
+
+                <TextView
+                    android:id="@+id/textViewProvincia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="4dp"
+                    android:text="@={c.cliente.nombreProvincia}"
+                    app:layout_constraintStart_toEndOf="@+id/imageView6"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewDepartamento" />
+
 
                 <TextView
                     android:id="@+id/textViewDireccion"
@@ -182,14 +193,14 @@
                     android:layout_marginTop="4dp"
                     android:text="@={c.cliente.direccion}"
                     app:layout_constraintStart_toEndOf="@+id/imageView6"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewDepartamento" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewProvincia" />
 
                 <ImageView
                     android:id="@+id/imageView7"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="48dp"
                     android:contentDescription="@string/imagen"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imageView6"
@@ -201,7 +212,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="@={c.cliente.telefono}"
+                    android:text="@={c.cliente.nroCelular}"
                     app:layout_constraintStart_toEndOf="@+id/imageView7"
                     app:layout_constraintTop_toBottomOf="@+id/textViewDireccion" />
 

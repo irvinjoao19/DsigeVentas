@@ -1,12 +1,8 @@
 package com.dsige.dsigeventas.ui.listeners
 
-import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import com.dsige.dsigeventas.data.local.model.Categoria
-import com.dsige.dsigeventas.data.local.model.Cliente
-import com.dsige.dsigeventas.data.local.model.MenuPrincipal
-import com.dsige.dsigeventas.data.local.model.Producto
+import com.dsige.dsigeventas.data.local.model.*
 import com.google.android.material.checkbox.MaterialCheckBox
 
 interface OnItemClickListener {
@@ -34,6 +30,18 @@ interface OnItemClickListener {
 
     interface MenuListener {
         fun onItemClick(m: MenuPrincipal, view: View, position: Int)
+    }
+
+    interface DepartamentoListener {
+        fun onItemClick(d: Departamento, v: View, position: Int)
+    }
+
+    interface ProvinciaListener {
+        fun onItemClick(p: Provincia, v: View, position: Int)
+    }
+
+    interface DistritoListener {
+        fun onItemClick(d: Distrito, v: View, position: Int)
     }
 
     fun onClick(v: View)

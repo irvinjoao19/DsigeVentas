@@ -23,6 +23,14 @@ interface ClienteDao {
     @Query("SELECT * FROM Cliente")
     fun getCliente(): DataSource.Factory<Int, Cliente>
 
+    @Query("SELECT * FROM Cliente WHERE departamentoId=:d AND provinciaId=:p AND distritoId=:s AND nombreCliente=:search")
+    fun getCliente(
+        d: Int,
+        p: Int,
+        s: Int,
+        search: String
+    ): DataSource.Factory<Int, Cliente>
+
     @Query("SELECT * FROM Cliente")
     fun getClienteTask(): Cliente
 

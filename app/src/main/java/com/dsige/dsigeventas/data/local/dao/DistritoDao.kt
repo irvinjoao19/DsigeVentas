@@ -25,10 +25,10 @@ interface DistritoDao {
     @Query("SELECT * FROM Distrito")
     fun getDistrito(): Distrito
 
-    @Query("SELECT * FROM Distrito")
-    fun getDistritoById(): LiveData<Distrito>
+    @Query("SELECT * FROM Distrito WHERE codigoProvincia=:pId AND codigoDepartamento=:dId")
+    fun getDistritosById(dId: String, pId: String): LiveData<List<Distrito>>
 
     @Query("DELETE FROM Distrito")
     fun deleteAll()
-    
+
 }

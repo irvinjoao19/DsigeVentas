@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 open class Distrito {
     @PrimaryKey
+    var distritoId: Int = 0
     var codigoProvincia: String = ""
     var codigoDepartamento: String = ""
     var codigoDistrito: String = ""

@@ -23,7 +23,7 @@ interface DepartamentoDao {
     fun getDepartamentoTask(): LiveData<Departamento>
 
     @Query("SELECT * FROM Departamento")
-    fun getDepartamento(): Departamento
+    fun getDepartamentos(): LiveData<List<Departamento>>
 
     @Query("SELECT * FROM Departamento")
     fun getDepartamentoById(): LiveData<Departamento>
