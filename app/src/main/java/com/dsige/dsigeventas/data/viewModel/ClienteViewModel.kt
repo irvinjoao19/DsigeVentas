@@ -8,6 +8,7 @@ import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
+import com.google.gson.Gson
 import io.reactivex.CompletableObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -45,14 +46,14 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             if (input == null || input.isEmpty()) {
                 roomRepository.getCliente()
             } else {
+                val f = Gson().fromJson(search.value, Filtro::class.java)
                 roomRepository.getCliente(
-                    1,1,1,
-                    String.format("%s%s%s", "%", input, "%")
+                    f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt(),
+                    String.format("%s%s%s", "%", f.search, "%")
                 )
             }
         }
     }
-
 
 
     fun getClienteById(id: Int): LiveData<Cliente> {

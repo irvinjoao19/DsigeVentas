@@ -23,6 +23,7 @@ import com.dsige.dsigeventas.ui.activities.FileClientActivity
 import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
 import com.dsige.dsigeventas.ui.adapters.*
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
+import com.google.gson.Gson
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_client.*
 import java.util.ArrayList
@@ -68,8 +69,8 @@ class ClientFragment : DaggerFragment(), View.OnClickListener {
                         )
                     }
                     1 -> {
-
-
+                        val json = Gson().toJson(f)
+                        clienteViewModel.search.value = json
                     }
                 }
             }
@@ -217,6 +218,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener {
                 val distritoAdapter =
                     DistritoAdapter(object : OnItemClickListener.DistritoListener {
                         override fun onItemClick(d: Distrito, v: View, position: Int) {
+                            f.distritoId = d.codigoDistrito
                             editTextDistrito.setText(d.nombre)
                             dialogSpinner.dismiss()
                         }
