@@ -180,4 +180,7 @@
     <string name="provincia">Provincia</string>
     <string name="motivo_no_comprar">Motivo no Comprar</string>
     <string name="producto_de_interes">Producto de Interés</string>
+    <string name="cantidad_producto">Cantidad Producto</string>
+    <string name="digite_cantidad">digite cantidad</string>
+    <string name="ok">Ok</string>
 </resources>

@@ -19,11 +19,13 @@ import javax.inject.Inject
 
 class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
     NavigationItemSelectedListener {
+
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.pedidos -> {
-                return true
-            }
+            R.id.pedidos ->
+                startActivity(
+                    Intent(this, OrdenActivity::class.java).putExtra("clienteId", c.clienteId)
+                )
             R.id.foto -> {
                 return true
             }
@@ -47,7 +49,6 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var clienteViewModel: ClienteViewModel
     lateinit var c: Cliente
-
     lateinit var binding: ActivityFileClientBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

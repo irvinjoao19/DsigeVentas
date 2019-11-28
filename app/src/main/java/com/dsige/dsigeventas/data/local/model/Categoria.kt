@@ -12,5 +12,5 @@ open class Categoria {
     var nombre: String = ""
 
     @Ignore
-    var productos: List<Producto>? = null
+    var pedidoDetalles: List<PedidoDetalle>? = null
 }

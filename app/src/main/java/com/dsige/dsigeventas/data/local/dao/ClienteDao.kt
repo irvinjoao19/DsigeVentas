@@ -25,10 +25,7 @@ interface ClienteDao {
 
     @Query("SELECT * FROM Cliente WHERE departamentoId=:d AND provinciaId=:p AND distritoId=:s AND nombreCliente=:search")
     fun getCliente(
-        d: Int,
-        p: Int,
-        s: Int,
-        search: String
+        d: Int, p: Int, s: Int, search: String
     ): DataSource.Factory<Int, Cliente>
 
     @Query("SELECT * FROM Cliente")
@@ -39,4 +36,7 @@ interface ClienteDao {
 
     @Query("DELETE FROM Cliente")
     fun deleteAll()
+
+    @Query("SELECT * FROM Cliente WHERE clienteId =:id")
+    fun getClienteTaskById(id: Int): Cliente
 }

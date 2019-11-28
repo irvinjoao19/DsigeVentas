@@ -1,6 +1,7 @@
 package com.dsige.dsigeventas.data.local.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.*
 import com.dsige.dsigeventas.data.local.model.Stock
 
@@ -31,7 +32,16 @@ interface StockDao {
     @Query("SELECT * FROM Stock WHERE productoId =:id")
     fun getStockById(id: Int): LiveData<Stock>
 
+    @Query("SELECT * FROM Stock")
+    fun getProductos(): DataSource.Factory<Int, Stock>
+
     @Query("DELETE FROM Stock")
     fun deleteAll()
+
+    @Query("SELECT * FROM Stock WHERE isSelected=:b")
+    fun getStockSelected(b: Boolean): List<Stock>
+
+    @Query("UPDATE Stock SET isSelected=:b")
+    fun enabledStockSelected(b: Boolean)
 
 }

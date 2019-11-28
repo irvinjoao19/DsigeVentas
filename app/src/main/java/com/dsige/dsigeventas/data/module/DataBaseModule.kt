@@ -45,8 +45,8 @@ class DataBaseModule {
     }
 
     @Provides
-    internal fun provideRegistroPhotoDao(appDataBase: AppDataBase): ProductoDao {
-        return appDataBase.productoDao()
+    internal fun provideRegistroPhotoDao(appDataBase: AppDataBase): PedidoDetalleDao {
+        return appDataBase.pedidoDetalleDao()
     }
 
     @Provides

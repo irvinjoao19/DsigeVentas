@@ -3,8 +3,10 @@ package com.dsige.dsigeventas.data.local.repository
 import androidx.lifecycle.LiveData
 import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.*
+import com.dsige.dsigeventas.helper.Mensaje
 import io.reactivex.Completable
 import io.reactivex.Observable
+import okhttp3.RequestBody
 
 interface AppRepository {
 
@@ -47,4 +49,32 @@ interface AppRepository {
     fun getProvinciasById(id: String): LiveData<List<Provincia>>
 
     fun getDistritosById(dId: String, pId: String): LiveData<List<Distrito>>
+
+    // TODO : Productos
+
+    fun getProductos() : LiveData<PagedList<Stock>>
+
+    fun getProductoById(id: Int): LiveData<Stock>
+
+    fun updateCheckPedido(s: Stock) : Completable
+
+    fun getProductoByPedido(id:Int): LiveData<PagedList<PedidoDetalle>>
+
+    fun savePedido(pedidoId:Int): Completable
+
+    fun updateProducto(p: PedidoDetalle): Completable
+
+    fun getPedidoById(id: Int): Observable<Pedido>
+
+    fun sendPedido(body: RequestBody) : Observable<Mensaje>
+
+    fun updatePedido(m: Mensaje): Completable
+
+    fun validatePedido(id: Int) : Observable<Boolean>
+
+    fun getPedidoCliente(id: Int): LiveData<Pedido>
+
+    fun updateTotalPedido(id: Int, igv: Double, total: Double, subTotal: Double): Completable
+
+    fun generarPedidoCliente(clienteId: Int): Completable
 }

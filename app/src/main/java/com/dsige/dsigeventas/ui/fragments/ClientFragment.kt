@@ -18,7 +18,6 @@ import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
-import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.FileClientActivity
 import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
 import com.dsige.dsigeventas.ui.adapters.*
@@ -26,7 +25,6 @@ import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.gson.Gson
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_client.*
-import java.util.ArrayList
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
@@ -55,7 +53,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         topMenu = menu
-        menu.findItem(R.id.pedidos).setVisible(false).isEnabled = false
+        menu.findItem(R.id.ok).setVisible(false).isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -134,8 +132,11 @@ class ClientFragment : DaggerFragment(), View.OnClickListener {
                 }
             })
         val layoutManager = LinearLayoutManager(context)
-        recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.layoutManager = layoutManager
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
+        )
         recyclerView.adapter = clientePagingAdapter
         clienteViewModel.getCliente()
             .observe(this, Observer(clientePagingAdapter::submitList))

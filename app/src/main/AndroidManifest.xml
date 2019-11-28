@@ -25,6 +25,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        <activity android:name=".ui.activities.OrdenActivity"></activity>
+        <activity android:name=".ui.activities.ProductoActivity" />
+        <activity android:name=".ui.activities.FileProductoActivity" />
         <activity
             android:name=".ui.activities.RegisterClientActivity"
             android:windowSoftInputMode="stateHidden" />

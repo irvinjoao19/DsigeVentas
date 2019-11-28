@@ -7,13 +7,12 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.dsige.dsigeventas.data.local.AppDataBase
 import com.dsige.dsigeventas.data.local.model.*
-import com.dsige.dsigeventas.helper.Util
+import com.dsige.dsigeventas.helper.Mensaje
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Observable
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import java.util.ArrayList
 
 class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDataBase) :
     AppRepository {
@@ -38,43 +37,6 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun insertUsuario(u: Usuario): Completable {
         return Completable.fromAction {
             dataBase.usuarioDao().insertUsuarioTask(u)
-
-            val productos = ArrayList<Producto>()
-            for (i in 0..10) {
-                val p = Producto()
-                p.productoId = i
-                p.categoriaId = 1
-                p.codigo = "1234567"
-                p.codigoBarra = "1234567"
-                p.pedidoId = 1
-                p.nombre = String.format("Mantequilla%s", i)
-                p.descripcion = String.format("Descripcion%s", i)
-                p.precioCompra = 10.5
-                p.precioVenta = 11.0
-                p.unidadMedida = 0.0
-                p.abreviaturaProducto = String.format("MA%s", i)
-                p.urlFoto = String.format("mantequilla%s.jpg", i)
-                p.peso = 100.0
-                p.stockMinimo = 10
-                p.estado = 1
-                p.fecha = Util.getFechaActual()
-                p.subTotal = 0.0
-                productos.add(p)
-            }
-
-            val pe = Pedido()
-            pe.pedidoId = 1
-            pe.usuarioId = 1
-            pe.total = 0.0
-
-            dataBase.pedidoDao().insertPedidoTask(pe)
-
-//            val a = Categoria("Linea 1", productos, 1)
-//            dataBase.categoriaDao().insertCategoriaTask(a)
-
-            for (p in productos) {
-                dataBase.productoDao().insertProductoTask(p)
-            }
         }
     }
 
@@ -180,5 +142,133 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getDistritosById(dId: String, pId: String): LiveData<List<Distrito>> {
         return dataBase.distritoDao().getDistritosById(dId, pId)
+    }
+
+    override fun getProductos(): LiveData<PagedList<Stock>> {
+        return dataBase.stockDao().getProductos().toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
+
+    override fun getProductoById(id: Int): LiveData<Stock> {
+        return dataBase.stockDao().getStockById(id)
+    }
+
+    override fun updateCheckPedido(s: Stock): Completable {
+        return Completable.fromAction {
+            dataBase.stockDao().updateStockTask(s)
+        }
+    }
+
+    override fun getProductoByPedido(id: Int): LiveData<PagedList<PedidoDetalle>> {
+        return dataBase.pedidoDetalleDao().getProductoByPedido(id).toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
+
+    override fun savePedido(pedidoId: Int): Completable {
+        return Completable.fromAction {
+            val stock = dataBase.stockDao().getStockSelected(true)
+//            val list = ArrayList<Producto>()
+            for (s: Stock in stock) {
+                val a = PedidoDetalle()
+                a.pedidoId = pedidoId
+                a.productoId = s.productoId
+                a.codigo = s.codigoProducto
+                a.nombre = s.nombreProducto
+                a.descripcion = s.descripcionProducto
+                a.stockMinimo = s.stock
+                a.precioCompra = s.precio
+                a.abreviaturaProducto = s.abreviaturaProducto
+
+                if (!dataBase.pedidoDetalleDao().getProductoExits(a.pedidoId, a.productoId)) {
+                    dataBase.pedidoDetalleDao().insertProductoTask(a)
+                }
+//                list.add(a)
+            }
+//            dataBase.productoDao().insertProductoListTask(list)
+        }
+    }
+
+    override fun updateProducto(p: PedidoDetalle): Completable {
+        return Completable.fromAction {
+            dataBase.pedidoDetalleDao().updateProductoTask(p)
+        }
+    }
+
+    override fun getPedidoById(id: Int): Observable<Pedido> {
+        return Observable.create { e ->
+            val p = dataBase.pedidoDao().getPedidoByIdTask(id)
+            val d: List<PedidoDetalle>? = dataBase.pedidoDetalleDao().getPedidoById(id)
+            if (d != null) {
+                p.detalles = d
+            }
+            e.onNext(p)
+            e.onComplete()
+        }
+    }
+
+    override fun sendPedido(body: RequestBody): Observable<Mensaje> {
+        return apiService.sendPedido(body)
+    }
+
+    override fun updatePedido(m: Mensaje): Completable {
+        return Completable.fromAction {
+            dataBase.pedidoDao().updatePedidoEnabled(m.codigoBase)
+            dataBase.stockDao().enabledStockSelected(false)
+        }
+    }
+
+    override fun validatePedido(id: Int): Observable<Boolean> {
+        return Observable.create { e ->
+            val a = dataBase.pedidoDetalleDao().validatePedido(id)
+            if (a > 0) {
+                e.onNext(false)
+            } else {
+                e.onNext(true)
+            }
+            e.onComplete()
+        }
+    }
+
+    override fun getPedidoCliente(id: Int): LiveData<Pedido> {
+        return dataBase.pedidoDao().getPedidoCliente(id)
+    }
+
+    override fun updateTotalPedido(
+        id: Int, igv: Double, total: Double, subTotal: Double
+    ): Completable {
+        return Completable.fromAction {
+            dataBase.pedidoDao().updateTotalPedido(id, total, subTotal)
+        }
+    }
+
+    override fun generarPedidoCliente(clienteId: Int): Completable {
+        return Completable.fromAction {
+            val p = dataBase.pedidoDao().getPedidoById(clienteId)
+            if (!p) {
+                val o = Pedido()
+                o.pedidoId = clienteId
+                o.clienteId = clienteId
+                val c = dataBase.clienteDao().getClienteTaskById(clienteId)
+                o.nombreCliente = c.nombreCliente
+                o.empresaId = c.empresaId
+                o.porcentajeIGV = 18.0
+                o.tipoDocumento = 2
+                o.almacenId = 18
+                o.cuadrillaId = 1
+                o.monedaId = 1
+                o.puntoVentaId = 1
+                o.codigoInternoCliente = c.codigoInterno
+                o.personalVendedorId = dataBase.usuarioDao().getUsuarioId()
+                dataBase.pedidoDao().insertPedidoTask(o)
+            }
+        }
     }
 }

@@ -1,9 +1,6 @@
 package com.dsige.dsigeventas.data.module
 
-import com.dsige.dsigeventas.ui.activities.FileClientActivity
-import com.dsige.dsigeventas.ui.activities.MainActivity
-import com.dsige.dsigeventas.ui.activities.LoginActivity
-import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
+import com.dsige.dsigeventas.ui.activities.*
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -22,4 +19,12 @@ abstract class ActivityBindingModule {
     @ContributesAndroidInjector
     internal abstract fun bindFileClientActivity(): FileClientActivity
 
+    @ContributesAndroidInjector
+    internal abstract fun bindFileProductoActivity(): FileProductoActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindProductoActivity(): ProductoActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindOrdenActivity(): OrdenActivity
 }

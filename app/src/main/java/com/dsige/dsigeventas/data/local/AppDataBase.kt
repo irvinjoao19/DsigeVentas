@@ -10,7 +10,7 @@ import com.dsige.dsigeventas.data.local.model.*
 @Database(
     entities = [
         Usuario::class,
-        Producto::class,
+        PedidoDetalle::class,
         Personal::class,
         Pedido::class,
         Cliente::class,
@@ -22,7 +22,7 @@ import com.dsige.dsigeventas.data.local.model.*
         Provincia::class,
         Stock::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -30,7 +30,7 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun usuarioDao(): UsuarioDao
     abstract fun clienteDao(): ClienteDao
     abstract fun personalDao(): PersonalDao
-    abstract fun productoDao(): ProductoDao
+    abstract fun pedidoDetalleDao(): PedidoDetalleDao
     abstract fun categoriaDao(): CategoriaDao
     abstract fun pedidoDao(): PedidoDao
     abstract fun departamentoDao(): DepartamentoDao

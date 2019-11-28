@@ -11,17 +11,32 @@ interface OnItemClickListener {
         fun onItemClick(c: Cliente, v: View, position: Int)
     }
 
-    interface Order {
-        fun onItemClick(p: Producto, v: View, e: EditText, position: Int)
+    interface ProductoListener {
+        fun onItemClick(s: Stock, v: View, position: Int)
     }
 
+    interface CheckProductoListener {
+        fun onCheckedChanged(s: Stock, p: Int, b: Boolean)
+    }
+
+    interface PedidoListener {
+        fun onItemClick(p: Pedido, v: View, position: Int)
+    }
+
+    interface ProductoPedidoListener {
+        fun onItemClick(p: PedidoDetalle, v: View, position: Int)
+    }
+
+    interface Order {
+        fun onItemClick(p: PedidoDetalle, v: View, e: EditText, position: Int)
+    }
 
     interface Product {
-        fun onItemClick(p: Producto, v: View, position: Int)
+        fun onItemClick(p: PedidoDetalle, v: View, position: Int)
 
         fun onCheckedChanged(
             a: Categoria,
-            p: Producto,
+            p: PedidoDetalle,
             position: Int,
             b: Boolean?,
             m: MaterialCheckBox

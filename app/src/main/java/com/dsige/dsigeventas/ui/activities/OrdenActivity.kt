@@ -1,9 +1,12 @@
-package com.dsige.dsigeventas.ui.fragments
+package com.dsige.dsigeventas.ui.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -15,73 +18,81 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dsige.dsigeventas.R
+import com.dsige.dsigeventas.data.local.model.Cliente
+import com.dsige.dsigeventas.data.local.model.Pedido
 import com.dsige.dsigeventas.data.local.model.PedidoDetalle
 import com.dsige.dsigeventas.data.viewModel.ProductoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
-import com.dsige.dsigeventas.ui.activities.ProductoActivity
 import com.dsige.dsigeventas.ui.adapters.ProductoPedidoAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.android.support.DaggerFragment
-import kotlinx.android.synthetic.main.fragment_orders.*
+import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_orden.*
 import javax.inject.Inject
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-class OrdersFragment : DaggerFragment() {
+class OrdenActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var productoViewModel: ProductoViewModel
 
-    private var param1: String? = null
-    private var param2: String? = null
-
     lateinit var builder: AlertDialog.Builder
     var dialog: AlertDialog? = null
-    lateinit var topMenu: Menu
+    var topMenu: Menu? = null
+    var clienteId: Int = 0
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
         topMenu = menu
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
-
+        menu.findItem(R.id.ok).setVisible(false).isEnabled = false
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.add -> startActivity(Intent(context, ProductoActivity::class.java))
-            R.id.ok -> productoViewModel.validatePedido(1)
+            R.id.add -> startActivity(
+                Intent(this, ProductoActivity::class.java).putExtra(
+                    "pedidoId",
+                    clienteId
+                )
+            )
+            R.id.ok -> productoViewModel.validatePedido(clienteId)
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+        setContentView(R.layout.activity_orden)
+
+        val b = intent.extras
+        if (b != null) {
+            clienteId = b.getInt("clienteId")
+            bindUI()
         }
-        setHasOptionsMenu(true)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_orders, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        bindUI()
     }
 
     private fun bindUI() {
         productoViewModel =
             ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
+
+        setSupportActionBar(toolbar)
+        supportActionBar!!.title = "Pedido"
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
+
+        productoViewModel.generarPedidoCliente(clienteId)
+
+        productoViewModel.getPedidoCliente(clienteId).observe(this, Observer<Pedido> { c ->
+            if (c != null) {
+                textViewNombre.text = c.nombreCliente
+                textViewSubTotal.text = String.format("Sub Total : S/. %s", c.subtotal)
+                textViewTotal.text = String.format("Total : S/. %s", c.totalNeto)
+            }
+        })
 
         val productoPedidoAdapter =
             ProductoPedidoAdapter(object : OnItemClickListener.ProductoPedidoListener {
@@ -114,7 +125,7 @@ class OrdersFragment : DaggerFragment() {
                     }
                 }
             })
-        val layoutManager = LinearLayoutManager(context)
+        val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.addItemDecoration(
@@ -123,30 +134,31 @@ class OrdersFragment : DaggerFragment() {
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = productoPedidoAdapter
 
-        productoViewModel.getProductoByPedido(1)
+        productoViewModel.getProductoByPedido(clienteId)
             .observe(this, Observer<PagedList<PedidoDetalle>> { p ->
-                if (p != null) {
-                    if (p.size == 0) {
-                        topMenu.findItem(R.id.ok).setVisible(false).isEnabled = false
-                    }
+                if (p.size != 0) {
+                    topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
                     updateProducto(p)
                     productoPedidoAdapter.submitList(p)
+                } else {
+                    topMenu?.findItem(R.id.ok)?.setVisible(false)?.isEnabled = false
                 }
             })
 
         productoViewModel.mensajeError.observe(this, Observer<String> { s ->
             if (s != null) {
-                Util.toastMensaje(context!!, s)
+                loadFinish()
+                Util.toastMensaje(this, s)
             }
         })
 
         productoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
                 when (s) {
-                    "Ok" -> sendPedido(1)
+                    "Ok" -> sendPedido(clienteId)
                     "ENVIADO" -> {
                         loadFinish()
-                        Util.toastMensaje(context!!, s)
+                        Util.toastMensaje(this, s)
                     }
                 }
             }
@@ -162,19 +174,18 @@ class OrdersFragment : DaggerFragment() {
         }
         igv = subTotal * 0.18
         total = igv + subTotal
-        textViewSubTotal.text = String.format("Sub Total : S/. %s", subTotal)
-        textViewTotal.text = String.format("Total : S/. %s", total)
+        productoViewModel.updateTotalPedido(clienteId, igv, total, subTotal)
     }
 
     private fun updateCantidadProducto(p: PedidoDetalle) {
-        val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
+        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
         @SuppressLint("InflateParams") val v =
-            LayoutInflater.from(context).inflate(R.layout.dialog_count_producto, null)
+            LayoutInflater.from(this).inflate(R.layout.dialog_count_producto, null)
         val editTextProducto: EditText = v.findViewById(R.id.editTextProducto)
         val buttonCancelar: MaterialButton = v.findViewById(R.id.buttonCancelar)
         val buttonAceptar: MaterialButton = v.findViewById(R.id.buttonAceptar)
         //editTextProducto.setText(p.cantidad.toInt().toString())
-        Util.showKeyboard(editTextProducto, context!!)
+        Util.showKeyboard(editTextProducto, this)
         builder.setView(v)
         val dialog = builder.create()
         dialog.show()
@@ -190,7 +201,7 @@ class OrdersFragment : DaggerFragment() {
                 p.unidadMedida = nPositive
                 p.subTotal = nPositive * p.precioCompra
                 productoViewModel.updateProducto(p)
-                Util.hideKeyboardFrom(context!!, v)
+                Util.hideKeyboardFrom(this, v)
                 dialog.dismiss()
             } else {
                 productoViewModel.setError("Digite cantidad")
@@ -202,7 +213,7 @@ class OrdersFragment : DaggerFragment() {
     }
 
     private fun sendPedido(id: Int) {
-        val dialog = MaterialAlertDialogBuilder(context)
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle("Mensaje")
             .setMessage("Deseas enviar el pedido ?")
             .setPositiveButton("SI") { dialog, _ ->
@@ -217,9 +228,9 @@ class OrdersFragment : DaggerFragment() {
     }
 
     private fun load() {
-        builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
+        builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
-            LayoutInflater.from(context).inflate(R.layout.dialog_login, null)
+            LayoutInflater.from(this).inflate(R.layout.dialog_login, null)
         builder.setView(view)
         val textView: TextView = view.findViewById(R.id.textViewLado)
         textView.text = String.format("%s", "Enviando")
@@ -235,16 +246,5 @@ class OrdersFragment : DaggerFragment() {
                 dialog!!.dismiss()
             }
         }
-    }
-
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            OrdersFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }
