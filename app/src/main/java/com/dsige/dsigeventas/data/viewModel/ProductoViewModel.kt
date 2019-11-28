@@ -246,4 +246,9 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
             })
     }
+
+
+    fun personalSearch(s: String): LiveData<PagedList<Cliente>> {
+        return roomRepository.getCliente(String.format("%s%s%s", "%", s, "%"))
+    }
 }

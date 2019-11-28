@@ -18,6 +18,7 @@ import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
+import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.FileClientActivity
 import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
 import com.dsige.dsigeventas.ui.adapters.*
@@ -30,7 +31,16 @@ import javax.inject.Inject
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class ClientFragment : DaggerFragment(), View.OnClickListener {
+class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditorActionListener {
+
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
+        if (v.text.isNotEmpty()) {
+            f.search = v.text.toString()
+            val json = Gson().toJson(f)
+            clienteViewModel.search.value = json
+        }
+        return false
+    }
 
     override fun onClick(v: View) {
         when (v.id) {
@@ -60,13 +70,12 @@ class ClientFragment : DaggerFragment(), View.OnClickListener {
         when (item.itemId) {
             R.id.add -> {
                 when (activeOrClose) {
-                    0 -> {
-                        startActivity(
-                            Intent(context, RegisterClientActivity::class.java)
-                                .putExtra("clienteId", 0)
-                        )
-                    }
+                    0 -> startActivity(
+                        Intent(context, RegisterClientActivity::class.java)
+                            .putExtra("clienteId", 0)
+                    )
                     1 -> {
+                        f.search = editTextSearch.text.toString()
                         val json = Gson().toJson(f)
                         clienteViewModel.search.value = json
                     }
@@ -115,6 +124,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener {
         editTextDepartamento.setOnClickListener(this)
         editTextProvincia.setOnClickListener(this)
         editTextDistrito.setOnClickListener(this)
+        editTextSearch.setOnEditorActionListener(this)
         bindUI()
     }
 

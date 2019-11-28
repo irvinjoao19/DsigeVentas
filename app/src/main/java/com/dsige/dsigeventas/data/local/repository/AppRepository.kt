@@ -38,6 +38,8 @@ interface AppRepository {
 
     fun getCliente(): LiveData<PagedList<Cliente>>
 
+    fun getCliente(search: String): LiveData<PagedList<Cliente>>
+
     fun getCliente(d: Int, p: Int, s: Int, search: String): LiveData<PagedList<Cliente>>
 
     fun getClienteById(id: Int): LiveData<Cliente>
@@ -77,4 +79,6 @@ interface AppRepository {
     fun updateTotalPedido(id: Int, igv: Double, total: Double, subTotal: Double): Completable
 
     fun generarPedidoCliente(clienteId: Int): Completable
+
+    fun getFormaPago(): LiveData<List<FormaPago>>
 }

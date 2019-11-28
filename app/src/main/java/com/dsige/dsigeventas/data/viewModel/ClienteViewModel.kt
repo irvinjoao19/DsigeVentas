@@ -29,6 +29,10 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         mensajeError.value = s
     }
 
+    fun getFormaPago(): LiveData<List<FormaPago>> {
+        return roomRepository.getFormaPago()
+    }
+
     fun getDepartamentos(): LiveData<List<Departamento>> {
         return roomRepository.getDepartamentos()
     }
@@ -47,10 +51,18 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 roomRepository.getCliente()
             } else {
                 val f = Gson().fromJson(search.value, Filtro::class.java)
-                roomRepository.getCliente(
-                    f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt(),
-                    String.format("%s%s%s", "%", f.search, "%")
-                )
+                if (f.departamentoId.isEmpty() || f.provinciaId.isEmpty() || f.distritoId.isEmpty()) {
+                    if (f.search.isNotEmpty()) {
+                        roomRepository.getCliente(String.format("%s%s%s", "%", f.search, "%"))
+                    } else {
+                        roomRepository.getCliente()
+                    }
+                } else {
+                    roomRepository.getCliente(
+                        f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt(),
+                        String.format("%s%s%s", "%", f.search, "%")
+                    )
+                }
             }
         }
     }
@@ -66,12 +78,42 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
 
     fun validateCliente(c: Cliente) {
-
+        if (c.tipo.isEmpty()) {
+            mensajeError.value = "Seleccione tipo"
+            return
+        }
+        if (c.documento.isEmpty()) {
+            mensajeError.value = "Ingrese documento"
+            return
+        }
         if (c.nombreCliente.isEmpty()) {
             mensajeError.value = "Ingrese Nombre"
             return
         }
-
+        if (c.nombreGiroNegocio.isEmpty()) {
+            mensajeError.value = "Seleccione forma de pago"
+            return
+        }
+        if (c.nombreDepartamento.isEmpty()) {
+            mensajeError.value = "Seleccione departamento"
+            return
+        }
+        if (c.nombreDistrito.isEmpty()) {
+            mensajeError.value = "Seleccione distrito"
+            return
+        }
+        if (c.direccion.isEmpty()) {
+            mensajeError.value = "Ingrese dirección"
+            return
+        }
+        if (c.nroCelular.isEmpty()) {
+            mensajeError.value = "Ingrese nro de celular"
+            return
+        }
+        if (c.email.isEmpty()) {
+            mensajeError.value = "Ingrese email"
+            return
+        }
         insertOrUpdateCliente(c)
     }
 

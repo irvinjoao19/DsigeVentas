@@ -88,4 +88,9 @@ class DataBaseModule {
     internal fun provideInspeccionAdicionalesDao(appDataBase: AppDataBase): PedidoDao {
         return appDataBase.pedidoDao()
     }
+
+    @Provides
+    internal fun provideFormaPagoDao(appDataBase: AppDataBase): FormaPagoDao {
+        return appDataBase.formaPagoDao()
+    }
 }

@@ -182,5 +182,9 @@
     <string name="producto_de_interes">Producto de Interés</string>
     <string name="cantidad_producto">Cantidad Producto</string>
     <string name="digite_cantidad">digite cantidad</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
+    <string name="unid">500 unid</string>
+    <string name="dinamita_acme">Dinamita Acme</string>
+    <string name="acme_02_004">ACME–02–004</string>
+    <string name="precio">10000000</string>
 </resources>

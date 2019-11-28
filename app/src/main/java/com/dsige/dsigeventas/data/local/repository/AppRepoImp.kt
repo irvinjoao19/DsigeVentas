@@ -91,11 +91,25 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (cl != null) {
                 dataBase.clienteDao().insertClienteListTask(cl)
             }
+
+            val pa: List<FormaPago>? = s.formaPagos
+            if (pa != null) {
+                dataBase.formaPagoDao().insertFormaPagoListTask(pa)
+            }
         }
     }
 
     override fun populatPersonal(): LiveData<List<Personal>> {
         return dataBase.personalDao().getPersonal()
+    }
+
+    override fun getCliente(search: String): LiveData<PagedList<Cliente>> {
+        return dataBase.clienteDao().getCliente(search).toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
     }
 
     override fun getCliente(): LiveData<PagedList<Cliente>> {
@@ -270,5 +284,9 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 dataBase.pedidoDao().insertPedidoTask(o)
             }
         }
+    }
+
+    override fun getFormaPago(): LiveData<List<FormaPago>> {
+        return dataBase.formaPagoDao().getFormaPago()
     }
 }

@@ -14,12 +14,17 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dsige.dsigeventas.R
+import com.dsige.dsigeventas.data.local.model.Cliente
+import com.dsige.dsigeventas.data.local.model.Pedido
 import com.dsige.dsigeventas.data.local.model.PedidoDetalle
 import com.dsige.dsigeventas.data.viewModel.ProductoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.ProductoActivity
+import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
+import com.dsige.dsigeventas.ui.adapters.ClienteAdapter
 import com.dsige.dsigeventas.ui.adapters.ProductoPedidoAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.material.button.MaterialButton
@@ -31,11 +36,29 @@ import javax.inject.Inject
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class OrdersFragment : DaggerFragment() {
+class OrdersFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditorActionListener {
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.imageViewAddPerson -> startActivity(
+                Intent(context, RegisterClientActivity::class.java)
+                    .putExtra("clienteId", 0)
+            )
+        }
+    }
+
+    override fun onEditorAction(v: TextView, actionId: Int, event: KeyEvent?): Boolean {
+        if (v.text.toString().isNotEmpty()) {
+            personalSearch(v.text.toString())
+        }
+        return false
+    }
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var productoViewModel: ProductoViewModel
+
+    lateinit var productoPedidoAdapter: ProductoPedidoAdapter
 
     private var param1: String? = null
     private var param2: String? = null
@@ -44,17 +67,21 @@ class OrdersFragment : DaggerFragment() {
     var dialog: AlertDialog? = null
     lateinit var topMenu: Menu
 
+    var clienteId: Int = 0
+
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         topMenu = menu
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.add -> startActivity(Intent(context, ProductoActivity::class.java))
-            R.id.ok -> productoViewModel.validatePedido(1)
+            R.id.add -> startActivity(
+                Intent(context, ProductoActivity::class.java)
+                    .putExtra("pedidoId", clienteId)
+            )
+            R.id.ok -> productoViewModel.validatePedido(clienteId)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -76,6 +103,8 @@ class OrdersFragment : DaggerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        imageViewAddPerson.setOnClickListener(this)
+        editTextTipo.setOnEditorActionListener(this)
         bindUI()
     }
 
@@ -83,7 +112,7 @@ class OrdersFragment : DaggerFragment() {
         productoViewModel =
             ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
 
-        val productoPedidoAdapter =
+        productoPedidoAdapter =
             ProductoPedidoAdapter(object : OnItemClickListener.ProductoPedidoListener {
                 override fun onItemClick(p: PedidoDetalle, v: View, position: Int) {
                     when (v.id) {
@@ -123,17 +152,6 @@ class OrdersFragment : DaggerFragment() {
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = productoPedidoAdapter
 
-        productoViewModel.getProductoByPedido(1)
-            .observe(this, Observer<PagedList<PedidoDetalle>> { p ->
-                if (p != null) {
-                    if (p.size == 0) {
-                        topMenu.findItem(R.id.ok).setVisible(false).isEnabled = false
-                    }
-                    updateProducto(p)
-                    productoPedidoAdapter.submitList(p)
-                }
-            })
-
         productoViewModel.mensajeError.observe(this, Observer<String> { s ->
             if (s != null) {
                 Util.toastMensaje(context!!, s)
@@ -143,7 +161,7 @@ class OrdersFragment : DaggerFragment() {
         productoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
                 when (s) {
-                    "Ok" -> sendPedido(1)
+                    "Ok" -> sendPedido(clienteId)
                     "ENVIADO" -> {
                         loadFinish()
                         Util.toastMensaje(context!!, s)
@@ -235,6 +253,60 @@ class OrdersFragment : DaggerFragment() {
                 dialog!!.dismiss()
             }
         }
+    }
+
+    private fun personalSearch(s: String) {
+        val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(context).inflate(R.layout.dialog_spinner, null)
+        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        builder.setView(view)
+        val dialog = builder.create()
+        dialog.show()
+
+        val layoutManager = LinearLayoutManager(context)
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                recyclerView.context, DividerItemDecoration.VERTICAL
+            )
+        )
+        recyclerView.layoutManager = layoutManager
+        textViewTitle.text = String.format("%s", "Buscar Personal")
+
+        val clienteAdapter =
+            ClienteAdapter(object : OnItemClickListener.ClienteListener {
+                override fun onItemClick(c: Cliente, v: View, position: Int) {
+                    editTextTipo.text = null
+                    clienteId = c.clienteId
+                    productoViewModel.generarPedidoCliente(clienteId)
+                    productoViewModel.getPedidoCliente(clienteId)
+                        .observe(this@OrdersFragment, Observer<Pedido> { p ->
+                            if (p != null) {
+                                textViewNombre.text = p.nombreCliente
+                                textViewIgv.text =
+                                    String.format("I.G.V. %s%s",p.porcentajeIGV, "%")
+                                textViewSubTotal.text =
+                                    String.format("Sub Total : S/. %s", p.subtotal)
+                                textViewTotal.text = String.format("Total : S/. %s", p.totalNeto)
+                            }
+                        })
+                    productoViewModel.getProductoByPedido(clienteId)
+                        .observe(this@OrdersFragment, Observer<PagedList<PedidoDetalle>> { p ->
+                            if (p != null) {
+                                if (p.size == 0) {
+                                    topMenu.findItem(R.id.ok).setVisible(false).isEnabled = false
+                                }
+                                updateProducto(p)
+                                productoPedidoAdapter.submitList(p)
+                            }
+                        })
+                    dialog.dismiss()
+                }
+            })
+        recyclerView.adapter = clienteAdapter
+        productoViewModel.personalSearch(s).observe(this, Observer(clienteAdapter::submitList))
     }
 
     companion object {

@@ -22,10 +22,7 @@ import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.databinding.ActivityRegisterClientBinding
 import com.dsige.dsigeventas.helper.Util
-import com.dsige.dsigeventas.ui.adapters.DepartamentoAdapter
-import com.dsige.dsigeventas.ui.adapters.DistritoAdapter
-import com.dsige.dsigeventas.ui.adapters.MenuAdapter
-import com.dsige.dsigeventas.ui.adapters.ProvinciAdapter
+import com.dsige.dsigeventas.ui.adapters.*
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_register_client.*
@@ -44,6 +41,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
             R.id.editTextDepartamento -> dialogSpinner("Departamento", 1)
             R.id.editTextProvincia -> dialogSpinner("Provincia", 2)
             R.id.editTextDistrito -> dialogSpinner("Distrito", 3)
+            R.id.editTextPago -> dialogSpinner("Forma de Pago", 4)
         }
     }
 
@@ -94,6 +92,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
 
         clienteViewModel.getClienteById(id).observe(this, Observer<Cliente> { cliente ->
             if (cliente != null) {
+                editTextProductoInteres.visibility = View.GONE
                 c = cliente
                 clienteViewModel.setCliente(c)
             }
@@ -150,22 +149,6 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         menu.add(MenuPrincipal(1, "Natural"))
         menu.add(MenuPrincipal(2, "Juridico"))
         menuAdapter.addItems(menu)
-    }
-
-    private fun formRegisterCliente() {
-        c.tipo = editTextTipo.text.toString()
-        c.documento = editTextDocumento.text.toString()
-        c.nombreCliente = editTextNombre.text.toString()
-        c.nombreGiroNegocio = editTextPago.text.toString()
-        c.nombreDepartamento = editTextDepartamento.text.toString()
-        c.nombreDistrito = editTextDistrito.text.toString()
-        c.direccion = editTextDireccion.text.toString()
-        c.nroCelular = editTextTelefono.text.toString()
-        c.email = editTextEmail.text.toString()
-        c.fechaVisita = editTextVisita.text.toString()
-        c.motivoNoCompra = editTextMotivoNoComprar.text.toString()
-        c.productoInteres = editTextProductoInteres.text.toString()
-        clienteViewModel.validateCliente(c)
     }
 
     private fun dialogSpinner(title: String, tipo: Int) {
@@ -253,6 +236,39 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                         }
                     })
             }
+            4 -> {
+                val formaPagoAdapter =
+                    FormaPagoAdapter(object : OnItemClickListener.FormaPagoListener {
+                        override fun onItemClick(f: FormaPago, v: View, position: Int) {
+                            c.giroNegocioId = f.formaPagoId
+                            editTextPago.setText(f.descripcion)
+                            dialogSpinner.dismiss()
+                        }
+                    })
+                recyclerView.adapter = formaPagoAdapter
+                clienteViewModel.getFormaPago().observe(this, Observer<List<FormaPago>> { f ->
+                    if (f != null) {
+                        formaPagoAdapter.addItems(f)
+                    }
+                })
+            }
         }
+    }
+
+    private fun formRegisterCliente() {
+        c.tipo = editTextTipo.text.toString()
+        c.documento = editTextDocumento.text.toString()
+        c.nombreCliente = editTextNombre.text.toString()
+        c.nombreGiroNegocio = editTextPago.text.toString()
+        c.nombreDepartamento = editTextDepartamento.text.toString()
+        c.nombreDistrito = editTextDistrito.text.toString()
+        c.direccion = editTextDireccion.text.toString()
+        c.nroCelular = editTextTelefono.text.toString()
+        c.email = editTextEmail.text.toString()
+        c.fechaVisita = editTextVisita.text.toString()
+        c.motivoNoCompra = editTextMotivoNoComprar.text.toString()
+        c.productoInteres = editTextProductoInteres.text.toString()
+        c.nombreGiroNegocio = editTextPago.text.toString()
+        clienteViewModel.validateCliente(c)
     }
 }

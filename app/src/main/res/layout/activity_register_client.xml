@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-
     <data>
-
         <variable
             name="listener"
             type="com.dsige.dsigeventas.ui.listeners.OnItemClickListener" />
@@ -161,6 +159,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:drawableEnd="@drawable/ic_down"
+                                android:focusable="false"
+                                android:onClick="@{listener::onClick}"
                                 android:text="@={c.cliente.nombreGiroNegocio}" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
