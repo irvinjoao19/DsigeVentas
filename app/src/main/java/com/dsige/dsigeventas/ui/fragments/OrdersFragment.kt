@@ -77,10 +77,15 @@ class OrdersFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.add -> startActivity(
-                Intent(context, ProductoActivity::class.java)
-                    .putExtra("pedidoId", clienteId)
-            )
+            R.id.add ->
+                if (clienteId != 0) {
+                    startActivity(
+                        Intent(context, ProductoActivity::class.java)
+                            .putExtra("pedidoId", clienteId)
+                    )
+                } else {
+                    productoViewModel.setError("Eliga un cliente")
+                }
             R.id.ok -> productoViewModel.validatePedido(clienteId)
         }
         return super.onOptionsItemSelected(item)
@@ -286,7 +291,7 @@ class OrdersFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                             if (p != null) {
                                 textViewNombre.text = p.nombreCliente
                                 textViewIgv.text =
-                                    String.format("I.G.V. %s%s",p.porcentajeIGV, "%")
+                                    String.format("I.G.V. %s%s", p.porcentajeIGV, "%")
                                 textViewSubTotal.text =
                                     String.format("Sub Total : S/. %s", p.subtotal)
                                 textViewTotal.text = String.format("Total : S/. %s", p.totalNeto)

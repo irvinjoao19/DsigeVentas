@@ -32,7 +32,7 @@ class MainActivity : DaggerAppCompatActivity(),
             }
             R.id.pedido -> {
                 logout = "on"
-                changeFragment(OrdersFragment.newInstance("", ""))
+                changeFragment(PedidoFragment.newInstance("", ""))
                 return true
             }
             R.id.map -> {

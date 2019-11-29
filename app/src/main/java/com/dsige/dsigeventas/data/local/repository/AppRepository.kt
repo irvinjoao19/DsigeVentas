@@ -81,4 +81,6 @@ interface AppRepository {
     fun generarPedidoCliente(clienteId: Int): Completable
 
     fun getFormaPago(): LiveData<List<FormaPago>>
+
+    fun getPedido(): LiveData<PagedList<Pedido>>
 }

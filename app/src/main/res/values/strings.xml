@@ -187,4 +187,5 @@
     <string name="dinamita_acme">Dinamita Acme</string>
     <string name="acme_02_004">ACME–02–004</string>
     <string name="precio">10000000</string>
+    <string name="ver">Ver Pedido</string>
 </resources>

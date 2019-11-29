@@ -27,7 +27,7 @@ interface PedidoDao {
     fun getPedidoByIdTask(id: Int): Pedido
 
     @Query("SELECT * FROM Pedido")
-    fun getPedido(): Pedido
+    fun getPedido(): DataSource.Factory<Int, Pedido>
 
     @Query("DELETE FROM Pedido")
     fun deleteAll()
@@ -35,7 +35,7 @@ interface PedidoDao {
     @Query("SELECT * FROM Pedido WHERE personalVendedorId=:id")
     fun getPedidoByUser(id: Int): DataSource.Factory<Int, Pedido>
 
-    @Query("UPDATE Pedido SET estado = 0 WHERE pedidoId=:id")
+    @Query("UPDATE Pedido SET estado = 1 WHERE pedidoId=:id")
     fun updatePedidoEnabled(id: Int)
 
     @Query("SELECT * FROM Pedido WHERE pedidoId=:id")

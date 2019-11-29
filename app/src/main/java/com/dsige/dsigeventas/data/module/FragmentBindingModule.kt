@@ -15,10 +15,14 @@ abstract class FragmentBindingModule {
         internal abstract fun providMapsFragment(): MapsFragment
 
         @ContributesAndroidInjector
+        internal abstract fun providPedidoFragment(): PedidoFragment
+
+        @ContributesAndroidInjector
         internal abstract fun providOrdersFragment(): OrdersFragment
 
         @ContributesAndroidInjector
         internal abstract fun providProductsFragment(): ProductsFragment
+
 
         @ContributesAndroidInjector
         internal abstract fun providInfoFragment(): InfoFragment

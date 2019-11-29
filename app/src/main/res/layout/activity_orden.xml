@@ -37,6 +37,33 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="UselessParent">
 
+                <LinearLayout
+                    android:id="@+id/linearLayoutCliente"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextTipo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:drawableEnd="@drawable/ic_search"
+                        android:inputType="text"
+                        android:lines="1" />
+
+                    <ImageView
+                        android:id="@+id/imageViewAddPerson"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:contentDescription="@string/img"
+                        app:srcCompat="@drawable/ic_person_add" />
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/textViewNombre"
                     android:layout_width="match_parent"
@@ -44,7 +71,6 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text="IRVIN JOAO GONGORA HERNANDEZ"
                     android:textColor="@color/colorPrimaryText" />
 
                 <LinearLayout
@@ -59,7 +85,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.7"
-                        android:text="Sub Total : "
                         android:textColor="@color/colorPrimaryText" />
 
                     <TextView
@@ -67,7 +92,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.3"
-                        android:text="I.G.V. 18%"
                         android:textColor="@color/colorPrimaryText" />
                 </LinearLayout>
 
@@ -78,7 +102,6 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="Total : "
                     android:textColor="@color/colorPrimaryText" />
             </LinearLayout>
 

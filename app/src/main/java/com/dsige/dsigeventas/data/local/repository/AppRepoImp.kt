@@ -289,4 +289,13 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun getFormaPago(): LiveData<List<FormaPago>> {
         return dataBase.formaPagoDao().getFormaPago()
     }
+
+    override fun getPedido(): LiveData<PagedList<Pedido>> {
+        return dataBase.pedidoDao().getPedido().toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
 }
