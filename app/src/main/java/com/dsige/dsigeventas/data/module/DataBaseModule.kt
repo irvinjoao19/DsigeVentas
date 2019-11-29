@@ -93,4 +93,9 @@ class DataBaseModule {
     internal fun provideFormaPagoDao(appDataBase: AppDataBase): FormaPagoDao {
         return appDataBase.formaPagoDao()
     }
+
+    @Provides
+    internal fun provideForsdmaPagoDao(appDataBase: AppDataBase): RepartoDao {
+        return appDataBase.repartoDao()
+    }
 }

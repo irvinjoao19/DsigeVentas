@@ -23,7 +23,12 @@ abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(ProductoViewModel::class)
-    internal abstract fun bindProductoViewModel(clienteViewModel: ProductoViewModel): ViewModel
+    internal abstract fun bindProductoViewModel(productoViewModel: ProductoViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(RepartoViewModel::class)
+    internal abstract fun bindRepartoViewModel(repartoViewModel: RepartoViewModel): ViewModel
 
     @Binds
     internal abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory

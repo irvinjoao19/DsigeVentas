@@ -54,33 +54,35 @@ interface AppRepository {
 
     // TODO : Productos
 
-    fun getProductos() : LiveData<PagedList<Stock>>
+    fun getProductos(): LiveData<PagedList<Stock>>
 
     fun getProductoById(id: Int): LiveData<Stock>
 
-    fun updateCheckPedido(s: Stock) : Completable
+    fun updateCheckPedido(s: Stock): Completable
 
-    fun getProductoByPedido(id:Int): LiveData<PagedList<PedidoDetalle>>
+    fun getProductoByPedido(id: Int): LiveData<PagedList<PedidoDetalle>>
 
-    fun savePedido(pedidoId:Int): Completable
+    fun savePedido(pedidoId: Int): Completable
 
     fun updateProducto(p: PedidoDetalle): Completable
 
     fun getPedidoById(id: Int): Observable<Pedido>
 
-    fun sendPedido(body: RequestBody) : Observable<Mensaje>
+    fun sendPedido(body: RequestBody): Observable<Mensaje>
 
     fun updatePedido(m: Mensaje): Completable
 
-    fun validatePedido(id: Int) : Observable<Boolean>
+    fun validatePedido(id: Int): Observable<Boolean>
 
     fun getPedidoCliente(id: Int): LiveData<Pedido>
 
     fun updateTotalPedido(id: Int, igv: Double, total: Double, subTotal: Double): Completable
 
-    fun generarPedidoCliente(clienteId: Int): Completable
+    fun generarPedidoCliente(latitud: String, longitud: String, clienteId: Int): Observable<Int>
 
     fun getFormaPago(): LiveData<List<FormaPago>>
 
     fun getPedido(): LiveData<PagedList<Pedido>>
+
+    fun getRepartos(): LiveData<PagedList<Reparto>>
 }

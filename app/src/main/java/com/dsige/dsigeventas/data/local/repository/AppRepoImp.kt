@@ -96,6 +96,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (pa != null) {
                 dataBase.formaPagoDao().insertFormaPagoListTask(pa)
             }
+
+            val r: List<Reparto>? = s.repartos
+            if (r != null) {
+                dataBase.repartoDao().insertRepartoListTask(r)
+            }
         }
     }
 
@@ -263,26 +268,33 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
-    override fun generarPedidoCliente(clienteId: Int): Completable {
-        return Completable.fromAction {
-            val p = dataBase.pedidoDao().getPedidoById(clienteId)
-            if (!p) {
-                val o = Pedido()
-                o.pedidoId = clienteId
-                o.clienteId = clienteId
-                val c = dataBase.clienteDao().getClienteTaskById(clienteId)
-                o.nombreCliente = c.nombreCliente
-                o.empresaId = c.empresaId
-                o.porcentajeIGV = 18.0
-                o.tipoDocumento = 2
-                o.almacenId = 18
-                o.cuadrillaId = 1
-                o.monedaId = 1
-                o.puntoVentaId = 1
-                o.codigoInternoCliente = c.codigoInterno
-                o.personalVendedorId = dataBase.usuarioDao().getUsuarioId()
-                dataBase.pedidoDao().insertPedidoTask(o)
-            }
+    override fun generarPedidoCliente(
+        latitud: String,
+        longitud: String,
+        clienteId: Int
+    ): Observable<Int> {
+        return Observable.create { e ->
+            val identity = dataBase.pedidoDao().getPedidoIdentity()
+            val o = Pedido()
+            o.pedidoId = if (identity == 0) 1 else identity + 1
+            o.clienteId = clienteId
+            val c = dataBase.clienteDao().getClienteTaskById(clienteId)
+            o.nombreCliente = c.nombreCliente
+            o.empresaId = c.empresaId
+            o.porcentajeIGV = 18.0
+            o.tipoDocumento = 2
+            o.almacenId = 18
+            o.cuadrillaId = 1
+            o.monedaId = 1
+            o.puntoVentaId = 1
+            o.codigoInternoCliente = c.codigoInterno
+            o.personalVendedorId = dataBase.usuarioDao().getUsuarioId()
+            o.latitud = latitud
+            o.longitud = longitud
+            o.direccionPedido = ""
+            dataBase.pedidoDao().insertPedidoTask(o)
+            e.onNext(o.pedidoId)
+            e.onComplete()
         }
     }
 
@@ -292,6 +304,15 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getPedido(): LiveData<PagedList<Pedido>> {
         return dataBase.pedidoDao().getPedido().toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
+
+    override fun getRepartos(): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getRepartos().toLiveData(
             Config(
                 pageSize = 20,
                 enablePlaceholders = true

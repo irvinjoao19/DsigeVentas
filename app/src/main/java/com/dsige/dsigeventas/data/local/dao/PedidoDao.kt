@@ -47,4 +47,7 @@ interface PedidoDao {
     @Query("SELECT * FROM Pedido WHERE pedidoId=:id")
     fun getPedidoById(id: Int): Boolean
 
+    @Query("SELECT pedidoId FROM Pedido ORDER BY pedidoId DESC LIMIT 1")
+    fun getPedidoIdentity(): Int
+
 }

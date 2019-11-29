@@ -35,6 +35,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
     val producto: MutableLiveData<Stock> = MutableLiveData()
+    val pedidoId: MutableLiveData<Int> = MutableLiveData()
 
     fun setError(s: String) {
         mensajeError.value = s
@@ -199,7 +200,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onError(e: Throwable) {
-
+                    mensajeError.value = e.toString()
                 }
 
             })
@@ -228,11 +229,11 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun generarPedidoCliente(clienteId: Int) {
-        roomRepository.generarPedidoCliente(clienteId)
+    fun generarPedidoCliente(latitud: String, longitud: String,clienteId: Int) {
+        roomRepository.generarPedidoCliente(latitud,longitud,clienteId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : CompletableObserver {
+            .subscribe(object : Observer<Int> {
                 override fun onComplete() {
 
                 }
@@ -241,8 +242,12 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
                 }
 
-                override fun onError(e: Throwable) {
+                override fun onNext(t: Int) {
+                    pedidoId.value = t
+                }
 
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.toString()
                 }
             })
     }

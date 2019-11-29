@@ -37,7 +37,7 @@ class MainActivity : DaggerAppCompatActivity(),
             }
             R.id.map -> {
                 logout = "on"
-                changeFragment(MapsFragment.newInstance("", ""))
+                changeFragment(RepartoFragment.newInstance("", ""))
                 return true
             }
             R.id.info -> {

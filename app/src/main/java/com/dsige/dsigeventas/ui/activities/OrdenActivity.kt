@@ -21,6 +21,7 @@ import com.dsige.dsigeventas.data.local.model.Pedido
 import com.dsige.dsigeventas.data.local.model.PedidoDetalle
 import com.dsige.dsigeventas.data.viewModel.ProductoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
+import com.dsige.dsigeventas.helper.Gps
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.adapters.ClienteAdapter
 import com.dsige.dsigeventas.ui.adapters.ProductoPedidoAdapter
@@ -59,6 +60,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
     var dialog: AlertDialog? = null
     var topMenu: Menu? = null
     var clienteId: Int = 0
+    var pedidoId: Int = 0
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -77,12 +79,12 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             R.id.add -> if (clienteId != 0) {
                 startActivity(
                     Intent(this, ProductoActivity::class.java)
-                        .putExtra("pedidoId", clienteId)
+                        .putExtra("pedidoId", pedidoId)
                 )
             } else {
                 productoViewModel.setError("Eliga un cliente")
             }
-            R.id.ok -> productoViewModel.validatePedido(clienteId)
+            R.id.ok -> productoViewModel.validatePedido(pedidoId)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -92,6 +94,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         setContentView(R.layout.activity_orden)
         val b = intent.extras
         if (b != null) {
+            pedidoId = b.getInt("pedidoId")
             clienteId = b.getInt("clienteId")
             bindUI()
         }
@@ -107,6 +110,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         toolbar.setNavigationOnClickListener { finish() }
         imageViewAddPerson.setOnClickListener(this)
         editTextTipo.setOnEditorActionListener(this)
+
 
         productoPedidoAdapter =
             ProductoPedidoAdapter(object : OnItemClickListener.ProductoPedidoListener {
@@ -148,28 +152,9 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = productoPedidoAdapter
 
-        if (clienteId != 0) {
-            linearLayoutCliente.visibility = View.GONE
-            productoViewModel.generarPedidoCliente(clienteId)
-            productoViewModel.getPedidoCliente(clienteId).observe(this, Observer<Pedido> { c ->
-                if (c != null) {
-                    textViewNombre.text = c.nombreCliente
-                    textViewSubTotal.text = String.format("Sub Total : S/. %s", c.subtotal)
-                    textViewTotal.text = String.format("Total : S/. %s", c.totalNeto)
-                }
-            })
-            productoViewModel.getProductoByPedido(clienteId)
-                .observe(this, Observer<PagedList<PedidoDetalle>> { p ->
-                    if (p.size != 0) {
-                        topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
-                        updateProducto(p)
-                        productoPedidoAdapter.submitList(p)
-                    } else {
-                        topMenu?.findItem(R.id.ok)?.setVisible(false)?.isEnabled = false
-                    }
-                })
-            topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
-        }
+
+        productoViewModel.pedidoId.value = pedidoId
+
 
         productoViewModel.mensajeError.observe(this, Observer<String> { s ->
             if (s != null) {
@@ -181,13 +166,42 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         productoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
                 when (s) {
-                    "Ok" -> sendPedido(clienteId)
+                    "Ok" -> sendPedido(pedidoId)
                     "ENVIADO" -> {
                         loadFinish()
                         Util.toastMensaje(this, s)
                         finish()
                     }
                 }
+            }
+        })
+
+        productoViewModel.pedidoId.observe(this, Observer<Int> { i ->
+            if (i != 0) {
+                linearLayoutCliente.visibility = View.GONE
+                pedidoId = i
+                productoViewModel.getPedidoCliente(i)
+                    .observe(this@OrdenActivity, Observer<Pedido> { p ->
+                        if (p != null) {
+                            textViewNombre.text = p.nombreCliente
+                            textViewIgv.text =
+                                String.format("I.G.V. %s%s", p.porcentajeIGV, "%")
+                            textViewSubTotal.text =
+                                String.format("Sub Total : S/. %s", p.subtotal)
+                            textViewTotal.text = String.format("Total : S/. %s", p.totalNeto)
+                        }
+                    })
+                productoViewModel.getProductoByPedido(i)
+                    .observe(this@OrdenActivity, Observer<PagedList<PedidoDetalle>> { p ->
+                        if (p.size != 0) {
+                            topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
+                            updateProducto(p)
+                            productoPedidoAdapter.submitList(p)
+                        } else {
+                            topMenu?.findItem(R.id.ok)?.setVisible(false)?.isEnabled = false
+                        }
+                    })
+                topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
             }
         })
     }
@@ -201,7 +215,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         }
         igv = subTotal * 0.18
         total = igv + subTotal
-        productoViewModel.updateTotalPedido(clienteId, igv, total, subTotal)
+        productoViewModel.updateTotalPedido(pedidoId, igv, total, subTotal)
     }
 
     private fun updateCantidadProducto(p: PedidoDetalle) {
@@ -211,7 +225,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         val editTextProducto: EditText = v.findViewById(R.id.editTextProducto)
         val buttonCancelar: MaterialButton = v.findViewById(R.id.buttonCancelar)
         val buttonAceptar: MaterialButton = v.findViewById(R.id.buttonAceptar)
-        //editTextProducto.setText(p.cantidad.toInt().toString())
+        //editTextProducto.setText(p.cantidad.toString())
         Util.showKeyboard(editTextProducto, this)
         builder.setView(v)
         val dialog = builder.create()
@@ -298,30 +312,18 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         val clienteAdapter =
             ClienteAdapter(object : OnItemClickListener.ClienteListener {
                 override fun onItemClick(c: Cliente, v: View, position: Int) {
-                    editTextTipo.text = null
-                    clienteId = c.clienteId
-                    productoViewModel.generarPedidoCliente(clienteId)
-                    productoViewModel.getPedidoCliente(clienteId)
-                        .observe(this@OrdenActivity, Observer<Pedido> { p ->
-                            if (p != null) {
-                                textViewNombre.text = p.nombreCliente
-                                textViewIgv.text =
-                                    String.format("I.G.V. %s%s", p.porcentajeIGV, "%")
-                                textViewSubTotal.text =
-                                    String.format("Sub Total : S/. %s", p.subtotal)
-                                textViewTotal.text = String.format("Total : S/. %s", p.totalNeto)
-                            }
-                        })
-                    productoViewModel.getProductoByPedido(clienteId)
-                        .observe(this@OrdenActivity, Observer<PagedList<PedidoDetalle>> { p ->
-                            if (p.size != 0) {
-                                topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
-                                updateProducto(p)
-                                productoPedidoAdapter.submitList(p)
-                            } else {
-                                topMenu?.findItem(R.id.ok)?.setVisible(false)?.isEnabled = false
-                            }
-                        })
+                    val gps = Gps(this@OrdenActivity)
+                    if (gps.isLocationEnabled()) {
+                        editTextTipo.text = null
+                        clienteId = c.clienteId
+                        productoViewModel.generarPedidoCliente(
+                            gps.getLatitude().toString(),
+                            gps.getLongitude().toString(),
+                            c.clienteId
+                        )
+                    } else {
+                        gps.showSettingsAlert(this@OrdenActivity)
+                    }
                     dialog.dismiss()
                 }
             })

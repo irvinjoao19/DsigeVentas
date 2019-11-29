@@ -2,55 +2,38 @@ package com.dsige.dsigeventas.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
-import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.dsige.dsigeventas.R
-import com.dsige.dsigeventas.data.local.model.Pedido
-import com.dsige.dsigeventas.data.viewModel.ProductoViewModel
+import com.dsige.dsigeventas.data.local.model.Reparto
+import com.dsige.dsigeventas.data.viewModel.RepartoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
-import com.dsige.dsigeventas.ui.activities.OrdenActivity
-import com.dsige.dsigeventas.ui.adapters.PedidoPagingAdapter
+import com.dsige.dsigeventas.ui.activities.MapsActivity
+import com.dsige.dsigeventas.ui.adapters.RepartoAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import dagger.android.support.DaggerFragment
-import kotlinx.android.synthetic.main.fragment_pedido.*
+import kotlinx.android.synthetic.main.cardview_reparto.view.*
+import kotlinx.android.synthetic.main.fragment_reparto.*
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class PedidoFragment : DaggerFragment() {
+class RepartoFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
-    lateinit var productoViewModel: ProductoViewModel
+    lateinit var repartoViewModel: RepartoViewModel
 
     private var param1: String? = null
     private var param2: String? = null
-
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
-        menu.findItem(R.id.ok).setVisible(false).isEnabled = false
-        menu.findItem(R.id.filter).setVisible(false).isEnabled = false
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add -> startActivity(
-                Intent(context, OrdenActivity::class.java)
-                    .putExtra("pedidoId", 0)
-                    .putExtra("clienteId", 0)
-            )
-        }
-        return super.onOptionsItemSelected(item)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,13 +41,12 @@ class PedidoFragment : DaggerFragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_pedido, container, false)
+        return inflater.inflate(R.layout.fragment_reparto, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -73,16 +55,19 @@ class PedidoFragment : DaggerFragment() {
     }
 
     private fun bindUI() {
-        productoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
+        repartoViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(RepartoViewModel::class.java)
 
-        val pedidoAdapter = PedidoPagingAdapter(object : OnItemClickListener.PedidoListener {
-            override fun onItemClick(p: Pedido, v: View, position: Int) {
-                startActivity(
-                    Intent(context, OrdenActivity::class.java)
-                        .putExtra("pedidoId", p.pedidoId)
-                        .putExtra("clienteId", p.clienteId)
-                )
+        val repartoAdapter = RepartoAdapter(object : OnItemClickListener.RepartoListener {
+            override fun onItemClick(r: Reparto, v: View, position: Int) {
+                when (v.id) {
+                    R.id.imageViewMap -> startActivity(
+                        Intent(context, MapsActivity::class.java)
+                            .putExtra("latitud", r.latitud)
+                            .putExtra("longitud", r.longitud)
+                            .putExtra("title", r.numeroPedido)
+                    )
+                }
             }
         })
 
@@ -93,14 +78,14 @@ class PedidoFragment : DaggerFragment() {
             DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
         )
         recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = pedidoAdapter
-        productoViewModel.getPedido().observe(this, Observer(pedidoAdapter::submitList))
+        recyclerView.adapter = repartoAdapter
+        repartoViewModel.getRepartos().observe(this, Observer(repartoAdapter::submitList))
     }
 
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            PedidoFragment().apply {
+            RepartoFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

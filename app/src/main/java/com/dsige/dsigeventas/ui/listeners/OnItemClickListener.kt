@@ -63,5 +63,9 @@ interface OnItemClickListener {
         fun onItemClick(f: FormaPago, v: View, position: Int)
     }
 
+    interface RepartoListener {
+        fun onItemClick(r: Reparto, v: View, position: Int)
+    }
+
     fun onClick(v: View)
 }

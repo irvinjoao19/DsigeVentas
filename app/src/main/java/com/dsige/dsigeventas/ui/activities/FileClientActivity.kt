@@ -62,7 +62,6 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
         if (b != null) {
             c = Cliente()
             bindUI(b.getInt("clienteId"))
-
         }
     }
 

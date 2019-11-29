@@ -9,5 +9,7 @@ open class Sync {
     var productos: List<Stock> = ArrayList()
     var clientes: List<Cliente> = ArrayList()
     var formaPagos: List<FormaPago> = ArrayList()
+    var repartos: List<Reparto> = ArrayList()
+
     var mensaje: String = ""
 }
