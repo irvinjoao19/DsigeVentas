@@ -1,11 +1,14 @@
 package com.dsige.dsigeventas.data.local.repository
 
+import com.dsige.dsigeventas.data.local.model.RoutesDetail
 import com.dsige.dsigeventas.data.local.model.Sync
 import com.dsige.dsigeventas.data.local.model.Usuario
 import com.dsige.dsigeventas.helper.Mensaje
 import io.reactivex.Observable
 import okhttp3.RequestBody
+import retrofit2.Call
 import retrofit2.http.*
+
 
 interface ApiService {
 
@@ -15,7 +18,7 @@ interface ApiService {
 
     @Headers("Cache-Control: no-cache")
     @GET("Sync")
-    fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String ): Observable<Sync>
+    fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String): Observable<Sync>
 
     @Headers("Cache-Control: no-cache")
     @POST("Save")
@@ -36,4 +39,14 @@ interface ApiService {
     @Headers("Cache-Control: no-cache")
     @POST("SavePedido")
     fun sendPedido(@Body body: RequestBody): Observable<Mensaje>
+
+
+    @GET("/maps/api/directions/json?")
+    fun getDirection(
+        @Query("origin") origin: String?,
+        @Query("destination") destination: String?,
+        @Query("key") key: String?,
+        @Query("mode") mode: String?,
+        @Query("alternatives") alternatives: Boolean
+    ): Call<RoutesDetail?>
 }

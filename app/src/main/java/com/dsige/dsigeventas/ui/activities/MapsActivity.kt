@@ -82,7 +82,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
             val sydney = LatLng(latitud.toDouble(), longitud.toDouble())
             mMap.addMarker(MarkerOptions().position(sydney).title(title))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-
+            mMap.isTrafficEnabled = true
             mMap.isMyLocationEnabled = true
 
             if (mapView?.findViewById<View>(Integer.parseInt("1")) != null) {
@@ -134,7 +134,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
     private fun getUrl(origin: LatLng, dest: LatLng): String {
         val str_origin = "origin=" + origin.latitude + "," + origin.longitude
         val str_dest = "destination=" + dest.latitude + "," + dest.longitude
-        val mode = "mode=driving"
+        val mode = "mode=driving&alternatives=true"
         val parameters = "$str_origin&$str_dest&$mode"
         val output = "json"
         return String.format(
