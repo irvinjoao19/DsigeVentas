@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
@@ -66,11 +67,6 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         menuInflater.inflate(R.menu.main, menu)
         topMenu = menu
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
-        if (clienteId != 0) {
-            menu.findItem(R.id.ok).setVisible(true).isEnabled = true
-        } else {
-            menu.findItem(R.id.ok).setVisible(false).isEnabled = false
-        }
         return true
     }
 
@@ -111,7 +107,6 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         imageViewAddPerson.setOnClickListener(this)
         editTextTipo.setOnEditorActionListener(this)
 
-
         productoPedidoAdapter =
             ProductoPedidoAdapter(object : OnItemClickListener.ProductoPedidoListener {
                 override fun onItemClick(p: PedidoDetalle, v: View, position: Int) {
@@ -137,8 +132,19 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                             p.cantidad = nPositive
                             p.unidadMedida = nPositive
                             p.subTotal = nPositive * p.precioCompra
-                            p.estado = 1
+                            p.estado = 2
                             productoViewModel.updateProducto(p)
+                        }
+                        else -> {
+                            val popupMenu = PopupMenu(this@OrdenActivity, v)
+                            popupMenu.menu.add(0, 1, 0, getText(R.string.delete))
+                            popupMenu.setOnMenuItemClickListener { item ->
+                                when (item.itemId) {
+                                    1 -> deletePedidoDialog(p)
+                                }
+                                false
+                            }
+                            popupMenu.show()
                         }
                     }
                 }
@@ -152,9 +158,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = productoPedidoAdapter
 
-
         productoViewModel.pedidoId.value = pedidoId
-
 
         productoViewModel.mensajeError.observe(this, Observer<String> { s ->
             if (s != null) {
@@ -184,26 +188,27 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                     .observe(this@OrdenActivity, Observer<Pedido> { p ->
                         if (p != null) {
                             textViewNombre.text = p.nombreCliente
-                            textViewIgv.text =
-                                String.format("I.G.V. %s%s", p.porcentajeIGV, "%")
-                            textViewSubTotal.text =
-                                String.format("Sub Total : S/. %s", p.subtotal)
                             textViewTotal.text = String.format("Total : S/. %s", p.totalNeto)
+                            if (p.estado == 1) {
+                                topMenu?.findItem(R.id.add)?.setVisible(false)?.isEnabled = false
+                                topMenu?.findItem(R.id.ok)?.setVisible(false)?.isEnabled = false
+                            }
                         }
                     })
                 productoViewModel.getProductoByPedido(i)
                     .observe(this@OrdenActivity, Observer<PagedList<PedidoDetalle>> { p ->
                         if (p.size != 0) {
-                            topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
                             updateProducto(p)
                             productoPedidoAdapter.submitList(p)
-                        } else {
-                            topMenu?.findItem(R.id.ok)?.setVisible(false)?.isEnabled = false
                         }
                     })
-                topMenu?.findItem(R.id.ok)?.setVisible(true)?.isEnabled = true
             }
         })
+        if (pedidoId == 0) {
+            if (clienteId != 0) {
+                generateCliente(clienteId)
+            }
+        }
     }
 
     private fun updateProducto(pedidoDetalles: List<PedidoDetalle>) {
@@ -312,22 +317,38 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         val clienteAdapter =
             ClienteAdapter(object : OnItemClickListener.ClienteListener {
                 override fun onItemClick(c: Cliente, v: View, position: Int) {
-                    val gps = Gps(this@OrdenActivity)
-                    if (gps.isLocationEnabled()) {
-                        editTextTipo.text = null
-                        clienteId = c.clienteId
-                        productoViewModel.generarPedidoCliente(
-                            gps.getLatitude().toString(),
-                            gps.getLongitude().toString(),
-                            c.clienteId
-                        )
-                    } else {
-                        gps.showSettingsAlert(this@OrdenActivity)
-                    }
+                    generateCliente(c.clienteId)
                     dialog.dismiss()
                 }
             })
         recyclerView.adapter = clienteAdapter
         productoViewModel.personalSearch(s).observe(this, Observer(clienteAdapter::submitList))
+    }
+
+    private fun generateCliente(id: Int) {
+        val gps = Gps(this@OrdenActivity)
+        if (gps.isLocationEnabled()) {
+            editTextTipo.text = null
+            clienteId = id
+            productoViewModel.generarPedidoCliente(
+                gps.getLatitude().toString(), gps.getLongitude().toString(), id
+            )
+        } else {
+            gps.showSettingsAlert(this@OrdenActivity)
+        }
+    }
+
+    private fun deletePedidoDialog(p: PedidoDetalle) {
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Mensaje")
+            .setMessage("Deseas eliminar el producto ?")
+            .setPositiveButton("SI") { dialog, _ ->
+                productoViewModel.deletePedidoDetalle(p)
+                dialog.dismiss()
+            }
+            .setNegativeButton("NO") { dialog, _ ->
+                dialog.dismiss()
+            }
+        dialog.show()
     }
 }

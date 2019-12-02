@@ -72,7 +72,7 @@ interface AppRepository {
 
     fun updatePedido(m: Mensaje): Completable
 
-    fun validatePedido(id: Int): Observable<Boolean>
+    fun validatePedido(id: Int): Observable<Int>
 
     fun getPedidoCliente(id: Int): LiveData<Pedido>
 
@@ -85,4 +85,6 @@ interface AppRepository {
     fun getPedido(): LiveData<PagedList<Pedido>>
 
     fun getRepartos(): LiveData<PagedList<Reparto>>
+
+    fun deletePedidoDetalle(p: PedidoDetalle): Completable
 }

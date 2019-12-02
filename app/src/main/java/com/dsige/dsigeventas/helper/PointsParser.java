@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.dsige.dsigeventas.data.local.model.Route;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -51,6 +52,8 @@ public class PointsParser extends AsyncTask<String, Integer, List<List<HashMap<S
 
     @Override
     protected void onPostExecute(List<List<HashMap<String, String>>> result) {
+
+
         ArrayList<LatLng> points;
         PolylineOptions lineOptions = null;
         for (int i = 0; i < result.size(); i++) {
@@ -65,13 +68,15 @@ public class PointsParser extends AsyncTask<String, Integer, List<List<HashMap<S
                 points.add(position);
             }
             lineOptions.addAll(points);
-            if (directionMode.equalsIgnoreCase("walking")) {
+//            if (directionMode.equalsIgnoreCase("walking")) {
+//                lineOptions.width(10);
+//                lineOptions.color(Color.MAGENTA);
+//            } else {
+
+
                 lineOptions.width(10);
-                lineOptions.color(Color.MAGENTA);
-            } else {
-                lineOptions.width(11);
                 lineOptions.color(Color.RED);
-            }
+//            }
             Log.d("mylog", "onPostExecute lineoptions decoded");
         }
         if (lineOptions != null) {

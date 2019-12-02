@@ -33,22 +33,27 @@ class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPe
             with(itemView) {
                 textViewNombre.text = p.nombre
                 textViewCodigo.text = p.codigo
-                textViewStock.text = p.stockMinimo.toString()
+                //textViewStock.text = p.stockMinimo.toString()
                 textViewPrecio.text = p.precioCompra.toString()
-                textViewSubTotal.text = p.subTotal.toString()
+                textViewSubTotal.text = String.format("S/. %s", p.subTotal)
                 editTextCantidad.setText(p.cantidad.toString())
-                editTextCantidad.setOnClickListener { v ->
-                    listener.onItemClick(p, v, adapterPosition)
-                }
-                imageViewMap.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
-                imageViewEdit.setOnClickListener { v ->
-                    listener.onItemClick(p, v, adapterPosition)
-                }
-                imageViewNegative.setOnClickListener { v ->
-                    listener.onItemClick(p, v, adapterPosition)
-                }
-                imageViewPositive.setOnClickListener { v ->
-                    listener.onItemClick(p, v, adapterPosition)
+
+                if (p.estado == 1) {
+                    imageViewPositive.visibility = View.GONE
+                    imageViewNegative.visibility = View.GONE
+                } else {
+                    editTextCantidad.setOnClickListener { v ->
+                        listener.onItemClick(p, v, adapterPosition)
+                    }
+                    //  imageViewMap.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
+                    //  imageViewEdit.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
+                    imageViewNegative.setOnClickListener { v ->
+                        listener.onItemClick(p, v, adapterPosition)
+                    }
+                    imageViewPositive.setOnClickListener { v ->
+                        listener.onItemClick(p, v, adapterPosition)
+                    }
+                    itemView.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
                 }
             }
     }
@@ -59,7 +64,10 @@ class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPe
                 oldItem.productoId == newItem.productoId
 
             @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: PedidoDetalle, newItem: PedidoDetalle): Boolean =
+            override fun areContentsTheSame(
+                oldItem: PedidoDetalle,
+                newItem: PedidoDetalle
+            ): Boolean =
                 oldItem == newItem
         }
     }

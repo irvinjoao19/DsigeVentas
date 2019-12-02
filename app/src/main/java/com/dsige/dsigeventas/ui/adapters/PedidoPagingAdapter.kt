@@ -37,7 +37,7 @@ class PedidoPagingAdapter(private var listener: OnItemClickListener.PedidoListen
                     0 -> textViewEstado.text = String.format("Estado : %s", "Por Enviar")
                     1 -> textViewEstado.text = String.format("Estado : %s", "Enviado")
                 }
-                textViewVer.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
+                itemView.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
             }
     }
 

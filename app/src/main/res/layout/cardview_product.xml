@@ -36,7 +36,6 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:text="@string/dinamita_acme"
-        android:textColor="@color/colorPrimaryText"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/divider"
@@ -49,7 +48,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
         android:text="@string/acme_02_004"
-        android:textColor="@color/colorPrimaryText"
         app:layout_constraintStart_toEndOf="@+id/divider"
         app:layout_constraintTop_toBottomOf="@+id/textViewName" />
 
@@ -59,8 +57,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/precio"
         android:textColor="@color/colorPrimaryText"
+        app:layout_constraintBottom_toTopOf="@+id/textViewStock"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewName" />
 
@@ -68,14 +68,11 @@
         android:id="@+id/textViewStock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:text="@string/unid"
-        android:textColor="@color/colorPrimaryText"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewPrecio" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -93,6 +90,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/img"
         app:layout_constraintEnd_toStartOf="@+id/textViewPrecio"
         app:layout_constraintTop_toBottomOf="@+id/textViewName"

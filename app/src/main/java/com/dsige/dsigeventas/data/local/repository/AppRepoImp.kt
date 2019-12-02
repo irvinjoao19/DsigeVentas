@@ -194,7 +194,6 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun savePedido(pedidoId: Int): Completable {
         return Completable.fromAction {
             val stock = dataBase.stockDao().getStockSelected(true)
-//            val list = ArrayList<Producto>()
             for (s: Stock in stock) {
                 val a = PedidoDetalle()
                 a.pedidoId = pedidoId
@@ -209,9 +208,8 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 if (!dataBase.pedidoDetalleDao().getProductoExits(a.pedidoId, a.productoId)) {
                     dataBase.pedidoDetalleDao().insertProductoTask(a)
                 }
-//                list.add(a)
             }
-//            dataBase.productoDao().insertProductoListTask(list)
+            dataBase.stockDao().enabledStockSelected(false)
         }
     }
 
@@ -240,17 +238,22 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun updatePedido(m: Mensaje): Completable {
         return Completable.fromAction {
             dataBase.pedidoDao().updatePedidoEnabled(m.codigoBase)
-            dataBase.stockDao().enabledStockSelected(false)
+            dataBase.pedidoDetalleDao().updatePedidoEnabled(m.codigoBase)
         }
     }
 
-    override fun validatePedido(id: Int): Observable<Boolean> {
+    override fun validatePedido(id: Int): Observable<Int> {
         return Observable.create { e ->
-            val a = dataBase.pedidoDetalleDao().validatePedido(id)
-            if (a > 0) {
-                e.onNext(false)
+            val c = dataBase.pedidoDetalleDao().validateCountPedido(id)
+            if (c == 0) {
+                e.onNext(2)
             } else {
-                e.onNext(true)
+                val a = dataBase.pedidoDetalleDao().validatePedido(id)
+                if (a > 0) {
+                    e.onNext(1)
+                } else {
+                    e.onNext(0)
+                }
             }
             e.onComplete()
         }
@@ -318,5 +321,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 enablePlaceholders = true
             )
         )
+    }
+
+    override fun deletePedidoDetalle(p: PedidoDetalle): Completable {
+        return Completable.fromAction {
+            dataBase.pedidoDetalleDao().deleteProductoTask(p)
+        }
     }
 }

@@ -182,7 +182,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         roomRepository.validatePedido(id)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<Boolean> {
+            .subscribe(object : Observer<Int> {
                 override fun onComplete() {
 
                 }
@@ -191,11 +191,11 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
                 }
 
-                override fun onNext(t: Boolean) {
-                    if (t) {
-                        mensajeSuccess.value = "Ok"
-                    } else {
-                        mensajeError.value = "Completar los productos en cantidad 0"
+                override fun onNext(t: Int) {
+                    when (t) {
+                        0 -> mensajeSuccess.value = "Ok"
+                        1 -> mensajeError.value = "Completar los productos en cantidad 0"
+                        2 -> mensajeError.value = "Agregar Producto"
                     }
                 }
 
@@ -229,8 +229,8 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun generarPedidoCliente(latitud: String, longitud: String,clienteId: Int) {
-        roomRepository.generarPedidoCliente(latitud,longitud,clienteId)
+    fun generarPedidoCliente(latitud: String, longitud: String, clienteId: Int) {
+        roomRepository.generarPedidoCliente(latitud, longitud, clienteId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : Observer<Int> {
@@ -259,5 +259,24 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
     fun getPedido(): LiveData<PagedList<Pedido>> {
         return roomRepository.getPedido()
+    }
+
+    fun deletePedidoDetalle(p: PedidoDetalle) {
+        roomRepository.deletePedidoDetalle(p)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+
+                }
+            })
     }
 }

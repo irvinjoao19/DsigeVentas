@@ -44,7 +44,13 @@ interface PedidoDetalleDao {
     @Query("SELECT * FROM PedidoDetalle WHERE pedidoId=:id")
     fun getPedidoById(id: Int): List<PedidoDetalle>
 
+    @Query("SELECT COUNT(*) FROM PedidoDetalle WHERE pedidoId=:id")
+    fun validateCountPedido(id: Int): Int
+
     @Query("SELECT COUNT(*) FROM PedidoDetalle WHERE estado = 0 AND pedidoId=:id")
     fun validatePedido(id: Int): Int
+
+    @Query("UPDATE PedidoDetalle SET estado = 1 WHERE pedidoId=:id")
+    fun updatePedidoEnabled(id: Int)
 
 }

@@ -14,7 +14,7 @@
         android:layout_marginTop="8dp"
         android:ellipsize="end"
         android:lines="1"
-        android:text="Dinamicta Acne"
+        android:text="@string/dinamita_acme"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,42 +26,30 @@
         android:layout_marginTop="4dp"
         android:ellipsize="end"
         android:lines="1"
-        android:text="ACME-02-004"
+        android:text="@string/acme_02_004"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewNombre" />
 
-    <TextView
-        android:id="@+id/textViewStock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="100.0 PZA"
-        app:layout_constraintStart_toEndOf="@+id/imageViewMap"
-        app:layout_constraintTop_toBottomOf="@+id/textViewCodigo" />
+    <!--    <TextView-->
+    <!--        android:id="@+id/textViewStock"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="4dp"-->
+    <!--        android:text="100.0 PZA"-->
+    <!--        android:visibility="gone"-->
+    <!--        app:layout_constraintStart_toEndOf="@+id/imageViewMap"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/textViewCodigo" />-->
 
-    <ImageView
-        android:id="@+id/imageViewMap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:contentDescription="@string/imagen"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewCodigo"
-        app:srcCompat="@drawable/ic_map" />
-
-    <ImageView
-        android:id="@+id/imageViewEdit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:contentDescription="@string/img"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewMap"
-        app:srcCompat="@drawable/ic_edit_blue"
-        />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/imageViewMap"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="8dp"-->
+    <!--        android:contentDescription="@string/imagen"-->
+    <!--        android:visibility="gone"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/textViewCodigo"-->
+    <!--        app:srcCompat="@drawable/ic_map" />-->
 
     <EditText
         android:id="@+id/editTextCantidad"
@@ -72,7 +60,6 @@
         android:ems="10"
         android:focusable="false"
         android:inputType="numberDecimal"
-        android:text="0.0"
         android:textAlignment="center"
         app:layout_constraintEnd_toStartOf="@+id/imageViewPositive"
         app:layout_constraintTop_toBottomOf="@+id/textViewNombre"
@@ -104,22 +91,35 @@
         app:srcCompat="@drawable/ic_add"
         app:tint="@color/colorWhite" />
 
+    <ImageView
+        android:id="@+id/imageViewPrecio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/img"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_money" />
+
     <TextView
         android:id="@+id/textViewPrecio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:layout_marginBottom="8dp"
-        android:text="10000 PZA"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageViewEdit" />
+        app:layout_constraintStart_toEndOf="@+id/imageViewPrecio" />
 
     <TextView
         android:id="@+id/textViewSubTotal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="10000 PZA"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextCantidad" />
 </androidx.constraintlayout.widget.ConstraintLayout>
