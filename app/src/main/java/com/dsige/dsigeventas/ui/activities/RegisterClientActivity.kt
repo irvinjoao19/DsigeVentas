@@ -2,6 +2,8 @@ package com.dsige.dsigeventas.ui.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -24,6 +26,7 @@ import com.dsige.dsigeventas.databinding.ActivityRegisterClientBinding
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.adapters.*
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
+import com.google.android.material.textfield.TextInputEditText
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_register_client.*
 import kotlinx.android.synthetic.main.activity_register_client.editTextDepartamento
@@ -159,9 +162,10 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
             )
         )
         @SuppressLint("InflateParams") val view =
-            LayoutInflater.from(this).inflate(R.layout.dialog_spinner, null)
+            LayoutInflater.from(this).inflate(R.layout.dialog_combo, null)
         val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        val editTextSearch: TextInputEditText = view.findViewById(R.id.editTextSearch)
         builder.setView(view)
         val dialogSpinner = builder.create()
         dialogSpinner.setCanceledOnTouchOutside(false)
@@ -197,6 +201,23 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                             departamentoAdapter.addItems(d)
                         }
                     })
+                editTextSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun onTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun afterTextChanged(editable: Editable) {
+                        departamentoAdapter.getFilter().filter(editable)
+                    }
+                })
             }
             2 -> {
                 val provinciaAdapter =
@@ -216,6 +237,23 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                             provinciaAdapter.addItems(d)
                         }
                     })
+                editTextSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun onTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun afterTextChanged(editable: Editable) {
+                        provinciaAdapter.getFilter().filter(editable)
+                    }
+                })
             }
             3 -> {
                 val distritoAdapter =
@@ -235,8 +273,26 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                             distritoAdapter.addItems(d)
                         }
                     })
+                editTextSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun onTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun afterTextChanged(editable: Editable) {
+                        distritoAdapter.getFilter().filter(editable)
+                    }
+                })
             }
             4 -> {
+                editTextSearch.visibility = View.GONE
                 val formaPagoAdapter =
                     FormaPagoAdapter(object : OnItemClickListener.FormaPagoListener {
                         override fun onItemClick(f: FormaPago, v: View, position: Int) {

@@ -30,4 +30,7 @@ interface UsuarioDao {
 
     @Query("DELETE FROM Usuario")
     fun deleteAll()
+
+    @Query("SELECT usuarioId FROM Usuario")
+    fun getUsuarioIdTask(): Int
 }

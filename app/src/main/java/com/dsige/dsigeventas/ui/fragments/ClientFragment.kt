@@ -3,6 +3,8 @@ package com.dsige.dsigeventas.ui.fragments
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +26,7 @@ import com.dsige.dsigeventas.ui.activities.FileClientActivity
 import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
 import com.dsige.dsigeventas.ui.adapters.*
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
+import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_client.*
@@ -65,6 +68,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         super.onPrepareOptionsMenu(menu)
         topMenu = menu
         menu.findItem(R.id.ok).setVisible(false).isEnabled = false
+        menu.findItem(R.id.search).setVisible(false).isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -170,9 +174,10 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
     private fun dialogSpinner(title: String, tipo: Int) {
         val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
-            LayoutInflater.from(context).inflate(R.layout.dialog_spinner, null)
+            LayoutInflater.from(context).inflate(R.layout.dialog_combo, null)
         val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        val editTextSearch: TextInputEditText = view.findViewById(R.id.editTextSearch)
         builder.setView(view)
         val dialogSpinner = builder.create()
         dialogSpinner.setCanceledOnTouchOutside(false)
@@ -208,6 +213,24 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                             departamentoAdapter.addItems(d)
                         }
                     })
+
+                editTextSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun onTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun afterTextChanged(editable: Editable) {
+                        departamentoAdapter.getFilter().filter(editable)
+                    }
+                })
             }
             2 -> {
                 val provinciaAdapter =
@@ -227,6 +250,23 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                             provinciaAdapter.addItems(d)
                         }
                     })
+                editTextSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun onTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun afterTextChanged(editable: Editable) {
+                        provinciaAdapter.getFilter().filter(editable)
+                    }
+                })
             }
             3 -> {
                 val distritoAdapter =
@@ -244,6 +284,23 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                             distritoAdapter.addItems(d)
                         }
                     })
+                editTextSearch.addTextChangedListener(object : TextWatcher {
+                    override fun beforeTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun onTextChanged(
+                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
+                    ) {
+
+                    }
+
+                    override fun afterTextChanged(editable: Editable) {
+                        distritoAdapter.getFilter().filter(editable)
+                    }
+                })
             }
         }
     }

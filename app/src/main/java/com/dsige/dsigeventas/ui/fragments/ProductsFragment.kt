@@ -2,10 +2,9 @@ package com.dsige.dsigeventas.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -41,6 +40,8 @@ class ProductsFragment : DaggerFragment() {
         menu.findItem(R.id.ok).setVisible(false).isEnabled = false
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.add).setVisible(false).isEnabled = false
+        val searchView = menu.findItem(R.id.search) as SearchView
+        search(searchView)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,6 +89,7 @@ class ProductsFragment : DaggerFragment() {
         recyclerView.adapter = productoPagingAdapter
         productoViewModel.getProductos()
             .observe(this, Observer(productoPagingAdapter::submitList))
+        productoViewModel.searchProducto.value = ""
     }
 
     companion object {
@@ -99,5 +101,18 @@ class ProductsFragment : DaggerFragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    private fun search(searchView: SearchView) {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                productoViewModel.searchProducto.value = newText
+                return true
+            }
+        })
     }
 }

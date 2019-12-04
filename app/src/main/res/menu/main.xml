@@ -5,7 +5,14 @@
         android:id="@+id/filter"
         android:icon="@drawable/ic_search_white"
         android:orderInCategory="100"
+        android:title="@string/filtro"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/search"
+        android:icon="@drawable/ic_search_white"
+        android:orderInCategory="100"
         android:title="@string/buscar"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/add"

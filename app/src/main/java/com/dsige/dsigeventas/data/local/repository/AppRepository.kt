@@ -7,8 +7,11 @@ import com.dsige.dsigeventas.helper.Mensaje
 import io.reactivex.Completable
 import io.reactivex.Observable
 import okhttp3.RequestBody
+import retrofit2.Call
 
 interface AppRepository {
+
+    fun getUsuarioIdTask(): Int
 
     fun getUsuario(): LiveData<Usuario>
 
@@ -56,6 +59,8 @@ interface AppRepository {
 
     fun getProductos(): LiveData<PagedList<Stock>>
 
+    fun getProductos(search: String): LiveData<PagedList<Stock>>
+
     fun getProductoById(id: Int): LiveData<Stock>
 
     fun updateCheckPedido(s: Stock): Completable
@@ -84,11 +89,19 @@ interface AppRepository {
 
     fun getPedido(): LiveData<PagedList<Pedido>>
 
+    fun getPedido(search:String): LiveData<PagedList<Pedido>>
+
     fun getRepartos(): LiveData<PagedList<Reparto>>
 
-    fun getMapReparto() : Observable<List<Reparto>>
+    fun getMapReparto(): Observable<List<Reparto>>
 
     fun deletePedidoDetalle(p: PedidoDetalle): Completable
 
     fun getRepartoById(id: Int): LiveData<Reparto>
+
+    fun deletePedido(p: Pedido): Completable
+
+    fun saveGpsTask(body: RequestBody): Call<Mensaje>
+
+    fun saveMovil(body: RequestBody): Observable<Mensaje>
 }

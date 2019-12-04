@@ -30,7 +30,6 @@ import com.dsige.dsigeventas.ui.activities.MapsActivity
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.button.MaterialButton
-import com.google.maps.android.ui.BubbleIconFactory
 import com.google.maps.android.ui.IconGenerator
 import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.DaggerFragment
@@ -83,9 +82,8 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             this
         )
 
-
-
         mMap.setOnMarkerClickListener(this)
+        mMap.setOnPolylineClickListener { }
     }
 
     @Inject
@@ -306,15 +304,13 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                     val lat = point["lat"]!!.toDouble()
                     val lng = point["lng"]!!.toDouble()
                     val position = LatLng(lat, lng)
-
-
-
                     points.add(position)
                 }
                 lineOptions.addAll(points)
                 lineOptions.width(7f)
                 lineOptions.color(Color.BLUE)
-                mMap.addPolyline(lineOptions)
+                val polyline = mMap.addPolyline(lineOptions)
+                polyline.isClickable = true
             }
         }
     }
@@ -381,7 +377,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             android.app.AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
         @SuppressLint("InflateParams") val v =
             LayoutInflater.from(context).inflate(R.layout.cardview_resumen_maps, null)
-
         val buttonSalir: MaterialButton = v.findViewById(R.id.buttonGo)
         val progressBar = v.findViewById<ProgressBar>(R.id.progressBar)
         val textViewTitle = v.findViewById<TextView>(R.id.textViewTitle)
@@ -393,16 +388,18 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         Handler().postDelayed({
             repartoViewModel.getRepartoById(t.toInt())
                 .observe(this, androidx.lifecycle.Observer<Reparto> { s ->
-                    textViewTitle.text = s.direccion
-                    progressBar.visibility = View.GONE
-                    buttonSalir.setOnClickListener {
-                        startActivity(
-                            Intent(context, MapsActivity::class.java)
-                                .putExtra("latitud", s.latitud)
-                                .putExtra("longitud", s.longitud)
-                                .putExtra("title", s.numeroPedido)
-                        )
-                        dialog.dismiss()
+                    if (s != null) {
+                        textViewTitle.text = s.direccion
+                        progressBar.visibility = View.GONE
+                        buttonSalir.setOnClickListener {
+                            startActivity(
+                                Intent(context, MapsActivity::class.java)
+                                    .putExtra("latitud", s.latitud)
+                                    .putExtra("longitud", s.longitud)
+                                    .putExtra("title", s.numeroPedido)
+                            )
+                            dialog.dismiss()
+                        }
                     }
                 })
         }, 500)

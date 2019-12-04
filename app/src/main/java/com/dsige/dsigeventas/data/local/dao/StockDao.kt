@@ -35,6 +35,9 @@ interface StockDao {
     @Query("SELECT * FROM Stock")
     fun getProductos(): DataSource.Factory<Int, Stock>
 
+    @Query("SELECT * FROM Stock WHERE nombreProducto LIKE :s")
+    fun getProductos(s:String): DataSource.Factory<Int, Stock>
+
     @Query("DELETE FROM Stock")
     fun deleteAll()
 

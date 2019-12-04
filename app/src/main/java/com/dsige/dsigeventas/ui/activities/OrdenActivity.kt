@@ -67,6 +67,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         menuInflater.inflate(R.menu.main, menu)
         topMenu = menu
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
+        menu.findItem(R.id.search).setVisible(false).isEnabled = false
         return true
     }
 

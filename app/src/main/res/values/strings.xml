@@ -189,4 +189,8 @@
     <string name="precio">10000000</string>
     <string name="ver">Ver Pedido</string>
     <string name="delete">Eliminar</string>
+    <string name="go">Ver Ruta</string>
+    <string name="goPedido">Ver Pedido</string>
+    <string name="search">Buscar</string>
+    <string name="filtro">Filtro</string>
 </resources>

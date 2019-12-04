@@ -24,7 +24,7 @@ class ProductoActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var productoViewModel: ProductoViewModel
-    var pedidoId : Int = 0
+    var pedidoId: Int = 0
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -34,6 +34,7 @@ class ProductoActivity : DaggerAppCompatActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.add).setVisible(false).isEnabled = false
+        menu.findItem(R.id.search).setVisible(false).isEnabled = false
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -48,7 +49,7 @@ class ProductoActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_producto)
         val b = intent.extras
-        if (b != null){
+        if (b != null) {
             pedidoId = b.getInt("pedidoId")
             bindUI()
         }
@@ -83,7 +84,7 @@ class ProductoActivity : DaggerAppCompatActivity() {
         recyclerView.adapter = checkProductoPagingAdapter
         productoViewModel.getProductos()
             .observe(this, Observer(checkProductoPagingAdapter::submitList))
-
+        productoViewModel.searchProducto.value = ""
         productoViewModel.mensajeError.observe(this, Observer<String> { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)

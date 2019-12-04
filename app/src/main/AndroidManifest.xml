@@ -31,6 +31,23 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
+        <receiver
+            android:name=".ui.broadcasts.GpsReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver
+            android:name=".ui.broadcasts.MovilReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <service
+            android:name=".ui.services.GpsService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".ui.services.MovilService"
+            android:enabled="true"
+            android:exported="false" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

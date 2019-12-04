@@ -53,4 +53,7 @@ interface PedidoDetalleDao {
     @Query("UPDATE PedidoDetalle SET estado = 1 WHERE pedidoId=:id")
     fun updatePedidoEnabled(id: Int)
 
+    @Query("DELETE FROM PedidoDetalle WHERE pedidoId =:id")
+    fun deletePedidoById(id:Int)
+
 }

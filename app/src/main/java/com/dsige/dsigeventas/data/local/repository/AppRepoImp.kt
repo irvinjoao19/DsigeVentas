@@ -13,9 +13,14 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import retrofit2.Call
 
 class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDataBase) :
     AppRepository {
+
+    override fun getUsuarioIdTask(): Int {
+        return dataBase.usuarioDao().getUsuarioIdTask()
+    }
 
     override fun getUsuario(): LiveData<Usuario> {
         return dataBase.usuarioDao().getUsuario()
@@ -172,6 +177,15 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getProductos(search: String): LiveData<PagedList<Stock>> {
+        return dataBase.stockDao().getProductos(search).toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
+
     override fun getProductoById(id: Int): LiveData<Stock> {
         return dataBase.stockDao().getStockById(id)
     }
@@ -314,6 +328,15 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getPedido(search: String): LiveData<PagedList<Pedido>> {
+        return dataBase.pedidoDao().getPedido(search).toLiveData(
+            Config(
+                pageSize = 20,
+                enablePlaceholders = true
+            )
+        )
+    }
+
     override fun getRepartos(): LiveData<PagedList<Reparto>> {
         return dataBase.repartoDao().getRepartos().toLiveData(
             Config(
@@ -343,5 +366,20 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getRepartoById(id: Int): LiveData<Reparto> {
         return dataBase.repartoDao().getRepartoById(id)
+    }
+
+    override fun deletePedido(p: Pedido): Completable {
+        return Completable.fromAction {
+            dataBase.pedidoDetalleDao().deletePedidoById(p.pedidoId)
+            dataBase.pedidoDao().deletePedidoTask(p)
+        }
+    }
+
+    override fun saveGpsTask(body: RequestBody): Call<Mensaje> {
+     return apiService.saveGps(body)
+    }
+
+    override fun saveMovil(body: RequestBody): Observable<Mensaje> {
+        return apiService.saveMovil(body)
     }
 }

@@ -3,6 +3,7 @@ package com.dsige.dsigeventas.data.viewModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.Cliente
@@ -36,6 +37,8 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
     val producto: MutableLiveData<Stock> = MutableLiveData()
     val pedidoId: MutableLiveData<Int> = MutableLiveData()
+    val searchPedido: MutableLiveData<String> = MutableLiveData()
+    val searchProducto: MutableLiveData<String> = MutableLiveData()
 
     fun setError(s: String) {
         mensajeError.value = s
@@ -46,7 +49,13 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     fun getProductos(): LiveData<PagedList<Stock>> {
-        return roomRepository.getProductos()
+        return Transformations.switchMap(searchProducto) { input ->
+            if (input == null || input.isEmpty()) {
+                roomRepository.getProductos()
+            } else {
+                roomRepository.getProductos(String.format("%s%s%s", "%", searchProducto, "%"))
+            }
+        }
     }
 
     fun getProductoById(id: Int): LiveData<Stock> {
@@ -258,11 +267,36 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     fun getPedido(): LiveData<PagedList<Pedido>> {
-        return roomRepository.getPedido()
+        return Transformations.switchMap(searchPedido) { input ->
+            if (input == null || input.isEmpty()) {
+                roomRepository.getPedido()
+            } else {
+                roomRepository.getPedido(String.format("%s%s%s", "%", searchPedido, "%"))
+            }
+        }
     }
 
     fun deletePedidoDetalle(p: PedidoDetalle) {
         roomRepository.deletePedidoDetalle(p)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+
+                }
+            })
+    }
+
+    fun deletePedido(p: Pedido) {
+        roomRepository.deletePedido(p)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {

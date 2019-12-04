@@ -3,11 +3,11 @@ package com.dsige.dsigeventas.ui.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +19,7 @@ import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.ui.activities.OrdenActivity
 import com.dsige.dsigeventas.ui.adapters.PedidoPagingAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_pedido.*
 import javax.inject.Inject
@@ -40,6 +41,8 @@ class PedidoFragment : DaggerFragment() {
         super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.ok).setVisible(false).isEnabled = false
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
+        val searchView = menu.findItem(R.id.search) as SearchView
+        search(searchView)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,11 +84,20 @@ class PedidoFragment : DaggerFragment() {
 
         val pedidoAdapter = PedidoPagingAdapter(object : OnItemClickListener.PedidoListener {
             override fun onItemClick(p: Pedido, v: View, position: Int) {
-                startActivity(
-                    Intent(context, OrdenActivity::class.java)
-                        .putExtra("pedidoId", p.pedidoId)
-                        .putExtra("clienteId", p.clienteId)
-                )
+                if (p.estado == 0) {
+                    val popupMenu = PopupMenu(context!!, v)
+                    popupMenu.menu.add(0, 1, 0, getText(R.string.goPedido))
+                    popupMenu.menu.add(0, 2, 0, getText(R.string.delete))
+                    popupMenu.setOnMenuItemClickListener { item ->
+                        when (item.itemId) {
+                            1 -> goOrdenActivity(p)
+                            2 -> deletePedidoDialog(p)
+                        }
+                        false
+                    }
+                    popupMenu.show()
+                } else goOrdenActivity(p)
+
             }
         })
 
@@ -98,6 +110,15 @@ class PedidoFragment : DaggerFragment() {
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = pedidoAdapter
         productoViewModel.getPedido().observe(this, Observer(pedidoAdapter::submitList))
+        productoViewModel.searchPedido.value = ""
+    }
+
+    private fun goOrdenActivity(p: Pedido) {
+        startActivity(
+            Intent(context, OrdenActivity::class.java)
+                .putExtra("pedidoId", p.pedidoId)
+                .putExtra("clienteId", p.clienteId)
+        )
     }
 
     companion object {
@@ -109,5 +130,32 @@ class PedidoFragment : DaggerFragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    private fun deletePedidoDialog(p: Pedido) {
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setTitle("Mensaje")
+            .setMessage("Deseas eliminar el producto ?")
+            .setPositiveButton("SI") { dialog, _ ->
+                productoViewModel.deletePedido(p)
+                dialog.dismiss()
+            }
+            .setNegativeButton("NO") { dialog, _ ->
+                dialog.dismiss()
+            }
+        dialog.show()
+    }
+
+    private fun search(searchView: SearchView) {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                productoViewModel.searchPedido.value = newText
+                return true
+            }
+        })
     }
 }

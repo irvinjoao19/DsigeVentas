@@ -29,6 +29,9 @@ interface PedidoDao {
     @Query("SELECT * FROM Pedido")
     fun getPedido(): DataSource.Factory<Int, Pedido>
 
+    @Query("SELECT * FROM Pedido WHERE nombreCliente LIKE :s")
+    fun getPedido(s:String): DataSource.Factory<Int, Pedido>
+
     @Query("DELETE FROM Pedido")
     fun deleteAll()
 
