@@ -7,6 +7,7 @@ import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.Reparto
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
+import io.reactivex.Observable
 import javax.inject.Inject
 
 class RepartoViewModel @Inject
@@ -20,4 +21,11 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         return roomRepository.getRepartos()
     }
 
+    fun getMapReparto(): Observable<List<Reparto>> {
+        return roomRepository.getMapReparto()
+    }
+
+    fun getRepartoById(id: Int): LiveData<Reparto> {
+        return roomRepository.getRepartoById(id)
+    }
 }

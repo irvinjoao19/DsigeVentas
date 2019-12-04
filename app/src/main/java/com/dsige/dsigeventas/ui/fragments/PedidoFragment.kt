@@ -3,6 +3,7 @@ package com.dsige.dsigeventas.ui.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -69,6 +70,8 @@ class PedidoFragment : DaggerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val toolbar: Toolbar = activity!!.findViewById(R.id.toolbar)
+        toolbar.visibility = View.VISIBLE
         bindUI()
     }
 

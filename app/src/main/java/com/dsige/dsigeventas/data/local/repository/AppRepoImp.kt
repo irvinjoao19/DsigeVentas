@@ -323,9 +323,25 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getMapReparto(): Observable<List<Reparto>> {
+        return Observable.create { e ->
+            val r: List<Reparto>? = dataBase.repartoDao().getMapReparto()
+            if (r != null) {
+                e.onNext(r)
+            } else {
+                e.onError(Throwable(String.format("%s", "No hay datos")))
+            }
+            e.onComplete()
+        }
+    }
+
     override fun deletePedidoDetalle(p: PedidoDetalle): Completable {
         return Completable.fromAction {
             dataBase.pedidoDetalleDao().deleteProductoTask(p)
         }
+    }
+
+    override fun getRepartoById(id: Int): LiveData<Reparto> {
+        return dataBase.repartoDao().getRepartoById(id)
     }
 }

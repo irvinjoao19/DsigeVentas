@@ -1,5 +1,7 @@
 package com.dsige.dsigeventas.helper;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -41,6 +43,36 @@ public class DataParser {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return routes;
+    }
+
+    public List<List<HashMap<String, String>>> marker(JSONObject jObject) {
+
+        List<List<HashMap<String, String>>> routes = new ArrayList<>();
+        JSONArray jRoutes;
+        JSONArray jLegs;
+        try {
+            jRoutes = jObject.getJSONArray("routes");
+            for (int i = 0; i < jRoutes.length(); i++) {
+                jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+                List path = new ArrayList<>();
+                for (int j = 0; j < jLegs.length(); j++) {
+                    Double latitud;
+                    Double longitud;
+                    latitud = (Double) ((JSONObject) ((JSONObject) jLegs.get(j)).get("start_location")).get("lat");
+                    longitud = (Double) ((JSONObject) ((JSONObject) jLegs.get(j)).get("start_location")).get("lng");
+                    HashMap<String, String> hm = new HashMap<>();
+                    hm.put("lat", latitud.toString());
+                    hm.put("lng", longitud.toString());
+                    path.add(hm);
+                }
+                routes.add(path);
+            }
+
+        } catch (Exception e) {
+            Log.i("TAG",e.toString());
             e.printStackTrace();
         }
         return routes;

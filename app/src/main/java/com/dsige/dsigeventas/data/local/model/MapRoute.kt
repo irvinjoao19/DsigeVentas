@@ -2,7 +2,8 @@ package com.dsige.dsigeventas.data.local.model
 
 import com.google.gson.annotations.SerializedName
 
-open class Route {
+open class MapRoute {
     @SerializedName("overview_polyline")
-    var overviewPolyLine: OverviewPolyline? = null
+    var mapOverviewPolyLine: MapOverviewPolyline? = null
+    var legs: List<MapLegs> = ArrayList()
 }

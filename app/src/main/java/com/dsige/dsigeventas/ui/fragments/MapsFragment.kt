@@ -1,20 +1,112 @@
 package com.dsige.dsigeventas.ui.fragments
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.AsyncTask
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.ViewModelProviders
 import com.dsige.dsigeventas.R
+import com.dsige.dsigeventas.data.local.model.Reparto
+import com.dsige.dsigeventas.data.viewModel.RepartoViewModel
+import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
+import com.dsige.dsigeventas.helper.DataParser
+import com.dsige.dsigeventas.ui.activities.MapsActivity
+import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.*
+import com.google.android.material.button.MaterialButton
+import com.google.maps.android.ui.BubbleIconFactory
+import com.google.maps.android.ui.IconGenerator
+import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.DaggerFragment
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class MapsFragment : DaggerFragment() {
+class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
+    GoogleMap.OnMarkerClickListener {
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        locationManager =
+            context!!.getSystemService(DaggerAppCompatActivity.LOCATION_SERVICE) as LocationManager
+        if (ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                context!!,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        mMap.isMyLocationEnabled = true
+
+
+        locationManager.requestLocationUpdates(
+            LocationManager.NETWORK_PROVIDER,
+            MIN_TIME_BW_UPDATES.toLong(),
+            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(),
+            this
+        )
+        locationManager.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            MIN_TIME_BW_UPDATES.toLong(),
+            MIN_DISTANCE_CHANGE_FOR_UPDATES.toFloat(),
+            this
+        )
+
+
+
+        mMap.setOnMarkerClickListener(this)
+    }
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var repartoViewModel: RepartoViewModel
+
+
     private var param1: String? = null
     private var param2: String? = null
+
+    lateinit var mMap: GoogleMap
+    lateinit var locationManager: LocationManager
+    lateinit var camera: CameraPosition
+
+    var MIN_DISTANCE_CHANGE_FOR_UPDATES: Int = 10
+    var MIN_TIME_BW_UPDATES: Int = 5000
+    var isFirstTime: Boolean = true
+    var waypoints: String = ""
+    var latitud: String = ""
+    var longitud: String = ""
+    var title: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,16 +114,251 @@ class MapsFragment : DaggerFragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        repartoViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(RepartoViewModel::class.java)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val toolbar: Toolbar = activity!!.findViewById(R.id.toolbar)
+        toolbar.visibility = View.GONE
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+    }
+
+    private fun zoomToLocation(location: Location) {
+        camera = CameraPosition.Builder()
+            .target(LatLng(location.latitude, location.longitude))
+            .zoom(12f)  // limite 21
+            //.bearing(165) // 0 - 365°
+            .tilt(30f)        // limit 90
+            .build()
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+    }
+
+
+    private fun getUrl(l: Location, latitud: String, longitud: String): String {
+        val str_origin = "origin=" + l.latitude + "," + l.longitude
+        val str_dest = "destination=" + latitud + "," + longitud
+        val mode = "mode=driving&alternatives=false"
+        val sensor = "sensor=false"
+        val parameters = "$str_origin&$str_dest&$mode&$sensor&$waypoints"
+        val output = "json"
+
+        Log.i(
+            "TAG", String.format(
+                "https://maps.googleapis.com/maps/api/directions/%s?%s&key=%s",
+                output,
+                parameters,
+                getString(R.string.google_maps_key)
+            )
+        )
+        return String.format(
+            "https://maps.googleapis.com/maps/api/directions/%s?%s&key=%s",
+            output,
+            parameters,
+            getString(R.string.google_maps_key)
+        )
+    }
+
+    override fun onLocationChanged(location: Location) {
+
+        if (isFirstTime) {
+            zoomToLocation(location)
+        }
+
+        repartoViewModel.getMapReparto()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<List<Reparto>> {
+                override fun onComplete() {
+                }
+
+                override fun onSubscribe(d: Disposable) {
+                }
+
+                override fun onNext(count: List<Reparto>) {
+                    waypoints = "waypoints=optimize:true|"
+                    var i = 1
+                    for (s: Reparto in count) {
+                        if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
+
+
+                            waypoints += String.format("%s,%s|", s.latitud, s.longitud)
+                            latitud = s.latitud
+                            longitud = s.longitud
+                            i++
+                        }
+                    }
+                    FetchURL().execute(getUrl(location, latitud, longitud))
+                    isFirstTime = false
+                }
+
+                override fun onError(e: Throwable) {
+
+                }
+            })
+    }
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+
+    }
+
+    override fun onProviderEnabled(provider: String?) {
+
+    }
+
+    override fun onProviderDisabled(provider: String?) {
+
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class FetchURL : AsyncTask<String, Void, String>() {
+
+        override fun doInBackground(vararg strings: String): String { // For storing data from web service
+            var data = ""
+            try {
+                data = downloadUrl(strings[0])
+            } catch (e: Exception) {
+                Log.d("Background Task", e.toString())
+            }
+            return data
+        }
+
+        override fun onPostExecute(s: String) {
+            super.onPostExecute(s)
+            MarkeParser().execute(s)
+            PointsParser().execute(s)
+        }
+
+        @Throws(IOException::class)
+        private fun downloadUrl(strUrl: String): String {
+            var data = ""
+            var iStream: InputStream? = null
+            var urlConnection: HttpURLConnection? = null
+            try {
+                val url = URL(strUrl)
+                // Creating an http connection to communicate with url
+                urlConnection = url.openConnection() as HttpURLConnection
+                // Connecting to url
+                urlConnection.connect()
+                // Reading data from url
+                iStream = urlConnection.inputStream
+                val br =
+                    BufferedReader(InputStreamReader(iStream))
+                val sb = StringBuilder()
+                var line: String?
+                while (br.readLine().also { line = it } != null) {
+                    sb.append(line)
+                }
+                data = sb.toString()
+//                Log.d("mylog", "Downloaded URL: $data")
+                br.close()
+            } catch (e: Exception) {
+                Log.d("mylog", "Exception downloading URL: $e")
+            } finally {
+                iStream!!.close()
+                urlConnection!!.disconnect()
+            }
+            return data
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class PointsParser :
+        AsyncTask<String, Int, List<List<HashMap<String, String>>>>() {
+
+        override fun doInBackground(vararg jsonData: String): List<List<HashMap<String, String>>>? {
+            val jObject: JSONObject
+            var routes: List<List<HashMap<String, String>>>? =
+                null
+            try {
+                jObject = JSONObject(jsonData[0])
+                val parser = DataParser()
+                routes = parser.parse(jObject)
+            } catch (e: java.lang.Exception) {
+                Log.d("mylog", e.toString())
+                e.printStackTrace()
+            }
+            return routes
+        }
+
+        override fun onPostExecute(result: List<List<HashMap<String, String>>>?) {
+
+            var points: ArrayList<LatLng>
+            var lineOptions: PolylineOptions?
+            for (i in result!!.indices) {
+                points = ArrayList()
+                lineOptions = PolylineOptions()
+                val path = result[i]
+                for (j in path.indices) {
+                    val point = path[j]
+                    val lat = point["lat"]!!.toDouble()
+                    val lng = point["lng"]!!.toDouble()
+                    val position = LatLng(lat, lng)
+
+
+
+                    points.add(position)
+                }
+                lineOptions.addAll(points)
+                lineOptions.width(7f)
+                lineOptions.color(Color.BLUE)
+                mMap.addPolyline(lineOptions)
+            }
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class MarkeParser :
+        AsyncTask<String, Int, List<List<HashMap<String, String>>>>() {
+
+        override fun doInBackground(vararg jsonData: String): List<List<HashMap<String, String>>>? {
+            val jObject: JSONObject
+            var routes: List<List<HashMap<String, String>>>? =
+                null
+            try {
+                jObject = JSONObject(jsonData[0])
+                val parser = DataParser()
+                routes = parser.marker(jObject)
+            } catch (e: java.lang.Exception) {
+                Log.d("mylog", e.toString())
+                e.printStackTrace()
+            }
+            return routes
+        }
+
+        override fun onPostExecute(result: List<List<HashMap<String, String>>>?) {
+            for (i in result!!.indices) {
+                val path = result[i]
+                for (j in path.indices) {
+                    val point = path[j]
+                    val lat = point["lat"]!!.toDouble()
+                    val lng = point["lng"]!!.toDouble()
+                    val position = LatLng(lat, lng)
+                    val iconFactory = IconGenerator(context)
+                    mMap.addMarker(
+                        MarkerOptions()
+                            .position(position)
+                            .title((j + 1).toString())
+                            .icon(
+                                BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon((j + 1).toString()))
+                            )
+                    )
+                }
+            }
+        }
+    }
 
     companion object {
         @JvmStatic
@@ -42,5 +369,42 @@ class MapsFragment : DaggerFragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun onMarkerClick(m: Marker): Boolean {
+        dialogResumen(m.title)
+        return true
+    }
+
+    private fun dialogResumen(t: String) {
+        val builder =
+            android.app.AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
+        @SuppressLint("InflateParams") val v =
+            LayoutInflater.from(context).inflate(R.layout.cardview_resumen_maps, null)
+
+        val buttonSalir: MaterialButton = v.findViewById(R.id.buttonGo)
+        val progressBar = v.findViewById<ProgressBar>(R.id.progressBar)
+        val textViewTitle = v.findViewById<TextView>(R.id.textViewTitle)
+
+        builder.setView(v)
+        val dialog = builder.create()
+        dialog.show()
+
+        Handler().postDelayed({
+            repartoViewModel.getRepartoById(t.toInt())
+                .observe(this, androidx.lifecycle.Observer<Reparto> { s ->
+                    textViewTitle.text = s.direccion
+                    progressBar.visibility = View.GONE
+                    buttonSalir.setOnClickListener {
+                        startActivity(
+                            Intent(context, MapsActivity::class.java)
+                                .putExtra("latitud", s.latitud)
+                                .putExtra("longitud", s.longitud)
+                                .putExtra("title", s.numeroPedido)
+                        )
+                        dialog.dismiss()
+                    }
+                })
+        }, 500)
     }
 }

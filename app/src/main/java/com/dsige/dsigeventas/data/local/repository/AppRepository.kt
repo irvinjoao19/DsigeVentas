@@ -86,5 +86,9 @@ interface AppRepository {
 
     fun getRepartos(): LiveData<PagedList<Reparto>>
 
+    fun getMapReparto() : Observable<List<Reparto>>
+
     fun deletePedidoDetalle(p: PedidoDetalle): Completable
+
+    fun getRepartoById(id: Int): LiveData<Reparto>
 }

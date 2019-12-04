@@ -1,6 +1,6 @@
 package com.dsige.dsigeventas.data.local.repository
 
-import com.dsige.dsigeventas.data.local.model.RoutesDetail
+import com.dsige.dsigeventas.data.local.model.MapPrincipal
 import com.dsige.dsigeventas.data.local.model.Sync
 import com.dsige.dsigeventas.data.local.model.Usuario
 import com.dsige.dsigeventas.helper.Mensaje
@@ -45,8 +45,8 @@ interface ApiService {
     fun getDirection(
         @Query("origin") origin: String?,
         @Query("destination") destination: String?,
-        @Query("key") key: String?,
         @Query("mode") mode: String?,
-        @Query("alternatives") alternatives: Boolean
-    ): Call<RoutesDetail?>
+        @Query("alternatives") alternatives: Boolean,
+        @Query("key") key: String?
+    ): Call<MapPrincipal>
 }

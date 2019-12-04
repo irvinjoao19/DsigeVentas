@@ -17,6 +17,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.dsige.dsigeventas.R
+import com.dsige.dsigeventas.data.local.AppRest
+import com.dsige.dsigeventas.data.local.model.MapPrincipal
+import com.dsige.dsigeventas.data.local.repository.ApiService
 import com.dsige.dsigeventas.helper.DataParser
 import com.dsige.dsigeventas.helper.Gps
 import com.dsige.dsigeventas.helper.TaskLoadedCallback
@@ -25,7 +28,11 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.gson.Gson
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -34,7 +41,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, TaskLoadedCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     lateinit var camera: CameraPosition
     lateinit var mMap: GoogleMap
@@ -93,7 +100,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
             val sydney = LatLng(latitud.toDouble(), longitud.toDouble())
             mMap.addMarker(MarkerOptions().position(sydney).title(title))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-            mMap.isTrafficEnabled = true
+
+//            mMap.isTrafficEnabled = true
             mMap.isMyLocationEnabled = true
 
             if (mapView?.findViewById<View>(Integer.parseInt("1")) != null) {
@@ -137,21 +145,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
     }
 
-    override fun onTaskDone(vararg values: Any) {
-//        currentPolyline?.remove()
-//        currentPolyline = mMap.addPolyline(values[0] as PolylineOptions)
-//
-//        for (v: Any in values) {
-//            currentPolyline = mMap.addPolyline(v as PolylineOptions)
-//        }
-    }
-
     private fun getUrl(origin: LatLng, dest: LatLng): String {
         val str_origin = "origin=" + origin.latitude + "," + origin.longitude
         val str_dest = "destination=" + dest.latitude + "," + dest.longitude
         val mode = "mode=driving&alternatives=true"
         val parameters = "$str_origin&$str_dest&$mode"
         val output = "json"
+
+//        Log.i("TAG",String.format(
+//            "https://maps.googleapis.com/maps/api/directions/%s?%s&key=%s",
+//            output,
+//            parameters,
+//            getString(R.string.google_maps_key)
+//        ))
         return String.format(
             "https://maps.googleapis.com/maps/api/directions/%s?%s&key=%s",
             output,
@@ -160,6 +166,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
         )
     }
 
+
     override fun onLocationChanged(location: Location) {
         zoomToLocation(location)
         if (isFirstTime) {
@@ -167,9 +174,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
                 MarkerOptions().position(LatLng(location.latitude, location.longitude)).title("YO")
             place2 = MarkerOptions().position(LatLng(latitud.toDouble(), longitud.toDouble()))
                 .title(title)
-            FetchURL().execute(getUrl(place1.position, place2.position), "driving")
+            FetchURL().execute(getUrl(place1.position, place2.position))
+
+//            getUrl2(place1.position, place2.position)
+
             isFirstTime = false
-//            FetchURL(this).execute(getUrl(place1.position, place2.position), "driving")
         }
     }
 
@@ -185,16 +194,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
 
     }
 
+    private fun getUrl2(o: LatLng, d: LatLng) {
+        val origen = String.format("%s,%s", o.latitude, o.longitude)
+        val destino = String.format("%s,%s", d.latitude, d.longitude)
+        FetchURL().execute(origen, destino)
+    }
+
     @SuppressLint("StaticFieldLeak")
     private inner class FetchURL : AsyncTask<String, Void, String>() {
-        private var directionMode = "driving"
 
         override fun doInBackground(vararg strings: String): String { // For storing data from web service
             var data = ""
-            directionMode = strings[1]
-            try { // Fetching the data from web service
+            try {
                 data = downloadUrl(strings[0])
-                Log.d("mylog", "Background task data $data")
             } catch (e: Exception) {
                 Log.d("Background Task", e.toString())
             }
@@ -208,6 +220,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
 
         @Throws(IOException::class)
         private fun downloadUrl(strUrl: String): String {
+//            var data = ""
+//            val apiServices = AppRest.api.create(ApiService::class.java)
+//            val call = apiServices
+//                .getDirection(
+//                    origen, destino, "driving", false, getString(R.string.google_maps_key)
+//                )
+//
+//            val response = call.execute()!!
+//            if (response.code() == 200) {
+//                val map: MapPrincipal = response.body()!!
+//                data = Gson().toJson(map)
+//            }
+
+
             var data = ""
             var iStream: InputStream? = null
             var urlConnection: HttpURLConnection? = null
@@ -227,7 +253,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
                     sb.append(line)
                 }
                 data = sb.toString()
-                Log.d("mylog", "Downloaded URL: $data")
+//                Log.d("mylog", "Downloaded URL: $data")
                 br.close()
             } catch (e: Exception) {
                 Log.d("mylog", "Exception downloading URL: $e")
@@ -243,21 +269,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
     private inner class PointsParser :
         AsyncTask<String, Int, List<List<HashMap<String, String>>>>() {
 
-
         override fun doInBackground(vararg jsonData: String): List<List<HashMap<String, String>>>? {
             val jObject: JSONObject
             var routes: List<List<HashMap<String, String>>>? =
                 null
             try {
                 jObject = JSONObject(jsonData[0])
-                Log.d("mylog", jsonData[0])
                 val parser = DataParser()
-                Log.d("mylog", parser.toString())
-                // Starts parsing data
                 routes = parser.parse(jObject)
-                Log.d("mylog", "Executing routes")
-                Log.d("mylog", routes.toString())
-
             } catch (e: java.lang.Exception) {
                 Log.d("mylog", e.toString())
                 e.printStackTrace()
@@ -266,6 +285,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
         }
 
         override fun onPostExecute(result: List<List<HashMap<String, String>>>?) {
+
+            val colorVariable = arrayOf(Color.RED, Color.BLUE, Color.GRAY, Color.GREEN)
             var points: ArrayList<LatLng>
             var lineOptions: PolylineOptions?
             for (i in result!!.indices) {
@@ -279,14 +300,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener, 
                     val position = LatLng(lat, lng)
                     points.add(position)
                 }
-
                 lineOptions.addAll(points)
-                lineOptions.width(9f)
-                if (i != 1) {
-                    lineOptions.color(Color.GRAY)
-                } else {
-                    lineOptions.color(Color.RED)
-                }
+                lineOptions.width(7f)
+                lineOptions.color(colorVariable[i])
                 mMap.addPolyline(lineOptions)
             }
         }

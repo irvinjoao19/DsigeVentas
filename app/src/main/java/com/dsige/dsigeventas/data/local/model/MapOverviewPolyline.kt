@@ -1,5 +1,5 @@
 package com.dsige.dsigeventas.data.local.model
 
-open class OverviewPolyline {
+open class MapOverviewPolyline {
     var points: String = ""
 }

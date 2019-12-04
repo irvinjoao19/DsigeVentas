@@ -26,10 +26,16 @@ interface RepartoDao {
     @Query("SELECT * FROM Reparto")
     fun getRepartos(): DataSource.Factory<Int, Reparto>
 
+    @Query("SELECT * FROM Reparto")
+    fun getMapReparto(): List<Reparto>
+
     @Query("SELECT * FROM Reparto WHERE repartoId=:id")
     fun getRepartosById(id: Int): LiveData<List<Reparto>>
 
     @Query("DELETE FROM Reparto")
     fun deleteAll()
+
+    @Query("SELECT * FROM Reparto WHERE repartoId=:id")
+    fun getRepartoById(id:Int): LiveData<Reparto>
 
 }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -121,6 +122,8 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val toolbar: Toolbar = activity!!.findViewById(R.id.toolbar)
+        toolbar.visibility = View.VISIBLE
         editTextDepartamento.setOnClickListener(this)
         editTextProvincia.setOnClickListener(this)
         editTextDistrito.setOnClickListener(this)
