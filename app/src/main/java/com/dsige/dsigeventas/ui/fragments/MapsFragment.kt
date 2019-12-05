@@ -292,7 +292,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         }
 
         override fun onPostExecute(result: List<List<HashMap<String, String>>>?) {
-
             var points: ArrayList<LatLng>
             var lineOptions: PolylineOptions?
             for (i in result!!.indices) {
@@ -368,11 +367,11 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     }
 
     override fun onMarkerClick(m: Marker): Boolean {
-        dialogResumen(m.title)
+        dialogResumen(m)
         return true
     }
 
-    private fun dialogResumen(t: String) {
+    private fun dialogResumen(m: Marker) {
         val builder =
             android.app.AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
         @SuppressLint("InflateParams") val v =
@@ -386,7 +385,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         dialog.show()
 
         Handler().postDelayed({
-            repartoViewModel.getRepartoById(t.toInt())
+            repartoViewModel.getRepartoById(m.title.toInt())
                 .observe(this, androidx.lifecycle.Observer<Reparto> { s ->
                     if (s != null) {
                         textViewTitle.text = s.direccion
@@ -397,6 +396,16 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                                     .putExtra("latitud", s.latitud)
                                     .putExtra("longitud", s.longitud)
                                     .putExtra("title", s.numeroPedido)
+                            )
+                            dialog.dismiss()
+                        }
+                    } else {
+                        buttonSalir.setOnClickListener {
+                            startActivity(
+                                Intent(context, MapsActivity::class.java)
+                                    .putExtra("latitud", m.position.latitude.toString())
+                                    .putExtra("longitud", m.position.longitude.toString())
+                                    .putExtra("title", m.title)
                             )
                             dialog.dismiss()
                         }

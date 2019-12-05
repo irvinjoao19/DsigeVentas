@@ -53,7 +53,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             if (input == null || input.isEmpty()) {
                 roomRepository.getProductos()
             } else {
-                roomRepository.getProductos(String.format("%s%s%s", "%", searchProducto, "%"))
+                roomRepository.getProductos(String.format("%s%s%s", "%", input, "%"))
             }
         }
     }
@@ -271,7 +271,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             if (input == null || input.isEmpty()) {
                 roomRepository.getPedido()
             } else {
-                roomRepository.getPedido(String.format("%s%s%s", "%", searchPedido, "%"))
+                roomRepository.getPedido(String.format("%s%s%s", "%", input, "%"))
             }
         }
     }

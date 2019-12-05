@@ -197,7 +197,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     private fun getUrl2(o: LatLng, d: LatLng) {
         val origen = String.format("%s,%s", o.latitude, o.longitude)
         val destino = String.format("%s,%s", d.latitude, d.longitude)
-        FetchURL().execute(origen, destino)
+        FetchURL().execute("", origen, destino)
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -206,7 +206,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         override fun doInBackground(vararg strings: String): String { // For storing data from web service
             var data = ""
             try {
-                data = downloadUrl(strings[0])
+                data = downloadUrl(strings[0], "", "")
             } catch (e: Exception) {
                 Log.d("Background Task", e.toString())
             }
@@ -219,7 +219,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
 
         @Throws(IOException::class)
-        private fun downloadUrl(strUrl: String): String {
+        private fun downloadUrl(strUrl: String, origen: String, destino: String): String {
 //            var data = ""
 //            val apiServices = AppRest.api.create(ApiService::class.java)
 //            val call = apiServices

@@ -41,7 +41,7 @@ class PedidoFragment : DaggerFragment() {
         super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.ok).setVisible(false).isEnabled = false
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
-        val searchView = menu.findItem(R.id.search) as SearchView
+        val searchView = menu.findItem(R.id.search).actionView as SearchView
         search(searchView)
     }
 
