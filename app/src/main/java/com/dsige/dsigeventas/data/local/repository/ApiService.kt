@@ -40,7 +40,6 @@ interface ApiService {
     @POST("SavePedido")
     fun sendPedido(@Body body: RequestBody): Observable<Mensaje>
 
-
     @GET("/maps/api/directions/json?")
     fun getDirection(
         @Query("origin") origin: String?,
@@ -49,4 +48,8 @@ interface ApiService {
         @Query("alternatives") alternatives: Boolean,
         @Query("key") key: String?
     ): Call<MapPrincipal>
+
+    @Headers("Cache-Control: no-cache")
+    @POST("SaveCliente")
+    fun sendCliente(@Body body: RequestBody): Observable<Mensaje>
 }

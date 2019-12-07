@@ -27,6 +27,10 @@ interface OnItemClickListener {
         fun onItemClick(p: PedidoDetalle, v: View, position: Int)
     }
 
+    interface RepartoDetalleListener {
+        fun onItemClick(r: RepartoDetalle, v: View, position: Int)
+    }
+
     interface Order {
         fun onItemClick(p: PedidoDetalle, v: View, e: EditText, position: Int)
     }

@@ -193,4 +193,6 @@
     <string name="goPedido">Ver Pedido</string>
     <string name="search">Buscar</string>
     <string name="filtro">Filtro</string>
+    <string name="ver_ruta">Ver ruta</string>
+    <string name="entrega_factura">Entrega de Factura</string>
 </resources>

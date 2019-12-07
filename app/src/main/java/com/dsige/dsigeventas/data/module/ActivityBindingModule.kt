@@ -27,4 +27,7 @@ abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     internal abstract fun bindOrdenActivity(): OrdenActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindMapActivity(): MapsActivity
 }

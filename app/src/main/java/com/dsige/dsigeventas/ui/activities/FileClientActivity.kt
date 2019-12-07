@@ -23,9 +23,15 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.pedidos ->
-                startActivity(
-                    Intent(this, OrdenActivity::class.java).putExtra("clienteId", c.clienteId)
-                )
+                if (c.identity != 0) {
+                    startActivity(
+                        Intent(this, OrdenActivity::class.java).putExtra("clienteId", c.identity)
+                    )
+                } else {
+                    startActivity(
+                        Intent(this, OrdenActivity::class.java).putExtra("clienteId", c.clienteId)
+                    )
+                }
             R.id.foto -> {
                 return true
             }

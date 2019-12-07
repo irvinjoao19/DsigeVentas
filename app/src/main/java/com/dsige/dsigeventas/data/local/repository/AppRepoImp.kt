@@ -105,6 +105,12 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             val r: List<Reparto>? = s.repartos
             if (r != null) {
                 dataBase.repartoDao().insertRepartoListTask(r)
+                for (re: Reparto in r) {
+                    val de: List<RepartoDetalle>? = re.detalle
+                    if (de != null) {
+                        dataBase.repartoDetalleDao().insertRepartoDetalleListTask(de)
+                    }
+                }
             }
         }
     }
@@ -115,19 +121,13 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getCliente(search: String): LiveData<PagedList<Cliente>> {
         return dataBase.clienteDao().getCliente(search).toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
     override fun getCliente(): LiveData<PagedList<Cliente>> {
         return dataBase.clienteDao().getCliente().toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
@@ -135,10 +135,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         d: Int, p: Int, s: Int, search: String
     ): LiveData<PagedList<Cliente>> {
         return dataBase.clienteDao().getCliente(d, p, s, search).toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
@@ -148,6 +145,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun insertOrUpdateCliente(c: Cliente): Completable {
         return Completable.fromAction {
+            c.personalVendedorId = dataBase.usuarioDao().getUsuarioId()
             if (c.clienteId == 0) {
                 dataBase.clienteDao().insertClienteTask(c)
             } else {
@@ -170,19 +168,13 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getProductos(): LiveData<PagedList<Stock>> {
         return dataBase.stockDao().getProductos().toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
     override fun getProductos(search: String): LiveData<PagedList<Stock>> {
         return dataBase.stockDao().getProductos(search).toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
@@ -198,10 +190,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getProductoByPedido(id: Int): LiveData<PagedList<PedidoDetalle>> {
         return dataBase.pedidoDetalleDao().getProductoByPedido(id).toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
@@ -216,7 +205,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 a.nombre = s.nombreProducto
                 a.descripcion = s.descripcionProducto
                 a.stockMinimo = s.stock
-                a.precioCompra = s.precio
+                a.precioVenta = s.precio
                 a.abreviaturaProducto = s.abreviaturaProducto
 
                 if (!dataBase.pedidoDetalleDao().getProductoExits(a.pedidoId, a.productoId)) {
@@ -262,11 +251,17 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (c == 0) {
                 e.onNext(2)
             } else {
-                val a = dataBase.pedidoDetalleDao().validatePedido(id)
-                if (a > 0) {
-                    e.onNext(1)
+                val identity =
+                    dataBase.clienteDao().getClienteIdentity(dataBase.pedidoDao().getClienteId(id))
+                if (identity != 0) {
+                    val a = dataBase.pedidoDetalleDao().validatePedido(id)
+                    if (a > 0) {
+                        e.onNext(1)
+                    } else {
+                        e.onNext(0)
+                    }
                 } else {
-                    e.onNext(0)
+                    e.onNext(3)
                 }
             }
             e.onComplete()
@@ -321,28 +316,19 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getPedido(): LiveData<PagedList<Pedido>> {
         return dataBase.pedidoDao().getPedido().toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
     override fun getPedido(search: String): LiveData<PagedList<Pedido>> {
         return dataBase.pedidoDao().getPedido(search).toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
     override fun getRepartos(): LiveData<PagedList<Reparto>> {
         return dataBase.repartoDao().getRepartos().toLiveData(
-            Config(
-                pageSize = 20,
-                enablePlaceholders = true
-            )
+            Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
@@ -376,10 +362,44 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun saveGpsTask(body: RequestBody): Call<Mensaje> {
-     return apiService.saveGps(body)
+        return apiService.saveGps(body)
     }
 
     override fun saveMovil(body: RequestBody): Observable<Mensaje> {
         return apiService.saveMovil(body)
+    }
+
+    override fun validateCliente(id: Int): Observable<Int> {
+        return Observable.create { e ->
+            val identity = dataBase.pedidoDao().getClienteId(id)
+//                dataBase.clienteDao().getClienteIdentity(dataBase.pedidoDao().getClienteId(id))
+            e.onNext(identity)
+            e.onComplete()
+        }
+    }
+
+    override fun getClienteByIdTask(id: Int): Observable<Cliente> {
+        return Observable.create { e ->
+            val c = dataBase.clienteDao().getClienteTaskById(id)
+            e.onNext(c)
+            e.onComplete()
+        }
+    }
+
+    override fun sendCliente(body: RequestBody): Observable<Mensaje> {
+        return apiService.sendCliente(body)
+    }
+
+    override fun updateCliente(m: Mensaje, pedidoId: Int): Completable {
+        return Completable.fromAction {
+            dataBase.clienteDao().updateCliente(m.codigoBase, m.codigoRetorno)
+            dataBase.pedidoDao().updatePedido(pedidoId, m.codigoRetorno)
+        }
+    }
+
+    override fun getDetalleRepartoById(id: Int): LiveData<PagedList<RepartoDetalle>> {
+        return dataBase.repartoDetalleDao().getDetalleRepartoById(id).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
     }
 }

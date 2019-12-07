@@ -89,7 +89,7 @@ interface AppRepository {
 
     fun getPedido(): LiveData<PagedList<Pedido>>
 
-    fun getPedido(search:String): LiveData<PagedList<Pedido>>
+    fun getPedido(search: String): LiveData<PagedList<Pedido>>
 
     fun getRepartos(): LiveData<PagedList<Reparto>>
 
@@ -104,4 +104,14 @@ interface AppRepository {
     fun saveGpsTask(body: RequestBody): Call<Mensaje>
 
     fun saveMovil(body: RequestBody): Observable<Mensaje>
+
+    fun validateCliente(id: Int): Observable<Int>
+
+    fun getClienteByIdTask(id: Int): Observable<Cliente>
+
+    fun sendCliente(body: RequestBody): Observable<Mensaje>
+
+    fun updateCliente(m: Mensaje, pedidoId: Int): Completable
+
+    fun getDetalleRepartoById(id: Int): LiveData<PagedList<RepartoDetalle>>
 }

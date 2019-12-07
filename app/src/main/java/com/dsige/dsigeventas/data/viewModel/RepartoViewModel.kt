@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.Reparto
+import com.dsige.dsigeventas.data.local.model.RepartoDetalle
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
 import io.reactivex.Observable
@@ -27,5 +28,9 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
     fun getRepartoById(id: Int): LiveData<Reparto> {
         return roomRepository.getRepartoById(id)
+    }
+
+    fun getDetalleRepartoById(id: Int) : LiveData<PagedList<RepartoDetalle>> {
+        return roomRepository.getDetalleRepartoById(id)
     }
 }

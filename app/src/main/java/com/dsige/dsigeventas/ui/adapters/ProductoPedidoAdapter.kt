@@ -34,7 +34,7 @@ class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPe
                 textViewNombre.text = p.nombre
                 textViewCodigo.text = p.codigo
                 //textViewStock.text = p.stockMinimo.toString()
-                textViewPrecio.text = p.precioCompra.toString()
+                textViewPrecio.text = p.precioVenta.toString()
                 textViewSubTotal.text = String.format("S/. %s", p.subTotal)
                 editTextCantidad.setText(p.cantidad.toString())
 

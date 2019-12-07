@@ -95,7 +95,12 @@ class DataBaseModule {
     }
 
     @Provides
-    internal fun provideForsdmaPagoDao(appDataBase: AppDataBase): RepartoDao {
+    internal fun provideRepartoDao(appDataBase: AppDataBase): RepartoDao {
         return appDataBase.repartoDao()
+    }
+
+    @Provides
+    internal fun provideRepartoDetalleDao(appDataBase: AppDataBase): RepartoDetalleDao {
+        return appDataBase.repartoDetalleDao()
     }
 }

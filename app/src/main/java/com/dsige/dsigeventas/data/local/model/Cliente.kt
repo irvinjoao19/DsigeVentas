@@ -18,7 +18,7 @@ open class Cliente {
     var departamentoId: Int = 0
     var nombreDepartamento: String = ""
     var provinciaId: Int = 0
-    var nombreProvincia:String = ""
+    var nombreProvincia: String = ""
     var distritoId: Int = 0
     var nombreDistrito: String = ""
     var giroNegocioId: Int = 0
@@ -34,4 +34,5 @@ open class Cliente {
     var longitud: String = ""
     var condFacturacion: Int = 0
     var estado: Int = 0
+    var identity: Int = 0
 }

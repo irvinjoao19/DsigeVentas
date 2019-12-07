@@ -53,4 +53,9 @@ interface PedidoDao {
     @Query("SELECT pedidoId FROM Pedido ORDER BY pedidoId DESC LIMIT 1")
     fun getPedidoIdentity(): Int
 
+    @Query("SELECT clienteId FROM Pedido WHERE pedidoId=:id")
+    fun getClienteId(id: Int): Int
+
+    @Query("UPDATE Pedido SET clienteId=:codigoRetorno WHERE pedidoId =:id")
+    fun updatePedido(id: Int, codigoRetorno: Int)
 }

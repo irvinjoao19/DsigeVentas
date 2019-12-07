@@ -3,6 +3,7 @@ package com.dsige.dsigeventas.ui.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -11,28 +12,39 @@ import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageView
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dsige.dsigeventas.R
-import com.dsige.dsigeventas.data.local.AppRest
-import com.dsige.dsigeventas.data.local.model.MapPrincipal
-import com.dsige.dsigeventas.data.local.repository.ApiService
+import com.dsige.dsigeventas.data.local.model.*
+import com.dsige.dsigeventas.data.viewModel.RepartoViewModel
+import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.DataParser
 import com.dsige.dsigeventas.helper.Gps
-import com.dsige.dsigeventas.helper.TaskLoadedCallback
+import com.dsige.dsigeventas.helper.Util
+import com.dsige.dsigeventas.ui.adapters.RepartoDetalleAdapter
+import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
+import dagger.android.support.DaggerAppCompatActivity
 import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -40,15 +52,21 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
+import javax.inject.Inject
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
+class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationListener,
+    GoogleMap.OnMarkerClickListener {
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var repartoViewModel: RepartoViewModel
+
 
     lateinit var camera: CameraPosition
     lateinit var mMap: GoogleMap
     var mapView: View? = null
     lateinit var place1: MarkerOptions
     lateinit var place2: MarkerOptions
-    var currentPolyline: Polyline? = null
     lateinit var locationManager: LocationManager
 
     var isFirstTime: Boolean = true
@@ -72,6 +90,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         setContentView(R.layout.activity_maps)
         val b = intent.extras
         if (b != null) {
+            repartoViewModel =
+                ViewModelProviders.of(this, viewModelFactory).get(RepartoViewModel::class.java)
+
             latitud = b.getString("latitud")!!
             longitud = b.getString("longitud")!!
             title = b.getString("title")!!
@@ -133,6 +154,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         } else {
             ActivityCompat.requestPermissions(this, permisos, 1)
         }
+        mMap.setOnMarkerClickListener(this)
     }
 
     private fun zoomToLocation(location: Location) {
@@ -152,12 +174,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         val parameters = "$str_origin&$str_dest&$mode"
         val output = "json"
 
-//        Log.i("TAG",String.format(
-//            "https://maps.googleapis.com/maps/api/directions/%s?%s&key=%s",
-//            output,
-//            parameters,
-//            getString(R.string.google_maps_key)
-//        ))
+        Log.i(
+            "TAG", String.format(
+                "https://maps.googleapis.com/maps/api/directions/%s?%s&key=%s",
+                output,
+                parameters,
+                getString(R.string.google_maps_key)
+            )
+        )
         return String.format(
             "https://maps.googleapis.com/maps/api/directions/%s?%s&key=%s",
             output,
@@ -303,8 +327,54 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
                 lineOptions.addAll(points)
                 lineOptions.width(7f)
                 lineOptions.color(colorVariable[i])
-                mMap.addPolyline(lineOptions)
+                val polyline = mMap.addPolyline(lineOptions)
+                polyline.isClickable = true
             }
         }
     }
+
+    private fun dialogResumen(m: Marker) {
+        val builder =
+            android.app.AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        @SuppressLint("InflateParams") val v =
+            LayoutInflater.from(this).inflate(R.layout.dialog_reparto, null)
+
+        val textViewDoc: TextView = v.findViewById(R.id.textViewDoc)
+        val textViewNameClient: TextView = v.findViewById(R.id.textViewNameClient)
+        val textViewSubTotal: TextView = v.findViewById(R.id.textViewSubTotal)
+        val recyclerView: RecyclerView = v.findViewById(R.id.recyclerView)
+
+        builder.setView(v)
+        val dialog = builder.create()
+        dialog.show()
+
+        repartoViewModel.getRepartoById(12).observe(this, Observer<Reparto> { r ->
+            if (r != null) {
+                textViewDoc.text = r.numeroDocumento
+                textViewNameClient.text = r.apellidoNombreCliente
+                textViewSubTotal.setText(
+                    Util.getTextHTML("<font color='red'>Sub Total : </font> S/" + r.subTotal),
+                    TextView.BufferType.SPANNABLE
+                )
+            }
+        })
+
+        val repartoDetalleAdapter = RepartoDetalleAdapter()
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = layoutManager
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
+        )
+        recyclerView.adapter = repartoDetalleAdapter
+        repartoViewModel.getDetalleRepartoById(12)
+            .observe(this, Observer(repartoDetalleAdapter::submitList))
+    }
+
+    override fun onMarkerClick(m: Marker): Boolean {
+        dialogResumen(m)
+        return true
+    }
+
+
 }

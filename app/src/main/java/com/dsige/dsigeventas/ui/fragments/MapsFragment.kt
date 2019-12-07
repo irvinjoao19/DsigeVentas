@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
@@ -22,14 +23,19 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProviders
 import com.dsige.dsigeventas.R
-import com.dsige.dsigeventas.data.local.model.Reparto
+import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.RepartoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.DataParser
+import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.MapsActivity
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.button.MaterialButton
+import com.google.gson.Gson
 import com.google.maps.android.ui.IconGenerator
 import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.DaggerFragment
@@ -89,7 +95,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var repartoViewModel: RepartoViewModel
-
 
     private var param1: String? = null
     private var param2: String? = null
@@ -190,8 +195,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                     var i = 1
                     for (s: Reparto in count) {
                         if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
-
-
                             waypoints += String.format("%s,%s|", s.latitud, s.longitud)
                             latitud = s.latitud
                             longitud = s.longitud
@@ -235,7 +238,35 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
 
         override fun onPostExecute(s: String) {
             super.onPostExecute(s)
-            MarkeParser().execute(s)
+            val map: MapPrincipal = Gson().fromJson(s, MapPrincipal::class.java)
+            val mapRoutes: List<MapRoute>? = map.routes
+            if (mapRoutes != null) {
+                for (r: MapRoute in map.routes) {
+                    val mapLegs: List<MapLegs>? = r.legs
+                    var i = 1
+                    if (mapLegs != null) {
+                        for (m: MapLegs in mapLegs) {
+                            val start: MapStartLocation? = m.start_location
+                            if (start != null) {
+                                val position = LatLng(start.lat, start.lng)
+                                val iconFactory = IconGenerator(context)
+                                mMap.addMarker(
+                                    MarkerOptions()
+                                        .position(position)
+                                        .title(m.start_address)
+                                        .icon(
+                                            BitmapDescriptorFactory.fromBitmap(
+                                                iconFactory.makeIcon(
+                                                    (i++).toString()
+                                                )
+                                            )
+                                        )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
             PointsParser().execute(s)
         }
 
@@ -260,7 +291,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                     sb.append(line)
                 }
                 data = sb.toString()
-//                Log.d("mylog", "Downloaded URL: $data")
                 br.close()
             } catch (e: Exception) {
                 Log.d("mylog", "Exception downloading URL: $e")
@@ -308,49 +338,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 lineOptions.addAll(points)
                 lineOptions.width(7f)
                 lineOptions.color(Color.BLUE)
-                val polyline = mMap.addPolyline(lineOptions)
-                polyline.isClickable = true
-            }
-        }
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private inner class MarkeParser :
-        AsyncTask<String, Int, List<List<HashMap<String, String>>>>() {
-
-        override fun doInBackground(vararg jsonData: String): List<List<HashMap<String, String>>>? {
-            val jObject: JSONObject
-            var routes: List<List<HashMap<String, String>>>? =
-                null
-            try {
-                jObject = JSONObject(jsonData[0])
-                val parser = DataParser()
-                routes = parser.marker(jObject)
-            } catch (e: java.lang.Exception) {
-                Log.d("mylog", e.toString())
-                e.printStackTrace()
-            }
-            return routes
-        }
-
-        override fun onPostExecute(result: List<List<HashMap<String, String>>>?) {
-            for (i in result!!.indices) {
-                val path = result[i]
-                for (j in path.indices) {
-                    val point = path[j]
-                    val lat = point["lat"]!!.toDouble()
-                    val lng = point["lng"]!!.toDouble()
-                    val position = LatLng(lat, lng)
-                    val iconFactory = IconGenerator(context)
-                    mMap.addMarker(
-                        MarkerOptions()
-                            .position(position)
-                            .title((j + 1).toString())
-                            .icon(
-                                BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon((j + 1).toString()))
-                            )
-                    )
-                }
+                mMap.addPolyline(lineOptions)
             }
         }
     }
@@ -377,40 +365,33 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         @SuppressLint("InflateParams") val v =
             LayoutInflater.from(context).inflate(R.layout.cardview_resumen_maps, null)
         val buttonSalir: MaterialButton = v.findViewById(R.id.buttonGo)
-        val progressBar = v.findViewById<ProgressBar>(R.id.progressBar)
         val textViewTitle = v.findViewById<TextView>(R.id.textViewTitle)
+        val textViewLatitud: TextView = v.findViewById(R.id.textViewLatitud)
+        val textViewLongitud: TextView = v.findViewById(R.id.textViewLongitud)
+        val imageViewClose: ImageView = v.findViewById(R.id.imageViewClose)
 
         builder.setView(v)
         val dialog = builder.create()
         dialog.show()
 
-        Handler().postDelayed({
-            repartoViewModel.getRepartoById(m.title.toInt())
-                .observe(this, androidx.lifecycle.Observer<Reparto> { s ->
-                    if (s != null) {
-                        textViewTitle.text = s.direccion
-                        progressBar.visibility = View.GONE
-                        buttonSalir.setOnClickListener {
-                            startActivity(
-                                Intent(context, MapsActivity::class.java)
-                                    .putExtra("latitud", s.latitud)
-                                    .putExtra("longitud", s.longitud)
-                                    .putExtra("title", s.numeroPedido)
-                            )
-                            dialog.dismiss()
-                        }
-                    } else {
-                        buttonSalir.setOnClickListener {
-                            startActivity(
-                                Intent(context, MapsActivity::class.java)
-                                    .putExtra("latitud", m.position.latitude.toString())
-                                    .putExtra("longitud", m.position.longitude.toString())
-                                    .putExtra("title", m.title)
-                            )
-                            dialog.dismiss()
-                        }
-                    }
-                })
-        }, 500)
+        textViewTitle.text = m.title
+        textViewLatitud.setText(
+            Util.getTextHTML("<strong>Latitud: </strong> " + m.position.latitude),
+            TextView.BufferType.SPANNABLE
+        )
+        textViewLongitud.setText(
+            Util.getTextHTML("<strong>Longitud : </strong> " + m.position.longitude),
+            TextView.BufferType.SPANNABLE
+        )
+        buttonSalir.setOnClickListener {
+            startActivity(
+                Intent(context, MapsActivity::class.java)
+                    .putExtra("latitud", m.position.latitude.toString())
+                    .putExtra("longitud", m.position.longitude.toString())
+                    .putExtra("title", m.title)
+            )
+            dialog.dismiss()
+        }
+        imageViewClose.setOnClickListener { dialog.dismiss() }
     }
 }

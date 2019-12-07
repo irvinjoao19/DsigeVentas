@@ -1,6 +1,7 @@
 package com.dsige.dsigeventas.data.local.model
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity
@@ -19,4 +20,9 @@ open class Reparto {
     var fechaEntrega: String = ""
     var latitud: String = ""
     var longitud: String = ""
+    var numeroDocumento: String = ""
+    var subTotal: Double = 0.0
+
+    @Ignore
+    var detalle: List<RepartoDetalle>? = null
 }

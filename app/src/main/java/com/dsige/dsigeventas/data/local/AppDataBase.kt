@@ -22,9 +22,10 @@ import com.dsige.dsigeventas.data.local.model.*
         Provincia::class,
         Stock::class,
         FormaPago::class,
-        Reparto::class
+        Reparto::class,
+        RepartoDetalle::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -43,6 +44,7 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun stockDao(): StockDao
     abstract fun formaPagoDao(): FormaPagoDao
     abstract fun repartoDao(): RepartoDao
+    abstract fun repartoDetalleDao(): RepartoDetalleDao
 
     companion object {
         @Volatile

@@ -123,7 +123,8 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                                 }
                                 p.cantidad = nNegative
                                 p.unidadMedida = nNegative
-                                p.subTotal = nNegative * p.precioCompra
+                                p.subTotal = nNegative * p.precioVenta
+                                p.totalPedido = p.subTotal
                                 productoViewModel.updateProducto(p)
                             }
                         }
@@ -132,7 +133,8 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                             val nPositive = sTotal.toDouble()
                             p.cantidad = nPositive
                             p.unidadMedida = nPositive
-                            p.subTotal = nPositive * p.precioCompra
+                            p.subTotal = nPositive * p.precioVenta
+                            p.totalPedido = p.subTotal
                             p.estado = 2
                             productoViewModel.updateProducto(p)
                         }
@@ -171,7 +173,8 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         productoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
                 when (s) {
-                    "Ok" -> sendPedido(pedidoId)
+                    "Ok" -> sendPedido(pedidoId,1)
+                    "Cliente" ->  sendPedido(pedidoId,0)
                     "ENVIADO" -> {
                         loadFinish()
                         Util.toastMensaje(this, s)
@@ -246,7 +249,8 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                 }
                 p.cantidad = nPositive
                 p.unidadMedida = nPositive
-                p.subTotal = nPositive * p.precioCompra
+                p.subTotal = nPositive * p.precioVenta
+                p.totalPedido = p.subTotal
                 productoViewModel.updateProducto(p)
                 Util.hideKeyboardFrom(this, v)
                 dialog.dismiss()
@@ -259,13 +263,17 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         }
     }
 
-    private fun sendPedido(id: Int) {
+    private fun sendPedido(id: Int,tipo:Int) {
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle("Mensaje")
             .setMessage("Deseas enviar el pedido ?")
             .setPositiveButton("SI") { dialog, _ ->
                 load()
-                productoViewModel.sendPedido(id)
+                if (tipo == 0){
+                    productoViewModel.validateCliente(id)
+                }else{
+                    productoViewModel.sendPedido(id)
+                }
                 dialog.dismiss()
             }
             .setNegativeButton("NO") { dialog, _ ->
