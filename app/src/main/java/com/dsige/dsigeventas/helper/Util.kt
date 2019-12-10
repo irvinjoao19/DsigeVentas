@@ -7,6 +7,7 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.graphics.*
+import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -30,10 +31,11 @@ import com.google.android.material.textfield.TextInputLayout
 import io.reactivex.Observable
 import java.io.*
 import java.nio.channels.FileChannel
+import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.ceil
+import kotlin.math.*
 
 object Util {
 
@@ -788,5 +790,24 @@ object Util {
             poly.add(p)
         }
         return poly
+    }
+
+    fun calculationByDistance(StartP: Location, EndP: LatLng): Double {
+        val radius = 6371 * 1000  // radius of earth in Km * meters
+        val lat1 = StartP.latitude
+        val lat2 = EndP.latitude
+        val lon1 = StartP.longitude
+        val lon2 = EndP.longitude
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = sin(dLat / 2) * sin(dLat / 2) + (cos(Math.toRadians(lat1))
+                * cos(Math.toRadians(lat2)) * sin(dLon / 2)
+                * sin(dLon / 2))
+        val c = 2 * asin(sqrt(a))
+        val valueResult = radius * c
+        val km = valueResult / 1
+        val newFormat = DecimalFormat("####")
+        val kmInDec = Integer.valueOf(newFormat.format(km))
+        return kmInDec.toDouble()
     }
 }

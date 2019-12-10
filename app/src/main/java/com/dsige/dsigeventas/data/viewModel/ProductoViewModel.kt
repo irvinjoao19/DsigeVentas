@@ -382,7 +382,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-
     private fun updateCliente(m:Mensaje,id:Int){
         roomRepository.updateCliente(m,id)
             .subscribeOn(Schedulers.io())

@@ -137,7 +137,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 override fun onError(e: Throwable) {
                     mensajeError.value = e.toString()
                 }
-
             })
     }
 }

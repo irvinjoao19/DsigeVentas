@@ -112,6 +112,16 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                     }
                 }
             }
+
+            val e: List<Estado>? = s.estados
+            if (e != null) {
+                dataBase.estadoDao().insertEstadoListTask(e)
+            }
+
+            val g: List<Grupo>? = s.grupos
+            if (g != null) {
+                dataBase.grupoDao().insertGrupoListTask(g)
+            }
         }
     }
 
@@ -332,6 +342,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getReparto(): LiveData<List<Reparto>> {
+        return dataBase.repartoDao().getReparto()
+    }
+
     override fun getMapReparto(): Observable<List<Reparto>> {
         return Observable.create { e ->
             val r: List<Reparto>? = dataBase.repartoDao().getMapReparto()
@@ -401,5 +415,30 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.repartoDetalleDao().getDetalleRepartoById(id).toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
         )
+    }
+
+    override fun getEstados(): LiveData<List<Estado>> {
+        return dataBase.estadoDao().getEstados()
+    }
+
+    override fun getGrupos(): LiveData<List<Grupo>> {
+        return dataBase.grupoDao().getGrupos()
+    }
+
+    override fun updateReparto(re: Reparto): Completable {
+        return Completable.fromAction {
+            dataBase.repartoDao().updateRepartoTask(re)
+        }
+    }
+
+    override fun getRepartoByIdTask(id: Int): Observable<Reparto> {
+        return Observable.create { e ->
+            e.onNext(dataBase.repartoDao().getRepartoByIdTask(id))
+            e.onComplete()
+        }
+    }
+
+    override fun sendUpdateReparto(body: RequestBody): Observable<Mensaje> {
+        return apiService.sendUpdateReparto(body)
     }
 }

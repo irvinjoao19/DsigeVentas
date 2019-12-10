@@ -3,7 +3,6 @@ package com.dsige.dsigeventas.ui.activities
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
@@ -11,14 +10,14 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -34,6 +33,9 @@ import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.DataParser
 import com.dsige.dsigeventas.helper.Gps
 import com.dsige.dsigeventas.helper.Util
+import com.dsige.dsigeventas.ui.adapters.EstadoAdapter
+import com.dsige.dsigeventas.ui.adapters.GrupoAdapter
+import com.dsige.dsigeventas.ui.adapters.ProductoPedidoAdapter
 import com.dsige.dsigeventas.ui.adapters.RepartoDetalleAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -42,7 +44,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.button.MaterialButton
-import com.google.gson.Gson
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import dagger.android.support.DaggerAppCompatActivity
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -61,13 +65,15 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var repartoViewModel: RepartoViewModel
 
-
     lateinit var camera: CameraPosition
     lateinit var mMap: GoogleMap
     var mapView: View? = null
     lateinit var place1: MarkerOptions
     lateinit var place2: MarkerOptions
     lateinit var locationManager: LocationManager
+
+    lateinit var builder: AlertDialog.Builder
+    var dialog: AlertDialog? = null
 
     var isFirstTime: Boolean = true
     var MIN_DISTANCE_CHANGE_FOR_UPDATES: Int = 10
@@ -99,6 +105,19 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
             val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
+
+            repartoViewModel.mensajeError.observe(this, Observer<String> { s ->
+                if (s != null) {
+                    loadFinish()
+                    Util.toastMensaje(this, s)
+                }
+            })
+            repartoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+                if (s != null) {
+                    loadFinish()
+                    Util.toastMensaje(this, s)
+                }
+            })
         }
     }
 
@@ -190,18 +209,14 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         )
     }
 
-
     override fun onLocationChanged(location: Location) {
-        zoomToLocation(location)
         if (isFirstTime) {
+            zoomToLocation(location)
             place1 =
                 MarkerOptions().position(LatLng(location.latitude, location.longitude)).title("YO")
             place2 = MarkerOptions().position(LatLng(latitud.toDouble(), longitud.toDouble()))
                 .title(title)
             FetchURL().execute(getUrl(place1.position, place2.position))
-
-//            getUrl2(place1.position, place2.position)
-
             isFirstTime = false
         }
     }
@@ -230,7 +245,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         override fun doInBackground(vararg strings: String): String { // For storing data from web service
             var data = ""
             try {
-                data = downloadUrl(strings[0], "", "")
+                data = downloadUrl(strings[0])
             } catch (e: Exception) {
                 Log.d("Background Task", e.toString())
             }
@@ -243,7 +258,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         }
 
         @Throws(IOException::class)
-        private fun downloadUrl(strUrl: String, origen: String, destino: String): String {
+        private fun downloadUrl(strUrl: String): String {
 //            var data = ""
 //            val apiServices = AppRest.api.create(ApiService::class.java)
 //            val call = apiServices
@@ -333,32 +348,107 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         }
     }
 
+    private fun dialogSpinner(
+        input: TextInputEditText, l: TextInputLayout, title: String, tipo: Int, re: Reparto
+    ) {
+        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(this).inflate(R.layout.dialog_spinner, null)
+        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        builder.setView(view)
+        val dialogSpinner = builder.create()
+        dialogSpinner.setCanceledOnTouchOutside(false)
+        dialogSpinner.show()
+
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                recyclerView.context, DividerItemDecoration.VERTICAL
+            )
+        )
+        recyclerView.layoutManager = layoutManager
+
+        textViewTitle.text = title
+
+        when (tipo) {
+            1 -> {
+                val estadoAdapter = EstadoAdapter(object : OnItemClickListener.EstadoListener {
+                    override fun onItemClick(e: Estado, v: View, position: Int) {
+                        re.estado = e.estadoId
+                        input.setText(e.nombre)
+                        l.visibility = View.GONE
+                        if (e.estadoId == 30) {
+                            l.visibility = View.VISIBLE
+                        }
+                        dialogSpinner.dismiss()
+                    }
+                })
+                recyclerView.adapter = estadoAdapter
+                repartoViewModel.getEstados().observe(this, Observer<List<Estado>> { e ->
+                    if (e != null) {
+                        estadoAdapter.addItems(e)
+                    }
+                })
+            }
+            2 -> {
+                val grupoAdapter = GrupoAdapter(object : OnItemClickListener.GrupoListener {
+                    override fun onItemClick(g: Grupo, v: View, position: Int) {
+                        re.motivoId = g.detalleTablaId
+                        input.setText(g.descripcion)
+                        dialogSpinner.dismiss()
+                    }
+                })
+                recyclerView.adapter = grupoAdapter
+                repartoViewModel.getGrupos().observe(this, Observer<List<Grupo>> { e ->
+                    if (e != null) {
+                        grupoAdapter.addItems(e)
+                    }
+                })
+            }
+        }
+    }
+
+    override fun onMarkerClick(m: Marker): Boolean {
+        dialogResumen(m)
+        return true
+    }
+
     private fun dialogResumen(m: Marker) {
-        val builder =
-            android.app.AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
         @SuppressLint("InflateParams") val v =
             LayoutInflater.from(this).inflate(R.layout.dialog_reparto, null)
 
+        val linearLayoutLoad: ConstraintLayout = v.findViewById(R.id.linearLayoutLoad)
+        val linearLayoutPrincipal: LinearLayout = v.findViewById(R.id.linearLayoutPrincipal)
         val textViewDoc: TextView = v.findViewById(R.id.textViewDoc)
         val textViewNameClient: TextView = v.findViewById(R.id.textViewNameClient)
         val textViewSubTotal: TextView = v.findViewById(R.id.textViewSubTotal)
         val recyclerView: RecyclerView = v.findViewById(R.id.recyclerView)
+        val imageViewClose: ImageView = v.findViewById(R.id.imageViewClose)
+        val editTextEstado: TextInputEditText = v.findViewById(R.id.editTextEstado)
+        val editTextMotivo: TextInputEditText = v.findViewById(R.id.editTextMotivo)
+        val textInputMotivo: TextInputLayout = v.findViewById(R.id.textInputMotivo)
+        val buttonGuardar: MaterialButton = v.findViewById(R.id.buttonGuardar)
+
+        var re = Reparto()
 
         builder.setView(v)
         val dialog = builder.create()
         dialog.show()
 
-        repartoViewModel.getRepartoById(12).observe(this, Observer<Reparto> { r ->
-            if (r != null) {
-                textViewDoc.text = r.numeroDocumento
-                textViewNameClient.text = r.apellidoNombreCliente
-                textViewSubTotal.setText(
-                    Util.getTextHTML("<font color='red'>Sub Total : </font> S/" + r.subTotal),
-                    TextView.BufferType.SPANNABLE
-                )
-            }
-        })
+        imageViewClose.setOnClickListener { dialog.dismiss() }
+        editTextEstado.setOnClickListener {
+            dialogSpinner(editTextEstado, textInputMotivo, "Estado", 1, re)
+        }
+        editTextMotivo.setOnClickListener {
+            dialogSpinner(editTextMotivo, textInputMotivo, "Grupo", 2, re)
+        }
 
+        buttonGuardar.setOnClickListener {
+            sendDialog(re)
+        }
         val repartoDetalleAdapter = RepartoDetalleAdapter()
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
@@ -367,14 +457,83 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
             DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
         )
         recyclerView.adapter = repartoDetalleAdapter
-        repartoViewModel.getDetalleRepartoById(12)
-            .observe(this, Observer(repartoDetalleAdapter::submitList))
+
+        Handler().postDelayed({
+            repartoViewModel.getReparto()
+                .observe(this, Observer<List<Reparto>> { count ->
+                    if (count != null) {
+                        for (s: Reparto in count) {
+                            if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
+                                val l1 = Location("location 1")
+                                l1.latitude = s.latitud.toDouble()
+                                l1.longitude = s.longitud.toDouble()
+                                val distance = Util.calculationByDistance(l1, m.position)
+
+                                if (distance <= 20) {
+                                    repartoViewModel.getRepartoById(s.repartoId)
+                                        .observe(this, Observer<Reparto> { r ->
+                                            if (r != null) {
+                                                textViewDoc.text = r.numeroDocumento
+                                                textViewNameClient.text = r.apellidoNombreCliente
+                                                textViewSubTotal.setText(
+                                                    Util.getTextHTML("<font color='red'>Total : </font> S/" + r.subTotal),
+                                                    TextView.BufferType.SPANNABLE
+                                                )
+
+                                                editTextEstado.setText(r.nombreEstado)
+                                                editTextMotivo.setText(r.motivo)
+                                                re = r
+
+                                                linearLayoutLoad.visibility = View.GONE
+                                                linearLayoutPrincipal.visibility = View.VISIBLE
+                                            }
+                                        })
+
+                                    repartoViewModel.getDetalleRepartoById(s.repartoId)
+                                        .observe(this, Observer(repartoDetalleAdapter::submitList))
+
+                                    break
+                                }
+                            }
+                        }
+                    }
+                })
+        }, 800)
     }
 
-    override fun onMarkerClick(m: Marker): Boolean {
-        dialogResumen(m)
-        return true
+    private fun load() {
+        builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(this).inflate(R.layout.dialog_login, null)
+        builder.setView(view)
+        val textView: TextView = view.findViewById(R.id.textViewLado)
+        textView.text = String.format("%s", "Enviando")
+        dialog = builder.create()
+        dialog!!.setCanceledOnTouchOutside(false)
+        dialog!!.setCancelable(false)
+        dialog!!.show()
     }
 
+    private fun loadFinish() {
+        if (dialog != null) {
+            if (dialog!!.isShowing) {
+                dialog!!.dismiss()
+            }
+        }
+    }
 
+    private fun sendDialog(r: Reparto) {
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Mensaje")
+            .setMessage("Deseas enviar el reparto?")
+            .setPositiveButton("SI") { dialog, _ ->
+                load()
+                repartoViewModel.updateReparto(r)
+                dialog.dismiss()
+            }
+            .setNegativeButton("NO") { dialog, _ ->
+                dialog.dismiss()
+            }
+        dialog.show()
+    }
 }

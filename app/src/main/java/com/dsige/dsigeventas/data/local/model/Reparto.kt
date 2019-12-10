@@ -22,6 +22,10 @@ open class Reparto {
     var longitud: String = ""
     var numeroDocumento: String = ""
     var subTotal: Double = 0.0
+    var estado: Int = 0
+    var nombreEstado: String = ""
+    var motivoId: Int = 0
+    var motivo: String = ""
 
     @Ignore
     var detalle: List<RepartoDetalle>? = null

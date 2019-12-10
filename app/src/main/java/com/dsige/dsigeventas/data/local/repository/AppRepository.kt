@@ -93,6 +93,8 @@ interface AppRepository {
 
     fun getRepartos(): LiveData<PagedList<Reparto>>
 
+    fun getReparto(): LiveData<List<Reparto>>
+
     fun getMapReparto(): Observable<List<Reparto>>
 
     fun deletePedidoDetalle(p: PedidoDetalle): Completable
@@ -114,4 +116,15 @@ interface AppRepository {
     fun updateCliente(m: Mensaje, pedidoId: Int): Completable
 
     fun getDetalleRepartoById(id: Int): LiveData<PagedList<RepartoDetalle>>
+
+    fun getEstados(): LiveData<List<Estado>>
+
+    fun getGrupos(): LiveData<List<Grupo>>
+
+    fun updateReparto(re: Reparto) : Completable
+
+    fun getRepartoByIdTask(id: Int): Observable<Reparto>
+
+    fun sendUpdateReparto(body: RequestBody): Observable<Mensaje>
+
 }

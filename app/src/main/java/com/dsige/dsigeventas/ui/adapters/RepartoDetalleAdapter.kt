@@ -37,7 +37,7 @@ class RepartoDetalleAdapter :
                 textViewPrecio.text = String.format("S/. %s", r.precioVenta)
                 textViewCodigo.text = r.codigoProducto
                 textViewSubTotal.setText(
-                    Util.getTextHTML("<font color='red'>Sub Total : </font> S/" + r.total),
+                    Util.getTextHTML("<font color='red'>Sub Total : </font> S/ " + r.total),
                     TextView.BufferType.SPANNABLE
                 )
                 editTextCantidad.setText(r.cantidad.toString())

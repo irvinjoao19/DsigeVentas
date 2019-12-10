@@ -52,4 +52,8 @@ interface ApiService {
     @Headers("Cache-Control: no-cache")
     @POST("SaveCliente")
     fun sendCliente(@Body body: RequestBody): Observable<Mensaje>
+
+    @Headers("Cache-Control: no-cache")
+    @POST("UpdateReparto")
+    fun sendUpdateReparto(@Body body: RequestBody): Observable<Mensaje>
 }

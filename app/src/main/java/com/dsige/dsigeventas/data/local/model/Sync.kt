@@ -10,6 +10,8 @@ open class Sync {
     var clientes: List<Cliente> = ArrayList()
     var formaPagos: List<FormaPago> = ArrayList()
     var repartos: List<Reparto> = ArrayList()
+    var estados: List<Estado> = ArrayList()
+    var grupos: List<Grupo> = ArrayList()
 
     var mensaje: String = ""
 }

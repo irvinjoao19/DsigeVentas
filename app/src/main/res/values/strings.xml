@@ -195,4 +195,8 @@
     <string name="filtro">Filtro</string>
     <string name="ver_ruta">Ver ruta</string>
     <string name="entrega_factura">Entrega de Factura</string>
+    <string name="cargando">Cargando…</string>
+    <string name="motivo_devolucion">Motivo de Devolución</string>
+    <string name="save">Guardar</string>
+    <string name="devolvio_entrega">Devolvio/Entrega</string>
 </resources>

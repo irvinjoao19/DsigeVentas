@@ -10,14 +10,13 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -360,8 +359,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     }
 
     private fun dialogResumen(m: Marker) {
-        val builder =
-            android.app.AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
+        val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
         @SuppressLint("InflateParams") val v =
             LayoutInflater.from(context).inflate(R.layout.cardview_resumen_maps, null)
         val buttonSalir: MaterialButton = v.findViewById(R.id.buttonGo)

@@ -103,4 +103,14 @@ class DataBaseModule {
     internal fun provideRepartoDetalleDao(appDataBase: AppDataBase): RepartoDetalleDao {
         return appDataBase.repartoDetalleDao()
     }
+
+    @Provides
+    internal fun provideEstadoDao(appDataBase: AppDataBase): EstadoDao {
+        return appDataBase.estadoDao()
+    }
+
+    @Provides
+    internal fun provideGrupoDao(appDataBase: AppDataBase): GrupoDao {
+        return appDataBase.grupoDao()
+    }
 }

@@ -20,8 +20,8 @@ interface RepartoDao {
     @Delete
     fun deleteRepartoTask(c: Reparto)
 
-    @Query("SELECT * FROM Reparto")
-    fun getRepartoTask(): Reparto
+    @Query("SELECT * FROM Reparto WHERE repartoId =:id")
+    fun getRepartoByIdTask(id:Int): Reparto
 
     @Query("SELECT * FROM Reparto")
     fun getRepartos(): DataSource.Factory<Int, Reparto>
@@ -38,4 +38,6 @@ interface RepartoDao {
     @Query("SELECT * FROM Reparto WHERE repartoId=:id")
     fun getRepartoById(id:Int): LiveData<Reparto>
 
+    @Query("SELECT * FROM Reparto")
+    fun getReparto(): LiveData<List<Reparto>>
 }
