@@ -69,6 +69,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         topMenu = menu
         menu.findItem(R.id.ok).setVisible(false).isEnabled = false
         menu.findItem(R.id.search).setVisible(false).isEnabled = false
+        menu.findItem(R.id.logout).setVisible(false).isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

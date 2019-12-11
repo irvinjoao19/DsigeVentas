@@ -46,7 +46,25 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun deleteUsuario(): Completable {
-        return Completable.fromAction { dataBase.usuarioDao().deleteAll() }
+        return Completable.fromAction {
+            dataBase.usuarioDao().deleteAll()
+            dataBase.categoriaDao().deleteAll()
+            dataBase.clienteDao().deleteAll()
+            dataBase.departamentoDao().deleteAll()
+            dataBase.distritoDao().deleteAll()
+            dataBase.estadoDao().deleteAll()
+            dataBase.formaPagoDao().deleteAll()
+            dataBase.giroNegocioDao().deleteAll()
+            dataBase.grupoDao().deleteAll()
+            dataBase.identidadDao().deleteAll()
+            dataBase.pedidoDao().deleteAll()
+            dataBase.pedidoDetalleDao().deleteAll()
+            dataBase.personalDao().deleteAll()
+            dataBase.provinciaDao().deleteAll()
+            dataBase.repartoDao().deleteAll()
+            dataBase.repartoDetalleDao().deleteAll()
+            dataBase.stockDao().deleteAll()
+        }
     }
 
     override fun deleteTotal(): Completable {
@@ -343,19 +361,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun getReparto(): LiveData<List<Reparto>> {
-        return dataBase.repartoDao().getReparto()
-    }
-
-    override fun getMapReparto(): Observable<List<Reparto>> {
-        return Observable.create { e ->
-            val r: List<Reparto>? = dataBase.repartoDao().getMapReparto()
-            if (r != null) {
-                e.onNext(r)
-            } else {
-                e.onError(Throwable(String.format("%s", "No hay datos")))
-            }
-            e.onComplete()
-        }
+        return dataBase.repartoDao().getReparto(10)
     }
 
     override fun deletePedidoDetalle(p: PedidoDetalle): Completable {

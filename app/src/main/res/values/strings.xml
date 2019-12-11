@@ -199,4 +199,7 @@
     <string name="motivo_devolucion">Motivo de Devolución</string>
     <string name="save">Guardar</string>
     <string name="devolvio_entrega">Devolvio/Entrega</string>
+    <string name="dni">70401291</string>
+    <string name="name">irvin joao gongora hernandez</string>
+    <string name="logout">Salir</string>
 </resources>

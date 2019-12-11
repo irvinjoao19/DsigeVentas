@@ -116,6 +116,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
                 if (s != null) {
                     loadFinish()
                     Util.toastMensaje(this, s)
+                    finish()
                 }
             })
         }
@@ -140,8 +141,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
             val sydney = LatLng(latitud.toDouble(), longitud.toDouble())
             mMap.addMarker(MarkerOptions().position(sydney).title(title))
             mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-
-//            mMap.isTrafficEnabled = true
+            mMap.isTrafficEnabled = true
             mMap.isMyLocationEnabled = true
 
             if (mapView?.findViewById<View>(Integer.parseInt("1")) != null) {
@@ -184,6 +184,13 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
             .tilt(30f)        // limit 90
             .build()
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+
+        mMap.addMarker(
+            MarkerOptions()
+                .position(LatLng(location.latitude, location.longitude))
+                .title("YO")
+                .icon(Util.bitmapDescriptorFromVector(this, R.drawable.ic_car_map))
+        )
     }
 
     private fun getUrl(origin: LatLng, dest: LatLng): String {
@@ -422,6 +429,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
 
         val linearLayoutLoad: ConstraintLayout = v.findViewById(R.id.linearLayoutLoad)
         val linearLayoutPrincipal: LinearLayout = v.findViewById(R.id.linearLayoutPrincipal)
+        val textViewRuc: TextView = v.findViewById(R.id.textViewRuc)
         val textViewDoc: TextView = v.findViewById(R.id.textViewDoc)
         val textViewNameClient: TextView = v.findViewById(R.id.textViewNameClient)
         val textViewSubTotal: TextView = v.findViewById(R.id.textViewSubTotal)
@@ -447,7 +455,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         }
 
         buttonGuardar.setOnClickListener {
-            sendDialog(re)
+            sendDialog(dialog, re)
         }
         val repartoDetalleAdapter = RepartoDetalleAdapter()
         val layoutManager = LinearLayoutManager(this)
@@ -473,7 +481,11 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
                                     repartoViewModel.getRepartoById(s.repartoId)
                                         .observe(this, Observer<Reparto> { r ->
                                             if (r != null) {
-                                                textViewDoc.text = r.numeroDocumento
+                                                textViewRuc.text = r.numeroDocumento
+                                                textViewDoc.setText(
+                                                    Util.getTextHTML("<strong>Nro Doc Vta: </string>" + r.docVTA),
+                                                    TextView.BufferType.SPANNABLE
+                                                )
                                                 textViewNameClient.text = r.apellidoNombreCliente
                                                 textViewSubTotal.setText(
                                                     Util.getTextHTML("<font color='red'>Total : </font> S/" + r.subTotal),
@@ -522,7 +534,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         }
     }
 
-    private fun sendDialog(r: Reparto) {
+    private fun sendDialog(d: AlertDialog, r: Reparto) {
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle("Mensaje")
             .setMessage("Deseas enviar el reparto?")
@@ -530,6 +542,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
                 load()
                 repartoViewModel.updateReparto(r)
                 dialog.dismiss()
+                d.dismiss()
             }
             .setNegativeButton("NO") { dialog, _ ->
                 dialog.dismiss()

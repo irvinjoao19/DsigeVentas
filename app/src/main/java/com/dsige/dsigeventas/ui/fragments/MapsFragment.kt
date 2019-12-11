@@ -20,6 +20,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.*
@@ -38,10 +39,6 @@ import com.google.gson.Gson
 import com.google.maps.android.ui.IconGenerator
 import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.DaggerFragment
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -106,8 +103,11 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     var MIN_TIME_BW_UPDATES: Int = 5000
     var isFirstTime: Boolean = true
     var waypoints: String = ""
-    var latitud: String = ""
-    var longitud: String = ""
+
+    var lat: String = ""
+    var lat2: String = ""
+    var lng: String = ""
+    var lng2: String = ""
     var title: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -136,6 +136,31 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        repartoViewModel.getReparto().observe(this, Observer<List<Reparto>>{count ->
+            if (count != null){
+                waypoints = "waypoints=optimize:true|"
+                var i = 1
+                val y = count.size
+                for (s: Reparto in count) {
+                    if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
+                        waypoints += String.format("%s,%s|", s.latitud, s.longitud)
+
+                        if (i == 1) {
+                            lat = s.latitud
+                            lng = s.longitud
+                        }
+
+                        if (i == y) {
+                            lat2 = s.latitud
+                            lng2 = s.longitud
+                        }
+                    }
+                    i++
+                }
+                FetchURL().execute(getUrl(lat, lng, lat2, lng2))
+            }
+        })
     }
 
     private fun zoomToLocation(location: Location) {
@@ -146,12 +171,18 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             .tilt(30f)        // limit 90
             .build()
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+
+        mMap.addMarker(
+            MarkerOptions()
+                .position(LatLng(location.latitude, location.longitude))
+                .title("YO")
+                .icon(Util.bitmapDescriptorFromVector(context!!, R.drawable.ic_car_map))
+        )
     }
 
-
-    private fun getUrl(l: Location, latitud: String, longitud: String): String {
-        val str_origin = "origin=" + l.latitude + "," + l.longitude
-        val str_dest = "destination=" + latitud + "," + longitud
+    private fun getUrl(lat: String, lng: String, lat2: String, lng2: String): String {
+        val str_origin = "origin=$lat,$lng"
+        val str_dest = "destination=$lat2,$lng2"
         val mode = "mode=driving&alternatives=false"
         val sensor = "sensor=false"
         val parameters = "$str_origin&$str_dest&$mode&$sensor&$waypoints"
@@ -178,36 +209,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         if (isFirstTime) {
             zoomToLocation(location)
         }
-
-        repartoViewModel.getMapReparto()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<List<Reparto>> {
-                override fun onComplete() {
-                }
-
-                override fun onSubscribe(d: Disposable) {
-                }
-
-                override fun onNext(count: List<Reparto>) {
-                    waypoints = "waypoints=optimize:true|"
-                    var i = 1
-                    for (s: Reparto in count) {
-                        if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
-                            waypoints += String.format("%s,%s|", s.latitud, s.longitud)
-                            latitud = s.latitud
-                            longitud = s.longitud
-                            i++
-                        }
-                    }
-                    FetchURL().execute(getUrl(location, latitud, longitud))
-                    isFirstTime = false
-                }
-
-                override fun onError(e: Throwable) {
-
-                }
-            })
+        isFirstTime = false
     }
 
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
@@ -242,7 +244,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             if (mapRoutes != null) {
                 for (r: MapRoute in map.routes) {
                     val mapLegs: List<MapLegs>? = r.legs
-                    var i = 1
+                    var i = 0
                     if (mapLegs != null) {
                         for (m: MapLegs in mapLegs) {
                             val start: MapStartLocation? = m.start_location

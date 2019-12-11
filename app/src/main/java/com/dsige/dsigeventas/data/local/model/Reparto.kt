@@ -26,6 +26,7 @@ open class Reparto {
     var nombreEstado: String = ""
     var motivoId: Int = 0
     var motivo: String = ""
+    var docVTA: String = ""
 
     @Ignore
     var detalle: List<RepartoDetalle>? = null

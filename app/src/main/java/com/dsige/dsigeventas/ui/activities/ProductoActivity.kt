@@ -3,6 +3,7 @@ package com.dsige.dsigeventas.ui.activities
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -34,7 +35,9 @@ class ProductoActivity : DaggerAppCompatActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.add).setVisible(false).isEnabled = false
-        menu.findItem(R.id.search).setVisible(false).isEnabled = false
+        menu.findItem(R.id.logout).setVisible(false).isEnabled = false
+        val searchView = menu.findItem(R.id.search).actionView as SearchView
+        search(searchView)
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -94,6 +97,19 @@ class ProductoActivity : DaggerAppCompatActivity() {
             if (s != null) {
                 Util.toastMensaje(this, s)
                 finish()
+            }
+        })
+    }
+
+    private fun search(searchView: SearchView) {
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                productoViewModel.searchProducto.value = newText
+                return true
             }
         })
     }

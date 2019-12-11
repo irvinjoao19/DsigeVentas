@@ -39,10 +39,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         return roomRepository.getReparto()
     }
 
-    fun getMapReparto(): Observable<List<Reparto>> {
-        return roomRepository.getMapReparto()
-    }
-
     fun getRepartoById(id: Int): LiveData<Reparto> {
         return roomRepository.getRepartoById(id)
     }

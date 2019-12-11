@@ -11,6 +11,7 @@ import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.PedidoDetalle
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import kotlinx.android.synthetic.main.cardview_pedidos.view.*
+import java.text.DecimalFormat
 
 class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPedidoListener) :
     PagedListAdapter<PedidoDetalle, ProductoPedidoAdapter.ViewHolder>(diffCallback) {
@@ -33,9 +34,9 @@ class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPe
             with(itemView) {
                 textViewNombre.text = p.nombre
                 textViewCodigo.text = p.codigo
-                //textViewStock.text = p.stockMinimo.toString()
                 textViewPrecio.text = p.precioVenta.toString()
-                textViewSubTotal.text = String.format("S/. %s", p.subTotal)
+                textViewSubTotal.text =
+                    String.format("S/. %.2f", p.subTotal)
                 editTextCantidad.setText(p.cantidad.toString())
 
                 if (p.estado == 1) {
@@ -45,8 +46,6 @@ class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPe
                     editTextCantidad.setOnClickListener { v ->
                         listener.onItemClick(p, v, adapterPosition)
                     }
-                    //  imageViewMap.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
-                    //  imageViewEdit.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
                     imageViewNegative.setOnClickListener { v ->
                         listener.onItemClick(p, v, adapterPosition)
                     }

@@ -68,6 +68,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         topMenu = menu
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.search).setVisible(false).isEnabled = false
+        menu.findItem(R.id.logout).setVisible(false).isEnabled = false
         return true
     }
 
@@ -192,7 +193,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                     .observe(this@OrdenActivity, Observer<Pedido> { p ->
                         if (p != null) {
                             textViewNombre.text = p.nombreCliente
-                            textViewTotal.text = String.format("Total : S/. %s", p.totalNeto)
+                            textViewTotal.text = String.format("Total : S/. %.2f", p.totalNeto)
                             if (p.estado == 1) {
                                 topMenu?.findItem(R.id.add)?.setVisible(false)?.isEnabled = false
                                 topMenu?.findItem(R.id.ok)?.setVisible(false)?.isEnabled = false
