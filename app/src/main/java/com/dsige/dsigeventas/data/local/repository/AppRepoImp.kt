@@ -360,8 +360,16 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getTotalReparto(): LiveData<Int> {
+        return dataBase.repartoDao().getReparto()
+    }
+
+    override fun getRepartoCount(valor : Int): LiveData<Int> {
+        return dataBase.repartoDao().getRepartoCount(valor)
+    }
+
     override fun getReparto(): LiveData<List<Reparto>> {
-        return dataBase.repartoDao().getReparto(10)
+        return dataBase.repartoDao().getReparto(8)
     }
 
     override fun deletePedidoDetalle(p: PedidoDetalle): Completable {

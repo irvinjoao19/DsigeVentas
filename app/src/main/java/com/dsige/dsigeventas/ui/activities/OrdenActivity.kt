@@ -244,9 +244,8 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         buttonAceptar.setOnClickListener {
             if (editTextProducto.text.toString().isNotEmpty()) {
                 val nPositive = editTextProducto.text.toString().toDouble()
-                when (nPositive) {
-                    0.0 -> p.estado = 0
-                    else -> p.estado = 1
+                if (nPositive == 0.0) {
+                    p.estado = 0
                 }
                 p.cantidad = nPositive
                 p.unidadMedida = nPositive

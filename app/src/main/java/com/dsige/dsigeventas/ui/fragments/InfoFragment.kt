@@ -71,7 +71,6 @@ class InfoFragment : DaggerFragment() {
         super.onViewCreated(view, savedInstanceState)
         val toolbar: Toolbar = activity!!.findViewById(R.id.toolbar)
         toolbar.visibility = View.VISIBLE
-
         bindUI()
     }
 

@@ -39,6 +39,7 @@ import com.google.gson.Gson
 import com.google.maps.android.ui.IconGenerator
 import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.DaggerFragment
+import kotlinx.android.synthetic.main.fragment_maps.*
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
@@ -70,7 +71,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         }
         mMap.isMyLocationEnabled = true
 
-
         locationManager.requestLocationUpdates(
             LocationManager.NETWORK_PROVIDER,
             MIN_TIME_BW_UPDATES.toLong(),
@@ -85,7 +85,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         )
 
         mMap.setOnMarkerClickListener(this)
-        mMap.setOnPolylineClickListener { }
     }
 
     @Inject
@@ -137,11 +136,16 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        repartoViewModel.getReparto().observe(this, Observer<List<Reparto>>{count ->
-            if (count != null){
+        repartoViewModel.getReparto().observe(this, Observer<List<Reparto>> { count ->
+            mMap.clear()
+            if (count.isNotEmpty()) {
                 waypoints = "waypoints=optimize:true|"
                 var i = 1
                 val y = count.size
+                textViewPendientes.setText(
+                    Util.getTextHTML("<strong>Pendientes: </string>$y"),
+                    TextView.BufferType.SPANNABLE
+                )
                 for (s: Reparto in count) {
                     if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
                         waypoints += String.format("%s,%s|", s.latitud, s.longitud)
@@ -161,23 +165,46 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 FetchURL().execute(getUrl(lat, lng, lat2, lng2))
             }
         })
+
+        repartoViewModel.getTotalReparto().observe(this, Observer<Int> { c ->
+            textViewAsignados.setText(
+                Util.getTextHTML("<strong>Asignados: </string>$c"),
+                TextView.BufferType.SPANNABLE
+            )
+        })
+
+        repartoViewModel.getTotalEntregado().observe(this, Observer<Int> { c ->
+            textViewEntregado.setText(
+                Util.getTextHTML("<strong>Entregados: </string>$c"),
+                TextView.BufferType.SPANNABLE
+            )
+        })
+
+        repartoViewModel.getTotalDevuelto().observe(this, Observer<Int> { c ->
+            textViewDevuelto.setText(
+                Util.getTextHTML("<strong>Devueltos: </string>$c"),
+                TextView.BufferType.SPANNABLE
+            )
+        })
     }
 
-    private fun zoomToLocation(location: Location) {
-        camera = CameraPosition.Builder()
-            .target(LatLng(location.latitude, location.longitude))
-            .zoom(12f)  // limite 21
-            //.bearing(165) // 0 - 365°
-            .tilt(30f)        // limit 90
-            .build()
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+    private fun zoomToLocation(location: Location?) {
+        if (location != null) {
+            camera = CameraPosition.Builder()
+                .target(LatLng(location.latitude, location.longitude))
+                .zoom(12f)  // limite 21
+                //.bearing(165) // 0 - 365°
+                .tilt(30f)        // limit 90
+                .build()
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
 
-        mMap.addMarker(
-            MarkerOptions()
-                .position(LatLng(location.latitude, location.longitude))
-                .title("YO")
-                .icon(Util.bitmapDescriptorFromVector(context!!, R.drawable.ic_car_map))
-        )
+            mMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(location.latitude, location.longitude))
+                    .title("YO")
+                    .icon(Util.bitmapDescriptorFromVector(context!!, R.drawable.ic_car_map))
+            )
+        }
     }
 
     private fun getUrl(lat: String, lng: String, lat2: String, lng2: String): String {

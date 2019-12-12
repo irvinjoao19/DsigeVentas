@@ -365,7 +365,6 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
         builder.setView(view)
         val dialogSpinner = builder.create()
-        dialogSpinner.setCanceledOnTouchOutside(false)
         dialogSpinner.show()
 
         val layoutManager = LinearLayoutManager(this)

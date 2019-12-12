@@ -34,7 +34,6 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
-        android:maxLines="2"
         android:text="@string/dinamita_acme"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"

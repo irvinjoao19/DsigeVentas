@@ -39,6 +39,18 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         return roomRepository.getReparto()
     }
 
+    fun getTotalReparto(): LiveData<Int> {
+        return roomRepository.getTotalReparto()
+    }
+
+    fun getTotalEntregado(): LiveData<Int> {
+        return roomRepository.getRepartoCount(31)
+    }
+
+    fun getTotalDevuelto(): LiveData<Int> {
+        return roomRepository.getRepartoCount(30)
+    }
+
     fun getRepartoById(id: Int): LiveData<Reparto> {
         return roomRepository.getRepartoById(id)
     }
