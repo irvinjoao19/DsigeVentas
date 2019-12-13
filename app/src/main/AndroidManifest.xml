@@ -24,12 +24,18 @@
     <application
         android:name=".data.App"
         android:allowBackup="true"
+        android:allowClearUserData="true"
+        android:fullBackupContent="true"
+        android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        android:usesCleartextTraffic="true"
+        android:vmSafeMode="true"
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:targetApi="m">
 
         <receiver
             android:name=".ui.broadcasts.GpsReceiver"
@@ -71,7 +77,8 @@
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".ui.activities.FileClientActivity" />
         <activity android:name=".ui.activities.LoginActivity" />
-        <activity android:name=".ui.activities.MainActivity"
+        <activity
+            android:name=".ui.activities.MainActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
