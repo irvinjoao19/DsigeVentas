@@ -45,5 +45,8 @@ interface RepartoDao {
     fun getReparto(): LiveData<Int>
 
     @Query("SELECT count(*) FROM Reparto WHERE estado =:e")
-    fun getRepartoCount(e : Int): LiveData<Int>
+    fun getRepartoCount(e: Int): LiveData<Int>
+
+    @Query("UPDATE Reparto SET subTotal=:total WHERE repartoId=:id")
+    fun updateTotalReparto(id: Int, total: Double)
 }

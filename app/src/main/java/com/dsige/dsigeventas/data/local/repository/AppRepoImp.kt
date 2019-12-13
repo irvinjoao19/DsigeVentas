@@ -364,7 +364,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.repartoDao().getReparto()
     }
 
-    override fun getRepartoCount(valor : Int): LiveData<Int> {
+    override fun getRepartoCount(valor: Int): LiveData<Int> {
         return dataBase.repartoDao().getRepartoCount(valor)
     }
 
@@ -426,7 +426,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun getDetalleRepartoById(id: Int): LiveData<PagedList<RepartoDetalle>> {
-        return dataBase.repartoDetalleDao().getDetalleRepartoById(id).toLiveData(
+        return dataBase.repartoDetalleDao().getDetalleRepartoById(id, 1).toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
         )
     }
@@ -447,12 +447,29 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getRepartoByIdTask(id: Int): Observable<Reparto> {
         return Observable.create { e ->
-            e.onNext(dataBase.repartoDao().getRepartoByIdTask(id))
+            val p = dataBase.repartoDao().getRepartoByIdTask(id)
+            val d: List<RepartoDetalle>? = dataBase.repartoDetalleDao().getRepartoById(id)
+            if (d != null) {
+                p.detalle = d
+            }
+            e.onNext(p)
             e.onComplete()
         }
     }
 
     override fun sendUpdateReparto(body: RequestBody): Observable<Mensaje> {
         return apiService.sendUpdateReparto(body)
+    }
+
+    override fun updateRepartoDetalle(r: RepartoDetalle): Completable {
+        return Completable.fromAction {
+            dataBase.repartoDetalleDao().updateRepartoDetalleTask(r)
+        }
+    }
+
+    override fun updateTotalReparto(repartoId: Int, total: Double): Completable {
+        return Completable.fromAction {
+            dataBase.repartoDao().updateTotalReparto(repartoId, total)
+        }
     }
 }

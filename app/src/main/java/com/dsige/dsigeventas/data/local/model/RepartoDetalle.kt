@@ -14,9 +14,11 @@ open class RepartoDetalle {
     var porcentajeDescuento: Double = 0.0
     var descuento: Double = 0.0
     var cantidad: Double = 0.0
+    var cantidadExacta: Double = 0.0
     var porcentajeIGV: Double = 0.0
     var total: Double = 0.0
     var numeroPedido: String = ""
     var nombreProducto: String = ""
     var codigoProducto: String = ""
+    var estado: Int = 0
 }

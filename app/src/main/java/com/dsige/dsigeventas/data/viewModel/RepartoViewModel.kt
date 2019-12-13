@@ -31,6 +31,10 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
 
+    fun setError(s: String) {
+        mensajeError.value = s
+    }
+
     fun getRepartos(): LiveData<PagedList<Reparto>> {
         return roomRepository.getRepartos()
     }
@@ -67,13 +71,15 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         return roomRepository.getGrupos()
     }
 
-    fun updateReparto(re: Reparto) {
+    fun updateReparto(tipo: Int, re: Reparto) {
         roomRepository.updateReparto(re)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
                 override fun onComplete() {
-                    sendUpdateReparto(re.repartoId)
+                    if (tipo == 1){
+                        sendUpdateReparto(re.repartoId)
+                    }
                 }
 
                 override fun onSubscribe(d: Disposable) {
@@ -83,7 +89,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 override fun onError(e: Throwable) {
                     mensajeError.value = e.toString()
                 }
-
             })
     }
 
@@ -128,6 +133,44 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 override fun onComplete() {
                     mensajeSuccess.postValue("ENVIADO")
                 }
+            })
+    }
+
+    fun updateRepartoDetalle(r: RepartoDetalle) {
+        roomRepository.updateRepartoDetalle(r)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.toString()
+                }
+
+            })
+    }
+
+    fun updateTotalReparto(repartoId: Int, total: Double) {
+        roomRepository.updateTotalReparto(repartoId, total)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.toString()
+                }
+
             })
     }
 }

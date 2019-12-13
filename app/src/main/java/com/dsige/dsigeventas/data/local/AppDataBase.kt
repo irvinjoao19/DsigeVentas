@@ -27,7 +27,7 @@ import com.dsige.dsigeventas.data.local.model.*
         Estado::class,
         Grupo::class
     ],
-    version = 6,
+    version = 7,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {

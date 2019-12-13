@@ -17,11 +17,13 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -355,70 +357,46 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         }
     }
 
-    private fun dialogSpinner(
-        input: TextInputEditText, l: TextInputLayout, title: String, tipo: Int, re: Reparto
-    ) {
-        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+    override fun onMarkerClick(m: Marker): Boolean {
+        dialogResumen(m)
+        return true
+    }
+
+    private fun load() {
+        builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
-            LayoutInflater.from(this).inflate(R.layout.dialog_spinner, null)
-        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
-        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+            LayoutInflater.from(this).inflate(R.layout.dialog_login, null)
         builder.setView(view)
-        val dialogSpinner = builder.create()
-        dialogSpinner.show()
+        val textView: TextView = view.findViewById(R.id.textViewLado)
+        textView.text = String.format("%s", "Enviando")
+        dialog = builder.create()
+        dialog!!.setCanceledOnTouchOutside(false)
+        dialog!!.setCancelable(false)
+        dialog!!.show()
+    }
 
-        val layoutManager = LinearLayoutManager(this)
-        recyclerView.itemAnimator = DefaultItemAnimator()
-        recyclerView.addItemDecoration(
-            DividerItemDecoration(
-                recyclerView.context, DividerItemDecoration.VERTICAL
-            )
-        )
-        recyclerView.layoutManager = layoutManager
-
-        textViewTitle.text = title
-
-        when (tipo) {
-            1 -> {
-                val estadoAdapter = EstadoAdapter(object : OnItemClickListener.EstadoListener {
-                    override fun onItemClick(e: Estado, v: View, position: Int) {
-                        re.estado = e.estadoId
-                        input.setText(e.nombre)
-                        l.visibility = View.GONE
-                        if (e.estadoId == 30) {
-                            l.visibility = View.VISIBLE
-                        }
-                        dialogSpinner.dismiss()
-                    }
-                })
-                recyclerView.adapter = estadoAdapter
-                repartoViewModel.getEstados().observe(this, Observer<List<Estado>> { e ->
-                    if (e != null) {
-                        estadoAdapter.addItems(e)
-                    }
-                })
-            }
-            2 -> {
-                val grupoAdapter = GrupoAdapter(object : OnItemClickListener.GrupoListener {
-                    override fun onItemClick(g: Grupo, v: View, position: Int) {
-                        re.motivoId = g.detalleTablaId
-                        input.setText(g.descripcion)
-                        dialogSpinner.dismiss()
-                    }
-                })
-                recyclerView.adapter = grupoAdapter
-                repartoViewModel.getGrupos().observe(this, Observer<List<Grupo>> { e ->
-                    if (e != null) {
-                        grupoAdapter.addItems(e)
-                    }
-                })
+    private fun loadFinish() {
+        if (dialog != null) {
+            if (dialog!!.isShowing) {
+                dialog!!.dismiss()
             }
         }
     }
 
-    override fun onMarkerClick(m: Marker): Boolean {
-        dialogResumen(m)
-        return true
+    private fun sendDialog(d: AlertDialog, r: Reparto) {
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Mensaje")
+            .setMessage("Deseas enviar el reparto?")
+            .setPositiveButton("SI") { dialog, _ ->
+                load()
+                repartoViewModel.updateReparto(1, r)
+                dialog.dismiss()
+                d.dismiss()
+            }
+            .setNegativeButton("NO") { dialog, _ ->
+                dialog.dismiss()
+            }
+        dialog.show()
     }
 
     private fun dialogResumen(m: Marker) {
@@ -446,17 +424,42 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         dialog.show()
 
         imageViewClose.setOnClickListener { dialog.dismiss() }
-        editTextEstado.setOnClickListener {
-            dialogSpinner(editTextEstado, textInputMotivo, "Estado", 1, re)
-        }
-        editTextMotivo.setOnClickListener {
-            dialogSpinner(editTextMotivo, textInputMotivo, "Grupo", 2, re)
-        }
+        editTextEstado.setOnClickListener { dialogSpinner(textInputMotivo, "Estado", 1, re) }
+        editTextMotivo.setOnClickListener { dialogSpinner(textInputMotivo, "Grupo", 2, re) }
 
         buttonGuardar.setOnClickListener {
             sendDialog(dialog, re)
         }
-        val repartoDetalleAdapter = RepartoDetalleAdapter()
+        val repartoDetalleAdapter =
+            RepartoDetalleAdapter(object : OnItemClickListener.RepartoDetalleListener {
+                override fun onItemClick(r: RepartoDetalle, v: View, position: Int) {
+                    when (v.id) {
+                        R.id.editTextCantidad -> updateCantidadReparto(r)
+                        R.id.imageViewNegative -> {
+                            val resta = r.cantidad
+                            if (resta != 0.0) {
+                                val rTotal = (resta - 1).toString()
+                                val nNegative = rTotal.toDouble()
+
+                                r.cantidad = nNegative
+                                r.total = nNegative * r.precioVenta
+                                repartoViewModel.updateRepartoDetalle(r)
+                            }
+                        }
+                        else -> {
+                            val popupMenu = PopupMenu(this@MapsActivity, v)
+                            popupMenu.menu.add(0, 1, 0, getText(R.string.delete))
+                            popupMenu.setOnMenuItemClickListener { item ->
+                                when (item.itemId) {
+                                    1 -> deleteRepartoDialog(r)
+                                }
+                                false
+                            }
+                            popupMenu.show()
+                        }
+                    }
+                }
+            })
         val layoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
@@ -501,8 +504,12 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
                                         })
 
                                     repartoViewModel.getDetalleRepartoById(s.repartoId)
-                                        .observe(this, Observer(repartoDetalleAdapter::submitList))
-
+                                        .observe(this, Observer<PagedList<RepartoDetalle>> { p ->
+                                            if (p.size != 0) {
+                                                updateReparto(s.repartoId, p)
+                                                repartoDetalleAdapter.submitList(p)
+                                            }
+                                        })
                                     break
                                 }
                             }
@@ -512,40 +519,124 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         }, 800)
     }
 
-    private fun load() {
-        builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
-        @SuppressLint("InflateParams") val view =
-            LayoutInflater.from(this).inflate(R.layout.dialog_login, null)
-        builder.setView(view)
-        val textView: TextView = view.findViewById(R.id.textViewLado)
-        textView.text = String.format("%s", "Enviando")
-        dialog = builder.create()
-        dialog!!.setCanceledOnTouchOutside(false)
-        dialog!!.setCancelable(false)
-        dialog!!.show()
-    }
+    private fun updateCantidadReparto(p: RepartoDetalle) {
+        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        @SuppressLint("InflateParams") val v =
+            LayoutInflater.from(this).inflate(R.layout.dialog_count_producto, null)
+        val editTextProducto: EditText = v.findViewById(R.id.editTextProducto)
+        val buttonCancelar: MaterialButton = v.findViewById(R.id.buttonCancelar)
+        val buttonAceptar: MaterialButton = v.findViewById(R.id.buttonAceptar)
+        //editTextProducto.setText(p.cantidad.toString())
+        Util.showKeyboard(editTextProducto, this)
+        builder.setView(v)
+        val dialog = builder.create()
+        dialog.show()
 
-    private fun loadFinish() {
-        if (dialog != null) {
-            if (dialog!!.isShowing) {
-                dialog!!.dismiss()
+        buttonAceptar.setOnClickListener {
+            if (editTextProducto.text.toString().isNotEmpty()) {
+                val nPositive = editTextProducto.text.toString().toDouble()
+                if (nPositive > p.cantidadExacta) {
+                    repartoViewModel.setError("Cantidad no debe ser mayor al actual " + p.cantidadExacta)
+                } else {
+                    p.cantidad = nPositive
+                    p.total = nPositive * p.precioVenta
+                    repartoViewModel.updateRepartoDetalle(p)
+                }
+                Util.hideKeyboardFrom(this, v)
+                dialog.dismiss()
+
+            } else {
+                repartoViewModel.setError("Digite cantidad")
             }
+        }
+        buttonCancelar.setOnClickListener {
+            dialog.cancel()
         }
     }
 
-    private fun sendDialog(d: AlertDialog, r: Reparto) {
+    private fun deleteRepartoDialog(r: RepartoDetalle) {
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle("Mensaje")
-            .setMessage("Deseas enviar el reparto?")
+            .setMessage("Deseas eliminar el producto ?")
             .setPositiveButton("SI") { dialog, _ ->
-                load()
-                repartoViewModel.updateReparto(r)
+                r.estado = 0
+                repartoViewModel.updateRepartoDetalle(r)
                 dialog.dismiss()
-                d.dismiss()
             }
             .setNegativeButton("NO") { dialog, _ ->
                 dialog.dismiss()
             }
         dialog.show()
+    }
+
+    private fun updateReparto(repartoId: Int, repartos: List<RepartoDetalle>) {
+        var total = 0.0
+        for (p in repartos) {
+            total += p.total
+        }
+        repartoViewModel.updateTotalReparto(repartoId, total)
+    }
+
+    private fun dialogSpinner(
+        l: TextInputLayout, title: String, tipo: Int, re: Reparto
+    ) {
+        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(this).inflate(R.layout.dialog_spinner, null)
+        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        builder.setView(view)
+        val dialogSpinner = builder.create()
+        dialogSpinner.show()
+
+        val layoutManager = LinearLayoutManager(this)
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                recyclerView.context, DividerItemDecoration.VERTICAL
+            )
+        )
+        recyclerView.layoutManager = layoutManager
+
+        textViewTitle.text = title
+
+        when (tipo) {
+            1 -> {
+                val estadoAdapter = EstadoAdapter(object : OnItemClickListener.EstadoListener {
+                    override fun onItemClick(e: Estado, v: View, position: Int) {
+                        re.estado = e.estadoId
+                        re.nombreEstado = e.nombre
+                        repartoViewModel.updateReparto(0, re)
+                        l.visibility = View.GONE
+                        if (e.estadoId == 30) {
+                            l.visibility = View.VISIBLE
+                        }
+                        dialogSpinner.dismiss()
+                    }
+                })
+                recyclerView.adapter = estadoAdapter
+                repartoViewModel.getEstados().observe(this, Observer<List<Estado>> { e ->
+                    if (e != null) {
+                        estadoAdapter.addItems(e)
+                    }
+                })
+            }
+            2 -> {
+                val grupoAdapter = GrupoAdapter(object : OnItemClickListener.GrupoListener {
+                    override fun onItemClick(g: Grupo, v: View, position: Int) {
+                        re.motivoId = g.detalleTablaId
+                        re.motivo = g.descripcion
+                        repartoViewModel.updateReparto(0, re)
+                        dialogSpinner.dismiss()
+                    }
+                })
+                recyclerView.adapter = grupoAdapter
+                repartoViewModel.getGrupos().observe(this, Observer<List<Grupo>> { e ->
+                    if (e != null) {
+                        grupoAdapter.addItems(e)
+                    }
+                })
+            }
+        }
     }
 }

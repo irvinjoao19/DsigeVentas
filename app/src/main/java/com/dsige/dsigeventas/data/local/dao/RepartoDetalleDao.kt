@@ -38,6 +38,9 @@ interface RepartoDetalleDao {
     @Query("SELECT * FROM RepartoDetalle WHERE repartoId=:id")
     fun getRepartoDetalleById(id: Int): LiveData<RepartoDetalle>
 
+    @Query("SELECT * FROM RepartoDetalle WHERE repartoId=:id AND estado =:e")
+    fun getDetalleRepartoById(id: Int, e: Int): DataSource.Factory<Int, RepartoDetalle>
+
     @Query("SELECT * FROM RepartoDetalle WHERE repartoId=:id")
-    fun getDetalleRepartoById(id: Int): DataSource.Factory<Int, RepartoDetalle>
+    fun getRepartoById(id: Int): List<RepartoDetalle>
 }

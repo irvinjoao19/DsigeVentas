@@ -11,15 +11,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.RepartoDetalle
 import com.dsige.dsigeventas.helper.Util
+import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import kotlinx.android.synthetic.main.cardview_reparto_detalle.view.*
 
-class RepartoDetalleAdapter :
+class RepartoDetalleAdapter(var listener: OnItemClickListener.RepartoDetalleListener):
     PagedListAdapter<RepartoDetalle, RepartoDetalleAdapter.ViewHolder>(diffCallback) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val s = getItem(position)
         if (s != null) {
-            holder.bind(s)
+            holder.bind(s,listener)
         }
     }
 
@@ -31,16 +32,19 @@ class RepartoDetalleAdapter :
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal fun bind(r: RepartoDetalle) =
+        internal fun bind(r: RepartoDetalle,listener: OnItemClickListener.RepartoDetalleListener) =
             with(itemView) {
                 textViewProducto.text = r.nombreProducto
                 textViewPrecio.text = String.format("S/. %s", r.precioVenta)
                 textViewCodigo.text = r.codigoProducto
                 textViewSubTotal.setText(
-                    Util.getTextHTML("<font color='red'>Sub Total : </font> S/ " + r.total),
+                    Util.getTextHTML(String.format("<font color='red'>Sub Total : </font> S/ %.2f", r.total)),
                     TextView.BufferType.SPANNABLE
                 )
                 editTextCantidad.setText(r.cantidad.toString())
+                editTextCantidad.setOnClickListener{v-> listener.onItemClick(r,v,adapterPosition)}
+                imageViewNegative.setOnClickListener{v-> listener.onItemClick(r,v,adapterPosition)}
+                itemView.setOnClickListener{v-> listener.onItemClick(r,v,adapterPosition)}
             }
     }
 

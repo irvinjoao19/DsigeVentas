@@ -162,7 +162,8 @@
                 android:id="@+id/editTextMotivo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/ic_down" />
+                android:drawableEnd="@drawable/ic_down"
+                android:focusable="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton

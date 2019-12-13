@@ -217,15 +217,13 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
     }
 
     private fun updateProducto(pedidoDetalles: List<PedidoDetalle>) {
-        var subTotal = 0.0
-        val total: Double
+        var total = 0.0
         val igv: Double
         for (p in pedidoDetalles) {
-            subTotal += p.subTotal
+            total += p.subTotal
         }
-        igv = subTotal * 0.18
-        total = igv + subTotal
-        productoViewModel.updateTotalPedido(pedidoId, igv, total, subTotal)
+        igv = total * 0.18
+        productoViewModel.updateTotalPedido(pedidoId, igv, total, total)
     }
 
     private fun updateCantidadProducto(p: PedidoDetalle) {

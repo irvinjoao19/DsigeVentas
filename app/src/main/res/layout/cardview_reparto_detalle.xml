@@ -8,13 +8,15 @@
 
     <TextView
         android:id="@+id/textViewProducto"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:ellipsize="end"
-        android:lines="1"
         android:text="@string/dinamita_acme"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,6 +31,20 @@
         android:text="@string/acme_02_004"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewProducto" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/imageViewNegative"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/imagen"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintEnd_toStartOf="@+id/editTextCantidad"
+        app:layout_constraintTop_toBottomOf="@+id/textViewCodigo"
+        app:srcCompat="@drawable/ic_remove"
+        app:tint="@color/colorWhite" />
+
 
     <EditText
         android:id="@+id/editTextCantidad"
@@ -60,8 +76,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="8dp"
-        android:textStyle="bold"
         android:textColor="@color/colorPrimary"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageViewPrecio" />
 

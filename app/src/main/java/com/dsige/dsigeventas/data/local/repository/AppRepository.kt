@@ -92,12 +92,11 @@ interface AppRepository {
     fun getPedido(search: String): LiveData<PagedList<Pedido>>
 
 
-
     fun getRepartos(): LiveData<PagedList<Reparto>>
 
     fun getTotalReparto(): LiveData<Int>
 
-    fun getRepartoCount(valor : Int): LiveData<Int>
+    fun getRepartoCount(valor: Int): LiveData<Int>
 
     fun getReparto(): LiveData<List<Reparto>>
 
@@ -130,5 +129,9 @@ interface AppRepository {
     fun getRepartoByIdTask(id: Int): Observable<Reparto>
 
     fun sendUpdateReparto(body: RequestBody): Observable<Mensaje>
+
+    fun updateRepartoDetalle(r: RepartoDetalle): Completable
+
+    fun updateTotalReparto(repartoId: Int, total: Double): Completable
 
 }
