@@ -7,16 +7,17 @@ import android.view.*
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 
 import com.dsige.dsigeventas.R
+import com.dsige.dsigeventas.data.local.model.Resumen
 import com.dsige.dsigeventas.data.local.model.Usuario
 import com.dsige.dsigeventas.data.viewModel.UsuarioViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.LoginActivity
+import com.dsige.dsigeventas.ui.activities.PersonalMapActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_info.*
@@ -25,7 +26,7 @@ import javax.inject.Inject
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class InfoFragment : DaggerFragment() {
+class InfoFragment : DaggerFragment(), View.OnClickListener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -33,7 +34,8 @@ class InfoFragment : DaggerFragment() {
 
     lateinit var builder: AlertDialog.Builder
     var dialog: AlertDialog? = null
-    private var param1: String? = null
+
+    private var cargo: String = ""
     private var param2: String? = null
 
 
@@ -55,7 +57,7 @@ class InfoFragment : DaggerFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
+            cargo = it.getString(ARG_PARAM1)!!
             param2 = it.getString(ARG_PARAM2)
         }
         setHasOptionsMenu(true)
@@ -69,29 +71,25 @@ class InfoFragment : DaggerFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val toolbar: Toolbar = activity!!.findViewById(R.id.toolbar)
-        toolbar.visibility = View.VISIBLE
         bindUI()
     }
 
     private fun bindUI() {
+        val toolbar: Toolbar = activity!!.findViewById(R.id.toolbar)
+        toolbar.visibility = View.VISIBLE
         usuarioViewModel =
             ViewModelProviders.of(this, viewModelFactory).get(UsuarioViewModel::class.java)
         usuarioViewModel.user.observe(this, Observer<Usuario> { u ->
             if (u != null) {
-                textViewName.text = u.apellidos
-                textViewDni.setText(
-                    Util.getTextHTML("<font color='red'>DNI : </font>" + u.documento),
-                    TextView.BufferType.SPANNABLE
-                )
+                toolbar.title = u.apellidos
+                textViewDni.setText(Util.getTextHTML(u.documento), TextView.BufferType.SPANNABLE)
                 textViewTelefono.setText(
-                    Util.getTextHTML("<font color='red'>Telefono : </font>" + u.telefono),
-                    TextView.BufferType.SPANNABLE
+                    Util.getTextHTML(u.telefono), TextView.BufferType.SPANNABLE
                 )
             }
         })
 
-        usuarioViewModel.mensajeSuccess.observe(this,Observer<String>{s->
+        usuarioViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
                 loadFinish()
                 val intent = Intent(context, LoginActivity::class.java)
@@ -101,12 +99,65 @@ class InfoFragment : DaggerFragment() {
             }
         })
 
-        usuarioViewModel.mensajeError.observe(this,Observer<String>{s->
+        usuarioViewModel.mensajeError.observe(this, Observer<String> { s ->
             if (s != null) {
                 loadFinish()
                 Util.toastMensaje(context!!, s)
             }
         })
+
+        if (cargo != "Administrador") {
+            linearLayout.visibility = View.GONE
+            fabResumen.visibility = View.GONE
+        } else {
+            usuarioViewModel.getResumen(Util.getFecha())
+            usuarioViewModel.resumen.observe(this, Observer<Resumen> { r ->
+                if (r != null) {
+                    textView1.setText(
+                        Util.getTextHTML("<strong>S/.</strong> " + r.totalVenta),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView2.setText(
+                        Util.getTextHTML(r.countPedidoVenta.toString()),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView3.setText(
+                        Util.getTextHTML(r.countClientes.toString()),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView4.setText(
+                        Util.getTextHTML(r.mejorVendedor),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView5.setText(
+                        Util.getTextHTML("<strong>S/.</strong> " + r.mejorProductoSoles),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView6.setText(
+                        Util.getTextHTML(r.mejorProducto),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView7.setText(
+                        Util.getTextHTML("<strong>S/.</strong> " + r.mejorProductoSoles),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView8.setText(
+                        Util.getTextHTML("<strong>S/.</strong> " + r.totalDevolucion),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView9.setText(
+                        Util.getTextHTML(r.peorVendedor),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    textView10.setText(
+                        Util.getTextHTML("<strong>S/.</strong> " + r.peorVendedorSoles),
+                        TextView.BufferType.SPANNABLE
+                    )
+                    linearLayout.visibility = View.VISIBLE
+                }
+            })
+        }
+        fabResumen.setOnClickListener(this)
     }
 
     private fun loadFinish() {
@@ -159,5 +210,12 @@ class InfoFragment : DaggerFragment() {
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
         dialog!!.show()
+    }
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.fabResumen -> startActivity(Intent(context, PersonalMapActivity::class.java))
+            //            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+        }
     }
 }

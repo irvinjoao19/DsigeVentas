@@ -186,6 +186,13 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 TextView.BufferType.SPANNABLE
             )
         })
+
+        repartoViewModel.getTotalParciales().observe(this, Observer<Int> { c ->
+            textViewParciales.setText(
+                Util.getTextHTML("<strong>Parciales: </string>$c"),
+                TextView.BufferType.SPANNABLE
+            )
+        })
     }
 
     private fun zoomToLocation(location: Location?) {
@@ -312,7 +319,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 // Reading data from url
                 iStream = urlConnection.inputStream
                 val br =
-                    BufferedReader(InputStreamReader(iStream))
+                    BufferedReader(InputStreamReader(iStream!!))
                 val sb = StringBuilder()
                 var line: String?
                 while (br.readLine().also { line = it } != null) {
@@ -323,7 +330,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             } catch (e: Exception) {
                 Log.d("mylog", "Exception downloading URL: $e")
             } finally {
-                iStream!!.close()
+                iStream?.close()
                 urlConnection!!.disconnect()
             }
             return data
@@ -391,8 +398,8 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
         @SuppressLint("InflateParams") val v =
             LayoutInflater.from(context).inflate(R.layout.cardview_resumen_maps, null)
-        val buttonSalir: MaterialButton = v.findViewById(R.id.buttonGo)
-        val textViewTitle = v.findViewById<TextView>(R.id.textViewTitle)
+        val buttonGo: MaterialButton = v.findViewById(R.id.buttonGo)
+        val textViewTitle: TextView = v.findViewById(R.id.textViewTitle)
         val textViewLatitud: TextView = v.findViewById(R.id.textViewLatitud)
         val textViewLongitud: TextView = v.findViewById(R.id.textViewLongitud)
         val imageViewClose: ImageView = v.findViewById(R.id.imageViewClose)
@@ -410,7 +417,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             Util.getTextHTML("<strong>Longitud : </strong> " + m.position.longitude),
             TextView.BufferType.SPANNABLE
         )
-        buttonSalir.setOnClickListener {
+        buttonGo.setOnClickListener {
             startActivity(
                 Intent(context, MapsActivity::class.java)
                     .putExtra("latitud", m.position.latitude.toString())

@@ -37,7 +37,6 @@ import com.dsige.dsigeventas.helper.Gps
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.adapters.EstadoAdapter
 import com.dsige.dsigeventas.ui.adapters.GrupoAdapter
-import com.dsige.dsigeventas.ui.adapters.ProductoPedidoAdapter
 import com.dsige.dsigeventas.ui.adapters.RepartoDetalleAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -294,7 +293,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
                 // Reading data from url
                 iStream = urlConnection.inputStream
                 val br =
-                    BufferedReader(InputStreamReader(iStream))
+                    BufferedReader(InputStreamReader(iStream!!))
                 val sb = StringBuilder()
                 var line: String?
                 while (br.readLine().also { line = it } != null) {
@@ -306,7 +305,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
             } catch (e: Exception) {
                 Log.d("mylog", "Exception downloading URL: $e")
             } finally {
-                Objects.requireNonNull(iStream)!!.close()
+                iStream?.close()
                 urlConnection!!.disconnect()
             }
             return data

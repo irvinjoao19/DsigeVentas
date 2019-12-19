@@ -143,7 +143,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
-    override fun populatPersonal(): LiveData<List<Personal>> {
+    override fun getPersonal(fecha:String): Observable<List<Personal>> {
+        return apiService.getPersonal(fecha)
+    }
+
+    override fun getPersonal(): LiveData<List<Personal>> {
         return dataBase.personalDao().getPersonal()
     }
 
@@ -471,5 +475,19 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return Completable.fromAction {
             dataBase.repartoDao().updateTotalReparto(repartoId, total)
         }
+    }
+
+    override fun insertPersonal(t: List<Personal>): Completable {
+        return Completable.fromAction {
+            dataBase.personalDao().insertPersonalListTask(t)
+        }
+    }
+
+    override fun getPersonalById(id: Int): LiveData<Personal> {
+        return dataBase.personalDao().getPersonalById(id)
+    }
+
+    override fun getResumen(fecha: String): Observable<Resumen> {
+        return apiService.getResumen(fecha)
     }
 }

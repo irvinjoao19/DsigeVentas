@@ -67,7 +67,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         }
     }
 
-
     fun getClienteById(id: Int): LiveData<Cliente> {
         return roomRepository.getClienteById(id)
     }
@@ -75,7 +74,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     fun setCliente(c: Cliente) {
         cliente.value = c
     }
-
 
     fun validateCliente(c: Cliente) {
         if (c.tipo.isEmpty()) {
@@ -129,7 +127,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                         mensajeSuccess.value = "Cliente Actualizado"
                     }
                 }
-
                 override fun onSubscribe(d: Disposable) {
 
                 }

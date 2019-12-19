@@ -27,7 +27,7 @@ import com.dsige.dsigeventas.data.local.model.*
         Estado::class,
         Grupo::class
     ],
-    version = 7,
+    version = 1,
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -55,7 +55,6 @@ abstract class AppDataBase : RoomDatabase() {
         var INSTANCE: AppDataBase? = null
         val DB_NAME = "ventas_db"
     }
-
 
     fun getDatabase(context: Context): AppDataBase {
         if (INSTANCE == null) {

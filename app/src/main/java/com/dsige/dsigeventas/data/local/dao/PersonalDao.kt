@@ -22,16 +22,7 @@ interface PersonalDao {
     @Query("SELECT * FROM Personal")
     fun getPersonal(): LiveData<List<Personal>>
 
-    @Query("SELECT COUNT(estado) FROM Personal WHERE estado = 1")
-    fun getSizePersonal(): LiveData<Int>
-
-    @Query("SELECT * FROM Personal WHERE estado =:valor")
-    fun getAllPersonalTask(valor: Int): List<Personal>
-
-    @Query("SELECT COUNT(estado) FROM Personal WHERE estado =:valor")
-    fun getAllPersonalVerificate(valor: Int): LiveData<Int>
-
-    @Query("SELECT * FROM Personal WHERE PersonalId =:id")
+    @Query("SELECT * FROM Personal WHERE personalId =:id")
     fun getPersonalById(id: Int): LiveData<Personal>
 
     @Query("SELECT * FROM Personal WHERE PersonalId =:id")
@@ -39,7 +30,4 @@ interface PersonalDao {
 
     @Query("DELETE FROM Personal")
     fun deleteAll()
-
-    @Query("UPDATE Personal SET estado = 0 WHERE PersonalId =:id")
-    fun updatePersonalEstado(id: Int)
 }

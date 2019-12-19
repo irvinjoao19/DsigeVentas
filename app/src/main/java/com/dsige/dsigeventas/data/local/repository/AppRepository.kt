@@ -34,7 +34,9 @@ interface AppRepository {
 
     // TODO : Personal
 
-    fun populatPersonal(): LiveData<List<Personal>>
+    fun getPersonal(fecha: String): Observable<List<Personal>>
+
+    fun getPersonal(): LiveData<List<Personal>>
 
 
     //  TODO : CLIENTE
@@ -133,5 +135,11 @@ interface AppRepository {
     fun updateRepartoDetalle(r: RepartoDetalle): Completable
 
     fun updateTotalReparto(repartoId: Int, total: Double): Completable
+
+    fun insertPersonal(t: List<Personal>): Completable
+
+    fun getPersonalById(id: Int): LiveData<Personal>
+
+    fun getResumen(fecha: String): Observable<Resumen>
 
 }

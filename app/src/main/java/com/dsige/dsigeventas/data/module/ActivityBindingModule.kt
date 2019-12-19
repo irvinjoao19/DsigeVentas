@@ -30,4 +30,7 @@ abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     internal abstract fun bindMapActivity(): MapsActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindPersonalMapActivity(): PersonalMapActivity
 }

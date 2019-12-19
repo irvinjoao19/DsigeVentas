@@ -8,9 +8,11 @@ open class Personal {
 
     @PrimaryKey(autoGenerate = true)
     var personalId: Int = 0
-    var cargoId: Int = 0
     var nombrePersonal: String = ""
-    var nombreCargo: String = ""
-    var estado: Int = 0
-
+    var countPedidos: Int = 0
+    var countClientes: Int = 0
+    var countProductos: Int = 0
+    var total: Double = 0.0
+    var latitud: String = ""
+    var longitud: String = ""
 }

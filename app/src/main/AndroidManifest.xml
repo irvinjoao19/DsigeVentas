@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.dsige.dsigeventas">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -36,6 +35,14 @@
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <!--        <activity-->
+        <!--            android:name=".ui.activities.ResultadoActivity"-->
+        <!--            android:screenOrientation="landscape">-->
+        <!--           -->
+        <!--        </activity>-->
+        <activity
+            android:name=".ui.activities.PersonalMapActivity"
+            android:screenOrientation="landscape" />
 
         <receiver
             android:name=".ui.broadcasts.GpsReceiver"

@@ -14,40 +14,11 @@ import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.ui.fragments.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.android.support.DaggerAppCompatActivity
+import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
-class MainActivity : DaggerAppCompatActivity(),
-    BottomNavigationView.OnNavigationItemSelectedListener {
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.client -> {
-                changeFragment(ClientFragment.newInstance("", ""))
-                return true
-            }
-            R.id.product -> {
-                changeFragment(ProductsFragment.newInstance("", ""))
-                return true
-            }
-            R.id.pedido -> {
-                logout = "on"
-                changeFragment(PedidoFragment.newInstance("", ""))
-                return true
-            }
-            R.id.map -> {
-                logout = "on"
-                changeFragment(MapsFragment.newInstance("", ""))
-                return true
-            }
-            R.id.info -> {
-                logout = "on"
-                changeFragment(InfoFragment.newInstance("", ""))
-                return true
-            }
-        }
-        return false
-    }
+class MainActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -72,18 +43,60 @@ class MainActivity : DaggerAppCompatActivity(),
             if (u != null) {
                 setSupportActionBar(toolbar)
                 supportActionBar!!.setDisplayShowTitleEnabled(false)
-                fragmentByDefault()
-                bottomNavigation.setOnNavigationItemSelectedListener(this)
+                when (u.nombreCargo) {
+                    "Repartidor" -> {
+                        bottomNavigation.menu.removeItem(R.id.client)
+                        bottomNavigation.menu.removeItem(R.id.product)
+                        bottomNavigation.menu.removeItem(R.id.pedido)
+                        fragmentByDefault(MapsFragment.newInstance("", ""))
+                    }
+                    "Vendedor" -> {
+                        bottomNavigation.menu.removeItem(R.id.map)
+                        fragmentByDefault(ClientFragment.newInstance("", ""))
+                    }
+                    else -> fragmentByDefault(ClientFragment.newInstance("", ""))
+                }
+                bottomNavigation.setOnNavigationItemSelectedListener(object :
+                    BottomNavigationView.OnNavigationItemSelectedListener {
+                    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+                        when (item.itemId) {
+                            R.id.client -> {
+                                changeFragment(ClientFragment.newInstance("", ""))
+                                return true
+                            }
+                            R.id.product -> {
+                                changeFragment(ProductsFragment.newInstance("", ""))
+                                return true
+                            }
+                            R.id.pedido -> {
+                                logout = "on"
+                                changeFragment(PedidoFragment.newInstance("", ""))
+                                return true
+                            }
+                            R.id.map -> {
+                                logout = "on"
+                                changeFragment(MapsFragment.newInstance("", ""))
+                                return true
+                            }
+                            R.id.info -> {
+                                logout = "on"
+                                changeFragment(InfoFragment.newInstance(u.nombreCargo, ""))
+                                return true
+                            }
+                        }
+                        return true
+                    }
+                })
             } else {
                 goLogin()
             }
         })
     }
 
-    private fun fragmentByDefault() {
+    private fun fragmentByDefault(fragment: DaggerFragment) {
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.content_frame, ClientFragment.newInstance("", ""))
+            .replace(R.id.content_frame, fragment)
             .commit()
     }
 

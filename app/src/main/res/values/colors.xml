@@ -174,11 +174,18 @@
     <!-- Solicitud -->
     <color name="color_carview_text">#2c3e50</color>
 
-    <color name="activo">#27ae60</color>
-    <color name="generado">#27ae60</color>
-    <color name="inactivo">#d35400</color>
-    <color name="pendiente">#44AA00FF</color>
-    <color name="atendido">#2c3e50</color>
-    <color name="anulado">#c0392b</color>
-    <color name="editar">#7f8c8d</color>
+
+    <color name="selected_background_color">#15a4fa</color>
+    <color name="unselected_background_color">#1c324a</color>
+    <color name="shadow_background_color">#28415f</color>
+    <color name="unselected_header_background_color">#1f3650</color>
+
+    <color name="unselected_text_color">#537095</color>
+    <color name="selected_text_color">#ffffff</color>
+    <color name="separator_color">#273e5b</color>
+
+    <color name="popup_menu_item_text_color">#88a5c9</color>
+
+    <color name="female_icon_color">#e9515f</color>
+    <color name="male_icon_color">#f28944</color>
 </resources>

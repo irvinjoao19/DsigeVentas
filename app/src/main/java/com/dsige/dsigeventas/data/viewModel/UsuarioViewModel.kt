@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.dsige.dsigeventas.data.local.model.Resumen
 import com.dsige.dsigeventas.data.local.model.Sync
 import com.dsige.dsigeventas.data.local.model.Usuario
 import com.dsige.dsigeventas.data.local.repository.ApiError
@@ -23,7 +24,8 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     ViewModel() {
 
     val mensajeError = MutableLiveData<String>()
-    val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
+    val mensajeSuccess = MutableLiveData<String>()
+    val resumen: MutableLiveData<Resumen> = MutableLiveData()
 
     val user: LiveData<Usuario>
         get() = roomRepository.getUsuario()
@@ -34,7 +36,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
     fun getLogin(usuario: String, pass: String, imei: String, version: String) {
         mensajeError.value = null
-        roomRepository.getUsuarioService(usuario, pass, imei,version)
+        roomRepository.getUsuarioService(usuario, pass, imei, version)
             .delay(1000, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -113,7 +115,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onComplete() {
-                    sync(operarioId,version)
+                    sync(operarioId, version)
                 }
 
                 override fun onError(e: Throwable) {
@@ -122,7 +124,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    private fun sync(operarioId: Int, version: String){
+    private fun sync(operarioId: Int, version: String) {
         roomRepository.getSync(operarioId, version)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -172,6 +174,40 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 override fun onError(e: Throwable) {
                     mensajeError.value = e.toString()
                 }
+            })
+    }
+
+    fun getResumen(fecha: String) {
+        roomRepository.getResumen(fecha)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Resumen> {
+                override fun onComplete() {
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(t: Resumen) {
+                    resumen.value = t
+                }
+
+                override fun onError(e: Throwable) {
+                    if (e is HttpException) {
+                        val body = e.response().errorBody()
+                        try {
+                            val error = retrofit.errorConverter.convert(body!!)
+                            mensajeError.postValue(error.Message)
+                        } catch (e1: IOException) {
+                            mensajeError.postValue(e1.toString())
+                        }
+                    } else {
+                        mensajeError.postValue(e.toString())
+                    }
+                }
+
             })
     }
 }

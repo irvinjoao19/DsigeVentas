@@ -1,14 +1,11 @@
 package com.dsige.dsigeventas.data.local.repository
 
-import com.dsige.dsigeventas.data.local.model.MapPrincipal
-import com.dsige.dsigeventas.data.local.model.Sync
-import com.dsige.dsigeventas.data.local.model.Usuario
+import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.helper.Mensaje
 import io.reactivex.Observable
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.*
-
 
 interface ApiService {
 
@@ -56,4 +53,10 @@ interface ApiService {
     @Headers("Cache-Control: no-cache")
     @POST("UpdateReparto")
     fun sendUpdateReparto(@Body body: RequestBody): Observable<Mensaje>
+
+    @GET("GetPersonal")
+    fun getPersonal(@Query("fecha") fecha: String): Observable<List<Personal>>
+
+    @GET("GetResumen")
+    fun getResumen(@Query("fecha") fecha: String): Observable<Resumen>
 }
