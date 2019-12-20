@@ -37,6 +37,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/DNI"
+                        android:textColor="@color/colorAccent"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -61,6 +62,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/telefono"
+                        android:textColor="@color/colorAccent"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -103,6 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/total_venta"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -127,6 +130,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/total_devolucion"
+                        android:textColor="@color/colorAccent"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -157,6 +161,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/venta_pedidos"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -181,6 +186,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/cantidad_clientes"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -211,6 +217,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mejor_vendedor"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -235,6 +242,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mejor_vendedor_soles"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -265,6 +273,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mejor_producto"
+                        android:textColor="@color/colorGreen"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -291,6 +300,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mejor_producto_soles"
+                        android:textColor="@color/colorGreen"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -321,6 +331,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/vendedor_bajo"
+                        android:textColor="@color/colorAccent"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -345,6 +356,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/menor_ingreso_soles"
+                        android:textColor="@color/colorAccent"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 

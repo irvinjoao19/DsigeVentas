@@ -110,7 +110,7 @@ interface AppRepository {
 
     fun saveGpsTask(body: RequestBody): Call<Mensaje>
 
-    fun saveMovil(body: RequestBody): Observable<Mensaje>
+    fun saveMovilTask(body: RequestBody): Call<Mensaje>
 
     fun validateCliente(id: Int): Observable<Int>
 

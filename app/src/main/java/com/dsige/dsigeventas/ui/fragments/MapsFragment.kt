@@ -197,20 +197,22 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
 
     private fun zoomToLocation(location: Location?) {
         if (location != null) {
-            camera = CameraPosition.Builder()
-                .target(LatLng(location.latitude, location.longitude))
-                .zoom(12f)  // limite 21
-                //.bearing(165) // 0 - 365°
-                .tilt(30f)        // limit 90
-                .build()
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
+            if (context != null){
+                camera = CameraPosition.Builder()
+                    .target(LatLng(location.latitude, location.longitude))
+                    .zoom(12f)  // limite 21
+                    //.bearing(165) // 0 - 365°
+                    .tilt(30f)        // limit 90
+                    .build()
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
 
-            mMap.addMarker(
-                MarkerOptions()
-                    .position(LatLng(location.latitude, location.longitude))
-                    .title("YO")
-                    .icon(Util.bitmapDescriptorFromVector(context!!, R.drawable.ic_car_map))
-            )
+                mMap.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(location.latitude, location.longitude))
+                        .title("YO")
+                        .icon(Util.bitmapDescriptorFromVector(context!!, R.drawable.ic_car_map))
+                )
+            }
         }
     }
 
@@ -284,19 +286,21 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                             val start: MapStartLocation? = m.start_location
                             if (start != null) {
                                 val position = LatLng(start.lat, start.lng)
-                                val iconFactory = IconGenerator(context)
-                                mMap.addMarker(
-                                    MarkerOptions()
-                                        .position(position)
-                                        .title(m.start_address)
-                                        .icon(
-                                            BitmapDescriptorFactory.fromBitmap(
-                                                iconFactory.makeIcon(
-                                                    (i++).toString()
+                                if (context != null){
+                                    val iconFactory = IconGenerator(context)
+                                    mMap.addMarker(
+                                        MarkerOptions()
+                                            .position(position)
+                                            .title(m.start_address)
+                                            .icon(
+                                                BitmapDescriptorFactory.fromBitmap(
+                                                    iconFactory.makeIcon(
+                                                        (i++).toString()
+                                                    )
                                                 )
                                             )
-                                        )
-                                )
+                                    )
+                                }
                             }
                         }
                     }

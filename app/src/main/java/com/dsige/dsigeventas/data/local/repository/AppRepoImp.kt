@@ -397,7 +397,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return apiService.saveGps(body)
     }
 
-    override fun saveMovil(body: RequestBody): Observable<Mensaje> {
+    override fun saveMovilTask(body: RequestBody): Call<Mensaje> {
         return apiService.saveMovil(body)
     }
 
