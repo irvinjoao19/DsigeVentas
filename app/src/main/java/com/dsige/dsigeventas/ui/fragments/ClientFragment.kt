@@ -81,6 +81,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                             .putExtra("clienteId", 0)
                     )
                     1 -> {
+
                         f.search = editTextSearch.text.toString()
                         val json = Gson().toJson(f)
                         clienteViewModel.search.value = json
@@ -88,6 +89,11 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                 }
             }
             R.id.filter -> {
+                f = Filtro()
+                editTextDepartamento.text = null
+                editTextProvincia.text = null
+                editTextDistrito.text = null
+                editTextSearch.text = null
                 val menu = topMenu!!.findItem(R.id.filter)
                 val menu2 = topMenu!!.findItem(R.id.add)
                 when (activeOrClose) {
@@ -101,6 +107,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                         cardviewFiltro.visibility = View.GONE
                         menu.icon = ContextCompat.getDrawable(context!!, R.drawable.ic_search_white)
                         menu2.icon = ContextCompat.getDrawable(context!!, R.drawable.ic_add)
+                        clienteViewModel.search.value = ""
                         activeOrClose = 0
                     }
                 }

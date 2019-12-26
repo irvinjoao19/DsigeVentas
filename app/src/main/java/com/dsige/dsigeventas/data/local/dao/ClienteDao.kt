@@ -26,10 +26,13 @@ interface ClienteDao {
     @Query("SELECT * FROM Cliente WHERE (nombreCliente LIKE :search OR documento LIKE :search) ")
     fun getCliente(search: String): DataSource.Factory<Int, Cliente>
 
-    @Query("SELECT * FROM Cliente WHERE departamentoId=:d OR provinciaId=:p OR distritoId=:s OR nombreCliente LIKE :search OR documento LIKE :search")
+    @Query("SELECT * FROM Cliente WHERE departamentoId=:d AND provinciaId=:p AND distritoId=:s AND (nombreCliente LIKE :search OR documento LIKE :search) ")
     fun getCliente(
         d: Int, p: Int, s: Int, search: String
     ): DataSource.Factory<Int, Cliente>
+
+    @Query("SELECT * FROM Cliente WHERE departamentoId=:d AND provinciaId=:p AND distritoId=:s ")
+    fun getCliente(d: Int, p: Int, s: Int): DataSource.Factory<Int, Cliente>
 
     @Query("SELECT * FROM Cliente")
     fun getClienteTask(): Cliente

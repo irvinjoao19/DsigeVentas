@@ -58,10 +58,16 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                         roomRepository.getCliente()
                     }
                 } else {
-                    roomRepository.getCliente(
-                        f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt(),
-                        String.format("%s%s%s", "%", f.search, "%")
-                    )
+                    if (f.search.isEmpty()) {
+                        roomRepository.getCliente(
+                            f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt()
+                        )
+                    } else {
+                        roomRepository.getCliente(
+                            f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt(),
+                            String.format("%s%s%s", "%", f.search, "%")
+                        )
+                    }
                 }
             }
         }
@@ -127,6 +133,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                         mensajeSuccess.value = "Cliente Actualizado"
                     }
                 }
+
                 override fun onSubscribe(d: Disposable) {
 
                 }

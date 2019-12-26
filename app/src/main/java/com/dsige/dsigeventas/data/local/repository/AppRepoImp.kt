@@ -171,6 +171,12 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getCliente(d: Int, p: Int, s: Int): LiveData<PagedList<Cliente>> {
+        return dataBase.clienteDao().getCliente(d, p, s).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
+    }
+
     override fun getClienteById(id: Int): LiveData<Cliente> {
         return dataBase.clienteDao().getClienteById(id)
     }

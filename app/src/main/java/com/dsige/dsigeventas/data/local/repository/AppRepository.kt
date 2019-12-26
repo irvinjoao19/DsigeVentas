@@ -47,6 +47,8 @@ interface AppRepository {
 
     fun getCliente(d: Int, p: Int, s: Int, search: String): LiveData<PagedList<Cliente>>
 
+    fun getCliente(d: Int, p: Int, s: Int): LiveData<PagedList<Cliente>>
+
     fun getClienteById(id: Int): LiveData<Cliente>
 
     fun insertOrUpdateCliente(c: Cliente): Completable
