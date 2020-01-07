@@ -3,6 +3,7 @@ package com.dsige.dsigeventas.ui.activities
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.Menu
@@ -142,6 +143,14 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         val menuAdapter = MenuAdapter(object : OnItemClickListener.MenuListener {
             override fun onItemClick(m: MenuPrincipal, view: View, position: Int) {
                 binding.editTextTipo.setText(m.title)
+                binding.editTextDocumento.text = null
+                if (m.title == "Natural") {
+                    binding.editTextDocumento.filters =
+                        arrayOf<InputFilter>(InputFilter.LengthFilter(8))
+                } else {
+                    binding.editTextDocumento.filters =
+                        arrayOf<InputFilter>(InputFilter.LengthFilter(11))
+                }
                 Util.hideKeyboard(this@RegisterClientActivity)
                 dialogSpinner.dismiss()
             }

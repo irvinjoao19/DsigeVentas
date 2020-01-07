@@ -86,10 +86,26 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             mensajeError.value = "Seleccione tipo"
             return
         }
+
         if (c.documento.isEmpty()) {
             mensajeError.value = "Ingrese documento"
             return
         }
+
+        if (c.tipo == "Natural"){
+            if (c.documento.length != 8) {
+                mensajeError.value = "Se requiere de 8 digitos"
+                return
+            }
+        }
+
+        if (c.tipo == "Juridico"){
+            if (c.documento.length != 11) {
+                mensajeError.value = "Se requiere 11 digitos"
+                return
+            }
+        }
+
         if (c.nombreCliente.isEmpty()) {
             mensajeError.value = "Ingrese Nombre"
             return
