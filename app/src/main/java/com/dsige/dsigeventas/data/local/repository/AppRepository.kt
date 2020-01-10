@@ -16,11 +16,10 @@ interface AppRepository {
     fun getUsuario(): LiveData<Usuario>
 
     fun getUsuarioService(
-        usuario: String,
-        password: String,
-        imei: String,
-        version: String
+        usuario: String, password: String, imei: String, version: String
     ): Observable<Usuario>
+
+    fun getLogout(login: String): Observable<Mensaje>
 
     fun insertUsuario(u: Usuario): Completable
 

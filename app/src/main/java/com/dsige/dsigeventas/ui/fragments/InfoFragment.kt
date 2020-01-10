@@ -35,6 +35,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
     lateinit var builder: AlertDialog.Builder
     var dialog: AlertDialog? = null
 
+    var login: String = ""
     private var cargo: String = ""
     private var param2: String? = null
 
@@ -81,6 +82,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             ViewModelProviders.of(this, viewModelFactory).get(UsuarioViewModel::class.java)
         usuarioViewModel.user.observe(this, Observer<Usuario> { u ->
             if (u != null) {
+                login = u.login
                 toolbar.title = u.apellidos
                 textViewDni.setText(Util.getTextHTML(u.documento), TextView.BufferType.SPANNABLE)
                 textViewTelefono.setText(
@@ -190,7 +192,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             )
             .setPositiveButton("SI") { dialog, _ ->
                 load()
-                usuarioViewModel.logout()
+                usuarioViewModel.logout(login)
                 dialog.dismiss()
             }
             .setNegativeButton("NO") { dialog, _ ->

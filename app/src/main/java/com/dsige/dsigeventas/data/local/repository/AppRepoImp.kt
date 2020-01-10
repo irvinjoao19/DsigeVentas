@@ -27,16 +27,21 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun getUsuarioService(
-        usuario: String,
-        password: String,
-        imei: String,
-        version: String
+        usuario: String, password: String, imei: String, version: String
     ): Observable<Usuario> {
         val u = Filtro(usuario, password, imei, version)
         val json = Gson().toJson(u)
         Log.i("TAG", json)
         val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
         return apiService.getLogin(body)
+    }
+
+    override fun getLogout(login: String): Observable<Mensaje> {
+        val u = Filtro(login)
+        val json = Gson().toJson(u)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+        return apiService.getLogout(body)
     }
 
     override fun insertUsuario(u: Usuario): Completable {
@@ -143,7 +148,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
-    override fun getPersonal(fecha:String): Observable<List<Personal>> {
+    override fun getPersonal(fecha: String): Observable<List<Personal>> {
         return apiService.getPersonal(fecha)
     }
 

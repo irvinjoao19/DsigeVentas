@@ -10,8 +10,12 @@ import retrofit2.http.*
 interface ApiService {
 
     @Headers("Cache-Control: no-cache")
-    @POST("Login")
+    @POST("LoginNew")
     fun getLogin(@Body body: RequestBody): Observable<Usuario>
+
+    @Headers("Cache-Control: no-cache")
+    @POST("Logout")
+    fun getLogout(@Body body: RequestBody): Observable<Mensaje>
 
     @Headers("Cache-Control: no-cache")
     @GET("Sync")

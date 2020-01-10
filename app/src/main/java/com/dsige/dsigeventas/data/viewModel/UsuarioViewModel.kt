@@ -9,6 +9,7 @@ import com.dsige.dsigeventas.data.local.model.Sync
 import com.dsige.dsigeventas.data.local.model.Usuario
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
+import com.dsige.dsigeventas.helper.Mensaje
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
 import io.reactivex.CompletableObserver
 import io.reactivex.Observer
@@ -87,7 +88,41 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun logout() {
+    fun logout(login: String) {
+        var mensaje = ""
+        roomRepository.getLogout(login)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Mensaje> {
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(m: Mensaje) {
+                    mensaje = m.mensaje
+                }
+
+                override fun onError(t: Throwable) {
+                    if (t is HttpException) {
+                        val body = t.response().errorBody()
+                        try {
+                            val error = retrofit.errorConverter.convert(body!!)
+                            mensajeError.postValue(error.Message)
+                        } catch (e1: IOException) {
+                            e1.printStackTrace()
+                        }
+                    } else {
+                        mensajeError.postValue(t.message)
+                    }
+                }
+
+                override fun onComplete() {
+                    deleteUser(mensaje)
+                }
+            })
+    }
+
+    private fun deleteUser(mensaje: String) {
         roomRepository.deleteUsuario()
             .delay(3, TimeUnit.SECONDS)
             .subscribeOn(Schedulers.computation())
@@ -97,7 +132,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onComplete() {
-                    mensajeSuccess.value = "Close"
+                    mensajeSuccess.value = mensaje
                 }
 
                 override fun onError(e: Throwable) {
