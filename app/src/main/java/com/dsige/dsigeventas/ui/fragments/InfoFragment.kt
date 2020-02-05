@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.Resumen
@@ -79,7 +79,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
         val toolbar: Toolbar = activity!!.findViewById(R.id.toolbar)
         toolbar.visibility = View.VISIBLE
         usuarioViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(UsuarioViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(UsuarioViewModel::class.java)
         usuarioViewModel.user.observe(this, Observer<Usuario> { u ->
             if (u != null) {
                 login = u.login

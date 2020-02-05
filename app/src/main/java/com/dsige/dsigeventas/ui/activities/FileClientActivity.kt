@@ -6,7 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.Cliente
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
@@ -62,7 +62,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
         binding = DataBindingUtil.setContentView(this, R.layout.activity_file_client)
         binding.lifecycleOwner = this
         clienteViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ClienteViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ClienteViewModel::class.java)
 
         val b = intent.extras
         if (b != null) {

@@ -2,12 +2,11 @@ package com.dsige.dsigeventas.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -69,7 +68,7 @@ class ProductsFragment : DaggerFragment() {
 
     private fun bindUI() {
         productoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ProductoViewModel::class.java)
 
         val productoPagingAdapter =
             ProductoPagingAdapter(object : OnItemClickListener.ProductoListener {

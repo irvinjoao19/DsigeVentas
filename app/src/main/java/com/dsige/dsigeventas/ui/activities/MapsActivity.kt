@@ -22,7 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -98,7 +98,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         val b = intent.extras
         if (b != null) {
             repartoViewModel =
-                ViewModelProviders.of(this, viewModelFactory).get(RepartoViewModel::class.java)
+                ViewModelProvider(this, viewModelFactory).get(RepartoViewModel::class.java)
 
             latitud = b.getString("latitud")!!
             longitud = b.getString("longitud")!!

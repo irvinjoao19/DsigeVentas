@@ -14,7 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -76,7 +76,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_register_client)
         binding.lifecycleOwner = this
         clienteViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ClienteViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ClienteViewModel::class.java)
 
         val b = intent.extras
         if (b != null) {
@@ -324,22 +324,24 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     private fun formRegisterCliente() {
         val gps = Gps(this@RegisterClientActivity)
         if (gps.isLocationEnabled()) {
-            c.tipo = editTextTipo.text.toString()
-            c.documento = editTextDocumento.text.toString()
-            c.nombreCliente = editTextNombre.text.toString()
-            c.nombreGiroNegocio = editTextPago.text.toString()
-            c.nombreDepartamento = editTextDepartamento.text.toString()
-            c.nombreDistrito = editTextDistrito.text.toString()
-            c.direccion = editTextDireccion.text.toString()
-            c.nroCelular = editTextTelefono.text.toString()
-            c.email = editTextEmail.text.toString()
-            c.fechaVisita = editTextVisita.text.toString()
-            c.motivoNoCompra = editTextMotivoNoComprar.text.toString()
-            c.productoInteres = editTextProductoInteres.text.toString()
-            c.nombreGiroNegocio = editTextPago.text.toString()
-            c.latitud = gps.getLatitude().toString()
-            c.longitud = gps.getLongitude().toString()
-            clienteViewModel.validateCliente(c)
+            if (gps.latitude.toString() != "0.0" || gps.longitude.toString() != "0.0") {
+                c.tipo = editTextTipo.text.toString()
+                c.documento = editTextDocumento.text.toString()
+                c.nombreCliente = editTextNombre.text.toString()
+                c.nombreGiroNegocio = editTextPago.text.toString()
+                c.nombreDepartamento = editTextDepartamento.text.toString()
+                c.nombreDistrito = editTextDistrito.text.toString()
+                c.direccion = editTextDireccion.text.toString()
+                c.nroCelular = editTextTelefono.text.toString()
+                c.email = editTextEmail.text.toString()
+                c.fechaVisita = editTextVisita.text.toString()
+                c.motivoNoCompra = editTextMotivoNoComprar.text.toString()
+                c.productoInteres = editTextProductoInteres.text.toString()
+                c.nombreGiroNegocio = editTextPago.text.toString()
+                c.latitud = gps.latitude.toString()
+                c.longitud = gps.longitude.toString()
+                clienteViewModel.validateCliente(c)
+            }
         } else {
             gps.showSettingsAlert(this@RegisterClientActivity)
         }

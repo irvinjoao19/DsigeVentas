@@ -5,7 +5,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -63,7 +63,7 @@ class ProductoActivity : DaggerAppCompatActivity() {
         supportActionBar!!.title = "Productos"
 
         productoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ProductoViewModel::class.java)
 
         val checkProductoPagingAdapter =
             CheckProductoPagingAdapter(object : OnItemClickListener.CheckProductoListener {

@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,7 +19,6 @@ import com.dsige.dsigeventas.ui.activities.MapsActivity
 import com.dsige.dsigeventas.ui.adapters.RepartoAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import dagger.android.support.DaggerFragment
-import kotlinx.android.synthetic.main.cardview_reparto.view.*
 import kotlinx.android.synthetic.main.fragment_reparto.*
 import javax.inject.Inject
 
@@ -56,7 +55,7 @@ class RepartoFragment : DaggerFragment() {
 
     private fun bindUI() {
         repartoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(RepartoViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(RepartoViewModel::class.java)
 
         val repartoAdapter = RepartoAdapter(object : OnItemClickListener.RepartoListener {
             override fun onItemClick(r: Reparto, v: View, position: Int) {

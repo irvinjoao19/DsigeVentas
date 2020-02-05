@@ -1,12 +1,10 @@
 package com.dsige.dsigeventas.ui.activities
 
 import android.annotation.SuppressLint
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -14,7 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.Personal
 import com.dsige.dsigeventas.data.tableview.MyTableAdapter
@@ -54,7 +52,7 @@ class PersonalMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
         mapFragment.getMapAsync(this)
 
         mapViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(MapViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(MapViewModel::class.java)
 
         mapViewModel.init(Util.getFecha())
         fabStatistics.setOnClickListener(this)

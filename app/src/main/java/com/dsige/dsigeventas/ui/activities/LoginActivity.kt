@@ -11,7 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.viewModel.UsuarioViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
@@ -103,7 +103,7 @@ class LoginActivity : DaggerAppCompatActivity(), View.OnClickListener {
 
     private fun bindUI() {
         usuarioViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(UsuarioViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(UsuarioViewModel::class.java)
         textViewVersion.text = String.format("Versión %s", Util.getVersion(this))
         buttonEnviar.setOnClickListener(this)
     }

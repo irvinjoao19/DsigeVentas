@@ -7,7 +7,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -81,7 +81,7 @@ class PedidoFragment : DaggerFragment() {
 
     private fun bindUI() {
         productoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ProductoViewModel::class.java)
 
         val pedidoAdapter = PedidoPagingAdapter(object : OnItemClickListener.PedidoListener {
             override fun onItemClick(p: Pedido, v: View, position: Int) {

@@ -3,7 +3,7 @@ package com.dsige.dsigeventas.ui.activities
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.Stock
 import com.dsige.dsigeventas.data.viewModel.ProductoViewModel
@@ -25,7 +25,7 @@ class FileProductoActivity : DaggerAppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_file_producto)
         binding.lifecycleOwner = this
         productoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ProductoViewModel::class.java)
 
         val b = intent.extras
         if (b != null) {

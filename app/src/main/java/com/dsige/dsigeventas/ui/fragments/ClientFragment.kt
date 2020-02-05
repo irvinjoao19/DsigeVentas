@@ -11,7 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,7 +21,6 @@ import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
-import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.FileClientActivity
 import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
 import com.dsige.dsigeventas.ui.adapters.*
@@ -145,7 +144,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
 
     private fun bindUI() {
         clienteViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ClienteViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ClienteViewModel::class.java)
 
         val clientePagingAdapter =
             ClientePagingAdapter(object : OnItemClickListener.ClienteListener {

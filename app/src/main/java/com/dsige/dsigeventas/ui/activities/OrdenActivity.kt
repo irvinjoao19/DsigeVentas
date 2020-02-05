@@ -10,7 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -100,7 +100,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
 
     private fun bindUI() {
         productoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(ProductoViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(ProductoViewModel::class.java)
 
         setSupportActionBar(toolbar)
         supportActionBar!!.title = "Pedido"
@@ -335,11 +335,13 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
     private fun generateCliente(id: Int) {
         val gps = Gps(this@OrdenActivity)
         if (gps.isLocationEnabled()) {
-            editTextTipo.text = null
-            clienteId = id
-            productoViewModel.generarPedidoCliente(
-                gps.getLatitude().toString(), gps.getLongitude().toString(), id
-            )
+            if (gps.latitude.toString() != "0.0" || gps.longitude.toString() != "0.0") {
+                editTextTipo.text = null
+                clienteId = id
+                productoViewModel.generarPedidoCliente(
+                    gps.latitude.toString(), gps.latitude.toString(), id
+                )
+            }
         } else {
             gps.showSettingsAlert(this@OrdenActivity)
         }
