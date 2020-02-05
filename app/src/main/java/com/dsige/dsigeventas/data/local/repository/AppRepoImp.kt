@@ -324,9 +324,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun generarPedidoCliente(
-        latitud: String,
-        longitud: String,
-        clienteId: Int
+        latitud: String, longitud: String, clienteId: Int
     ): Observable<Int> {
         return Observable.create { e ->
             val identity = dataBase.pedidoDao().getPedidoIdentity()

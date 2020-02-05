@@ -24,6 +24,7 @@ import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.databinding.ActivityRegisterClientBinding
+import com.dsige.dsigeventas.helper.Gps
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.adapters.*
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
@@ -321,19 +322,26 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     }
 
     private fun formRegisterCliente() {
-        c.tipo = editTextTipo.text.toString()
-        c.documento = editTextDocumento.text.toString()
-        c.nombreCliente = editTextNombre.text.toString()
-        c.nombreGiroNegocio = editTextPago.text.toString()
-        c.nombreDepartamento = editTextDepartamento.text.toString()
-        c.nombreDistrito = editTextDistrito.text.toString()
-        c.direccion = editTextDireccion.text.toString()
-        c.nroCelular = editTextTelefono.text.toString()
-        c.email = editTextEmail.text.toString()
-        c.fechaVisita = editTextVisita.text.toString()
-        c.motivoNoCompra = editTextMotivoNoComprar.text.toString()
-        c.productoInteres = editTextProductoInteres.text.toString()
-        c.nombreGiroNegocio = editTextPago.text.toString()
-        clienteViewModel.validateCliente(c)
+        val gps = Gps(this@RegisterClientActivity)
+        if (gps.isLocationEnabled()) {
+            c.tipo = editTextTipo.text.toString()
+            c.documento = editTextDocumento.text.toString()
+            c.nombreCliente = editTextNombre.text.toString()
+            c.nombreGiroNegocio = editTextPago.text.toString()
+            c.nombreDepartamento = editTextDepartamento.text.toString()
+            c.nombreDistrito = editTextDistrito.text.toString()
+            c.direccion = editTextDireccion.text.toString()
+            c.nroCelular = editTextTelefono.text.toString()
+            c.email = editTextEmail.text.toString()
+            c.fechaVisita = editTextVisita.text.toString()
+            c.motivoNoCompra = editTextMotivoNoComprar.text.toString()
+            c.productoInteres = editTextProductoInteres.text.toString()
+            c.nombreGiroNegocio = editTextPago.text.toString()
+            c.latitud = gps.getLatitude().toString()
+            c.longitud = gps.getLongitude().toString()
+            clienteViewModel.validateCliente(c)
+        } else {
+            gps.showSettingsAlert(this@RegisterClientActivity)
+        }
     }
 }
