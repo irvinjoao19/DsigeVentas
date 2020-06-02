@@ -58,12 +58,15 @@ class LoginActivity : DaggerAppCompatActivity(), View.OnClickListener {
                 if (usuario.isNotEmpty()) {
                     if (pass.isNotEmpty()) {
                         load()
-                        usuarioViewModel.getLogin(
-                            usuario,
-                            pass,
-                            Util.getImei(this),
-                            Util.getVersion(this)
-                        )
+                        if (Build.VERSION.SDK_INT == 29) {
+                            usuarioViewModel.getLogin(
+                                usuario, pass, pass, Util.getVersion(this)
+                            )
+                        } else {
+                            usuarioViewModel.getLogin(
+                                usuario, pass, Util.getImei(this), Util.getVersion(this)
+                            )
+                        }
                     } else {
                         usuarioViewModel.setError("Ingrese password")
                     }

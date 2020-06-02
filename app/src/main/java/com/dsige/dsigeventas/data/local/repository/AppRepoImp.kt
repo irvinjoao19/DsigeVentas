@@ -145,6 +145,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (g != null) {
                 dataBase.grupoDao().insertGrupoListTask(g)
             }
+
+            val l: List<Local>? = s.locales
+            if (l != null) {
+                dataBase.localDao().insertLocalListTask(l)
+            }
         }
     }
 
@@ -498,5 +503,16 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getResumen(fecha: String): Observable<Resumen> {
         return apiService.getResumen(fecha)
+    }
+
+    override fun getRepartoByTipo(t: Int): LiveData<List<Reparto>> {
+        return when (t) {
+            0 -> dataBase.repartoDao().getReparto(8)
+            else -> dataBase.repartoDao().getRepartoByTipo(8, t)
+        }
+    }
+
+    override fun getLocales(): LiveData<List<Local>> {
+        return dataBase.localDao().getLocales()
     }
 }

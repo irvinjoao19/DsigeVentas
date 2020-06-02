@@ -41,6 +41,9 @@ interface RepartoDao {
     @Query("SELECT * FROM Reparto WHERE estado =:e")
     fun getReparto(e: Int): LiveData<List<Reparto>>
 
+    @Query("SELECT * FROM Reparto WHERE estado =:e AND localId =:t")
+    fun getRepartoByTipo(e: Int,t:Int): LiveData<List<Reparto>>
+
     @Query("SELECT count(*) FROM Reparto")
     fun getReparto(): LiveData<Int>
 

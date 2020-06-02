@@ -143,4 +143,8 @@ interface AppRepository {
 
     fun getResumen(fecha: String): Observable<Resumen>
 
+    fun getRepartoByTipo(t: Int): LiveData<List<Reparto>>
+
+    fun getLocales(): LiveData<List<Local>>
+
 }

@@ -223,4 +223,5 @@
     <string name="menor_ingreso_soles">Menor ingreso en soles</string>
     <string name="resumen">Resumen</string>
     <string name="DNI">DNI</string>
+    <string name="local">Local</string>
 </resources>

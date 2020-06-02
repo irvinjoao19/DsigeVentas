@@ -79,5 +79,9 @@ interface OnItemClickListener {
         fun onItemClick(r: Reparto, v: View, position: Int)
     }
 
+    interface LocalListener {
+        fun onItemClick(l: Local, v: View, position: Int)
+    }
+
     fun onClick(v: View)
 }

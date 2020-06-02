@@ -20,6 +20,7 @@ class RepartoDetalleAdapter(var listener: OnItemClickListener.RepartoDetalleList
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val s = getItem(position)
         if (s != null) {
+            //holder.setIsRecyclable(false)
             holder.bind(s,listener)
         }
     }

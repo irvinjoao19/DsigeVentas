@@ -12,6 +12,7 @@ open class Sync {
     var repartos: List<Reparto> = ArrayList()
     var estados: List<Estado> = ArrayList()
     var grupos: List<Grupo> = ArrayList()
+    var locales: List<Local> = ArrayList()
 
     var mensaje: String = ""
 }

@@ -6,10 +6,11 @@
     tools:context=".ui.fragments.MapsFragment">
 
     <FrameLayout
+        android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
@@ -19,9 +20,10 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="10dp">
+        android:layout_gravity="start|bottom"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="60dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -56,4 +58,21 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="1dp"
+        android:hint="@string/local">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextLocal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhite"
+            android:focusable="false"
+            android:drawableEnd="@drawable/ic_down" />
+    </com.google.android.material.textfield.TextInputLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

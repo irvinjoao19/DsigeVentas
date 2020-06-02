@@ -21,7 +21,11 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.RepartoViewModel
@@ -29,6 +33,8 @@ import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.DataParser
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.MapsActivity
+import com.dsige.dsigeventas.ui.adapters.LocalAdapter
+import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -53,7 +59,11 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
-    GoogleMap.OnMarkerClickListener {
+    GoogleMap.OnMarkerClickListener, View.OnClickListener {
+
+    override fun onClick(v: View) {
+        dialogLocal()
+    }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
@@ -108,6 +118,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     var lng: String = ""
     var lng2: String = ""
     var title: String = ""
+    var localId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,7 +128,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         }
 
         repartoViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(RepartoViewModel::class.java)
+            ViewModelProvider(this, viewModelFactory).get(RepartoViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -135,8 +146,9 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        editTextLocal.setOnClickListener(this)
 
-        repartoViewModel.getReparto().observe(this, Observer<List<Reparto>> { count ->
+        repartoViewModel.getReparto().observe(viewLifecycleOwner, Observer { count ->
             mMap.clear()
             if (count.isNotEmpty()) {
                 waypoints = "waypoints=optimize:true|"
@@ -165,29 +177,30 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 FetchURL().execute(getUrl(lat, lng, lat2, lng2))
             }
         })
+        repartoViewModel.tipo.value = 0
 
-        repartoViewModel.getTotalReparto().observe(this, Observer<Int> { c ->
+        repartoViewModel.getTotalReparto().observe(viewLifecycleOwner, Observer<Int> { c ->
             textViewAsignados.setText(
                 Util.getTextHTML("<strong>Asignados: </string>$c"),
                 TextView.BufferType.SPANNABLE
             )
         })
 
-        repartoViewModel.getTotalEntregado().observe(this, Observer<Int> { c ->
+        repartoViewModel.getTotalEntregado().observe(viewLifecycleOwner, Observer { c ->
             textViewEntregado.setText(
                 Util.getTextHTML("<strong>Entregados: </string>$c"),
                 TextView.BufferType.SPANNABLE
             )
         })
 
-        repartoViewModel.getTotalDevuelto().observe(this, Observer<Int> { c ->
+        repartoViewModel.getTotalDevuelto().observe(viewLifecycleOwner, Observer { c ->
             textViewDevuelto.setText(
                 Util.getTextHTML("<strong>Devueltos: </string>$c"),
                 TextView.BufferType.SPANNABLE
             )
         })
 
-        repartoViewModel.getTotalParciales().observe(this, Observer<Int> { c ->
+        repartoViewModel.getTotalParciales().observe(viewLifecycleOwner, Observer { c ->
             textViewParciales.setText(
                 Util.getTextHTML("<strong>Parciales: </string>$c"),
                 TextView.BufferType.SPANNABLE
@@ -197,7 +210,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
 
     private fun zoomToLocation(location: Location?) {
         if (location != null) {
-            if (context != null){
+            if (context != null) {
                 camera = CameraPosition.Builder()
                     .target(LatLng(location.latitude, location.longitude))
                     .zoom(12f)  // limite 21
@@ -286,7 +299,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                             val start: MapStartLocation? = m.start_location
                             if (start != null) {
                                 val position = LatLng(start.lat, start.lng)
-                                if (context != null){
+                                if (context != null) {
                                     val iconFactory = IconGenerator(context)
                                     mMap.addMarker(
                                         MarkerOptions()
@@ -427,9 +440,47 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                     .putExtra("latitud", m.position.latitude.toString())
                     .putExtra("longitud", m.position.longitude.toString())
                     .putExtra("title", m.title)
+                    .putExtra("localId", localId)
             )
             dialog.dismiss()
         }
         imageViewClose.setOnClickListener { dialog.dismiss() }
+    }
+
+
+    private fun dialogLocal() {
+        val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(context).inflate(R.layout.dialog_spinner, null)
+        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        builder.setView(view)
+        val dialog = builder.create()
+        dialog.show()
+
+        val layoutManager = LinearLayoutManager(context)
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                recyclerView.context, DividerItemDecoration.VERTICAL
+            )
+        )
+        recyclerView.layoutManager = layoutManager
+
+        textViewTitle.text = String.format("Locales")
+
+        val localAdapter = LocalAdapter(object : OnItemClickListener.LocalListener {
+            override fun onItemClick(l: Local, v: View, position: Int) {
+                repartoViewModel.tipo.value = l.localId
+                editTextLocal.setText(l.nombre)
+                dialog.dismiss()
+            }
+        })
+        recyclerView.adapter = localAdapter
+        repartoViewModel.getLocales().observe(this, Observer { e ->
+            if (e != null) {
+                localAdapter.addItems(e)
+            }
+        })
     }
 }

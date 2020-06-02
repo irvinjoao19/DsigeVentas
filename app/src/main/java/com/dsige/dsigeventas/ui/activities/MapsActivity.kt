@@ -83,6 +83,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
     var latitud: String = ""
     var longitud: String = ""
     var title: String = ""
+    var localId: Int = 0
 
     override fun onResume() {
         super.onResume()
@@ -103,6 +104,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
             latitud = b.getString("latitud")!!
             longitud = b.getString("longitud")!!
             title = b.getString("title")!!
+            localId = b.getInt("localId")
             val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
@@ -468,8 +470,8 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         recyclerView.adapter = repartoDetalleAdapter
 
         Handler().postDelayed({
-            repartoViewModel.getReparto()
-                .observe(this, Observer<List<Reparto>> { count ->
+            repartoViewModel.getRepartoByLocal(localId)
+                .observe(this, Observer { count ->
                     if (count != null) {
                         for (s: Reparto in count) {
                             if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
@@ -503,7 +505,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
                                         })
 
                                     repartoViewModel.getDetalleRepartoById(s.repartoId)
-                                        .observe(this, Observer<PagedList<RepartoDetalle>> { p ->
+                                        .observe(this, Observer { p ->
                                             if (p.size != 0) {
                                                 updateReparto(s.repartoId, p)
                                                 repartoDetalleAdapter.submitList(p)

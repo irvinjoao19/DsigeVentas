@@ -3,6 +3,7 @@ package com.dsige.dsigeventas.data.viewModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.*
@@ -30,6 +31,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
+    val tipo: MutableLiveData<Int> = MutableLiveData()
 
     fun setError(s: String) {
         mensajeError.value = s
@@ -39,8 +41,18 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         return roomRepository.getRepartos()
     }
 
+    fun getRepartoByLocal(id: Int): LiveData<List<Reparto>> {
+        return roomRepository.getRepartoByTipo(id)
+    }
+
     fun getReparto(): LiveData<List<Reparto>> {
-        return roomRepository.getReparto()
+        return Transformations.switchMap(tipo) { input ->
+            if (input == 0 || input == null) {
+                roomRepository.getReparto()
+            } else {
+                roomRepository.getRepartoByTipo(input)
+            }
+        }
     }
 
     fun getTotalReparto(): LiveData<Int> {
@@ -81,7 +93,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
                 override fun onComplete() {
-                    if (tipo == 1){
+                    if (tipo == 1) {
                         sendUpdateReparto(re.repartoId)
                     }
                 }
@@ -176,5 +188,9 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
             })
+    }
+
+    fun getLocales(): LiveData<List<Local>> {
+        return roomRepository.getLocales()
     }
 }

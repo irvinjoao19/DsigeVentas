@@ -113,4 +113,9 @@ class DataBaseModule {
     internal fun provideGrupoDao(appDataBase: AppDataBase): GrupoDao {
         return appDataBase.grupoDao()
     }
+
+    @Provides
+    internal fun provideLocalDao(appDataBase: AppDataBase): LocalDao {
+        return appDataBase.localDao()
+    }
 }
