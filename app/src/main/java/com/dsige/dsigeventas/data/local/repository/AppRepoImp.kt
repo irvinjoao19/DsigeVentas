@@ -293,6 +293,12 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
+    /**
+        0 -> "Ok"
+        1 -> "Completar los productos en cantidad 0"
+        2 -> "Agregar Producto"
+        3 -> "Cliente"
+     */
     override fun validatePedido(id: Int): Observable<Int> {
         return Observable.create { e ->
             val c = dataBase.pedidoDetalleDao().validateCountPedido(id)

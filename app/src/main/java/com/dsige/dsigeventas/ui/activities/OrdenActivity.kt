@@ -242,9 +242,11 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         buttonAceptar.setOnClickListener {
             if (editTextProducto.text.toString().isNotEmpty()) {
                 val nPositive = editTextProducto.text.toString().toDouble()
-                if (nPositive == 0.0) {
+                if (nPositive == 0.0)
                     p.estado = 0
-                }
+                else
+                    p.estado = 2
+
                 p.cantidad = nPositive
                 p.unidadMedida = nPositive
                 p.subTotal = nPositive * p.precioVenta
