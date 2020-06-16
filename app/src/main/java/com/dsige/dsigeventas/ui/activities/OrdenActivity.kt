@@ -174,8 +174,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         productoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
             if (s != null) {
                 when (s) {
-                    "Ok" -> sendPedido(pedidoId,1)
-                    "Cliente" ->  sendPedido(pedidoId,0)
+                    "Ok" -> sendPedido(pedidoId)
                     "ENVIADO" -> {
                         loadFinish()
                         Util.toastMensaje(this, s)
@@ -263,17 +262,13 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         }
     }
 
-    private fun sendPedido(id: Int,tipo:Int) {
+    private fun sendPedido(id: Int) {
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle("Mensaje")
             .setMessage("Deseas enviar el pedido ?")
             .setPositiveButton("SI") { dialog, _ ->
                 load()
-                if (tipo == 0){
-                    productoViewModel.validateCliente(id)
-                }else{
-                    productoViewModel.sendPedido(id)
-                }
+                productoViewModel.sendPedido(id)
                 dialog.dismiss()
             }
             .setNegativeButton("NO") { dialog, _ ->

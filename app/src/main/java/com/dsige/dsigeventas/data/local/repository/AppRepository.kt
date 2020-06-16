@@ -147,4 +147,5 @@ interface AppRepository {
 
     fun getLocales(): LiveData<List<Local>>
 
+    fun getOrdenById(id: Int): Observable<Orden>
 }

@@ -80,7 +80,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
         binding.navigate = this
         binding.c = clienteViewModel
 
-        clienteViewModel.getClienteById(id).observe(this, Observer<Cliente> { cliente ->
+        clienteViewModel.getClienteById(id).observe(this, Observer { cliente ->
             if (cliente != null) {
                 c = cliente
                 clienteViewModel.setCliente(c)

@@ -38,7 +38,7 @@ interface ApiService {
     fun saveInspection(@Body body: RequestBody): Observable<Mensaje>
 
     @Headers("Cache-Control: no-cache")
-    @POST("SavePedido")
+    @POST("SavePedidoNew")
     fun sendPedido(@Body body: RequestBody): Observable<Mensaje>
 
     @GET("/maps/api/directions/json?")

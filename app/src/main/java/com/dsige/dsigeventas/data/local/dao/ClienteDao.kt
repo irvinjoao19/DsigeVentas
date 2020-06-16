@@ -49,6 +49,9 @@ interface ClienteDao {
     @Query("SELECT identity FROM Cliente WHERE clienteId =:id")
     fun getClienteIdentity(id: Int): Int
 
+    @Query("SELECT estado FROM Cliente WHERE clienteId =:id")
+    fun getClienteIsUpdte(id: Int): Int
+
     @Query("UPDATE Cliente SET identity =:codigoRetorno WHERE clienteId =:codigoBase")
     fun updateCliente(codigoBase: Int, codigoRetorno: Int)
 }

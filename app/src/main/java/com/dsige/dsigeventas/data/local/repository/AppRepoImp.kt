@@ -288,16 +288,18 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun updatePedido(m: Mensaje): Completable {
         return Completable.fromAction {
+            dataBase.clienteDao().updateCliente(m.codigoBaseCliente, m.codigoRetornoCliente)
+            dataBase.pedidoDao().updatePedido(m.codigoBaseCliente, m.codigoRetornoCliente)
             dataBase.pedidoDao().updatePedidoEnabled(m.codigoBase)
             dataBase.pedidoDetalleDao().updatePedidoEnabled(m.codigoBase)
         }
     }
 
     /**
-        0 -> "Ok"
-        1 -> "Completar los productos en cantidad 0"
-        2 -> "Agregar Producto"
-        3 -> "Cliente"
+    0 -> "Ok"
+    1 -> "Completar los productos en cantidad 0"
+    2 -> "Agregar Producto"
+    3 -> "Cliente"
      */
     override fun validatePedido(id: Int): Observable<Int> {
         return Observable.create { e ->
@@ -305,18 +307,18 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (c == 0) {
                 e.onNext(2)
             } else {
-                val identity =
-                    dataBase.clienteDao().getClienteIdentity(dataBase.pedidoDao().getClienteId(id))
-                if (identity != 0) {
-                    val a = dataBase.pedidoDetalleDao().validatePedido(id)
-                    if (a > 0) {
-                        e.onNext(1)
-                    } else {
-                        e.onNext(0)
-                    }
+//                val identity =
+//                    dataBase.clienteDao().getClienteIdentity(dataBase.pedidoDao().getClienteId(id))
+//                if (identity != 0) {
+                val a = dataBase.pedidoDetalleDao().validatePedido(id)
+                if (a > 0) {
+                    e.onNext(1)
                 } else {
-                    e.onNext(3)
+                    e.onNext(0)
                 }
+//                } else {
+//                    e.onNext(3)
+//                }
             }
             e.onComplete()
         }
@@ -520,5 +522,22 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getLocales(): LiveData<List<Local>> {
         return dataBase.localDao().getLocales()
+    }
+
+    override fun getOrdenById(id: Int): Observable<Orden> {
+        return Observable.create { e ->
+            val o = Orden()
+            val c = dataBase.clienteDao().getClienteTaskById(dataBase.pedidoDao().getClienteId(id))
+            o.cliente = c
+            val p = dataBase.pedidoDao().getPedidoByIdTask(id)
+            val d: List<PedidoDetalle>? = dataBase.pedidoDetalleDao().getPedidoById(id)
+            if (d != null) {
+                p.detalles = d
+            }
+            o.pedido = p
+
+            e.onNext(o)
+            e.onComplete()
+        }
     }
 }

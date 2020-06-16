@@ -6,10 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.PagedList
-import com.dsige.dsigeventas.data.local.model.Cliente
-import com.dsige.dsigeventas.data.local.model.Pedido
-import com.dsige.dsigeventas.data.local.model.PedidoDetalle
-import com.dsige.dsigeventas.data.local.model.Stock
+import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
 import com.dsige.dsigeventas.helper.Mensaje
@@ -124,14 +121,14 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     fun sendPedido(id: Int) {
-        val pedidos: Observable<Pedido> = roomRepository.getPedidoById(id)
+        val pedidos: Observable<Orden> = roomRepository.getOrdenById(id)
         pedidos.flatMap { a ->
             val json = Gson().toJson(a)
             Log.i("TAG", json)
             val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
             Observable.zip(
                 Observable.just(a), roomRepository.sendPedido(body),
-                BiFunction<Pedido, Mensaje, Mensaje> { _, mensaje ->
+                BiFunction<Orden, Mensaje, Mensaje> { _, mensaje ->
                     mensaje
                 })
         }.subscribeOn(Schedulers.io())
