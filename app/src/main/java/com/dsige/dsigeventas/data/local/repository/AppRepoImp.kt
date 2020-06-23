@@ -191,9 +191,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.clienteDao().getClienteById(id)
     }
 
-    override fun insertOrUpdateCliente(c: Cliente): Completable {
+    override fun insertOrUpdateCliente(c: Cliente, m: Mensaje?): Completable {
         return Completable.fromAction {
-            c.personalVendedorId = dataBase.usuarioDao().getUsuarioId()
+            if (m != null) {
+                c.identity = m.codigoRetorno
+            }
             if (c.clienteId == 0) {
                 dataBase.clienteDao().insertClienteTask(c)
             } else {
@@ -289,7 +291,6 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     override fun updatePedido(m: Mensaje): Completable {
         return Completable.fromAction {
             dataBase.clienteDao().updateCliente(m.codigoBaseCliente, m.codigoRetornoCliente)
-            dataBase.pedidoDao().updatePedido(m.codigoBaseCliente, m.codigoRetornoCliente)
             dataBase.pedidoDao().updatePedidoEnabled(m.codigoBase)
             dataBase.pedidoDetalleDao().updatePedidoEnabled(m.codigoBase)
         }
@@ -299,7 +300,6 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     0 -> "Ok"
     1 -> "Completar los productos en cantidad 0"
     2 -> "Agregar Producto"
-    3 -> "Cliente"
      */
     override fun validatePedido(id: Int): Observable<Int> {
         return Observable.create { e ->
@@ -307,18 +307,12 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (c == 0) {
                 e.onNext(2)
             } else {
-//                val identity =
-//                    dataBase.clienteDao().getClienteIdentity(dataBase.pedidoDao().getClienteId(id))
-//                if (identity != 0) {
                 val a = dataBase.pedidoDetalleDao().validatePedido(id)
                 if (a > 0) {
                     e.onNext(1)
                 } else {
                     e.onNext(0)
                 }
-//                } else {
-//                    e.onNext(3)
-//                }
             }
             e.onComplete()
         }
@@ -336,6 +330,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
+    // estado : 1 -> identity , 0 clienteId
     override fun generarPedidoCliente(
         latitud: String, longitud: String, clienteId: Int
     ): Observable<Int> {
@@ -344,7 +339,8 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             val o = Pedido()
             o.pedidoId = if (identity == 0) 1 else identity + 1
             o.clienteId = clienteId
-            val c = dataBase.clienteDao().getClienteTaskById(clienteId)
+            val c =
+                dataBase.clienteDao().getClienteTaskById(clienteId)
             o.nombreCliente = c.nombreCliente
             o.empresaId = c.empresaId
             o.porcentajeIGV = 18.0
@@ -421,15 +417,6 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun saveMovilTask(body: RequestBody): Call<Mensaje> {
         return apiService.saveMovil(body)
-    }
-
-    override fun validateCliente(id: Int): Observable<Int> {
-        return Observable.create { e ->
-            val identity = dataBase.pedidoDao().getClienteId(id)
-//                dataBase.clienteDao().getClienteIdentity(dataBase.pedidoDao().getClienteId(id))
-            e.onNext(identity)
-            e.onComplete()
-        }
     }
 
     override fun getClienteByIdTask(id: Int): Observable<Cliente> {

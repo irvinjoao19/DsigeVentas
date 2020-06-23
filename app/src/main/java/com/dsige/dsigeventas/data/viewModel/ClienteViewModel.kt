@@ -1,5 +1,6 @@
 package com.dsige.dsigeventas.data.viewModel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -8,11 +9,16 @@ import androidx.paging.PagedList
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
+import com.dsige.dsigeventas.helper.Mensaje
 import com.google.gson.Gson
 import io.reactivex.CompletableObserver
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class ClienteViewModel @Inject
@@ -81,7 +87,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         cliente.value = c
     }
 
-    fun validateCliente(c: Cliente) {
+    fun validateCliente(c: Cliente,tipo:Int) {
         if (c.tipo.isEmpty()) {
             mensajeError.value = "Seleccione tipo"
             return
@@ -101,7 +107,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
         if (c.tipo == "Juridico"){
             if (c.documento.length != 11) {
-                mensajeError.value = "Se requiere 11 digitos"
+                mensajeError.value = "Se requiere 11 digitos si el tipo es Juridico"
                 return
             }
         }
@@ -134,11 +140,15 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             mensajeError.value = "Ingrese email"
             return
         }
-        insertOrUpdateCliente(c)
+
+        if(tipo == 1)
+            sendCliente(c)
+        else
+            insertOrUpdateCliente(c,null)
     }
 
-    private fun insertOrUpdateCliente(c: Cliente) {
-        roomRepository.insertOrUpdateCliente(c)
+    private fun insertOrUpdateCliente(c: Cliente,m:Mensaje?) {
+        roomRepository.insertOrUpdateCliente(c,m)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
@@ -156,6 +166,33 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
                 override fun onError(e: Throwable) {
                     mensajeError.value = e.toString()
+                }
+            })
+    }
+
+    fun sendCliente(c:Cliente) {
+        val json = Gson().toJson(c)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+        roomRepository.sendCliente(body)
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Mensaje>{
+                override fun onComplete() {
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onNext(t: Mensaje) {
+                    insertOrUpdateCliente(c,t)
+                }
+
+                override fun onError(e: Throwable) {
+
                 }
             })
     }

@@ -202,7 +202,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                         0 -> mensajeSuccess.value = "Ok"
                         1 -> mensajeError.value = "Completar los productos en cantidad 0"
                         2 -> mensajeError.value = "Agregar Producto"
-                        3 -> mensajeSuccess.value = "Cliente"
                     }
                 }
 
@@ -310,93 +309,4 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
             })
     }
-
-    fun validateCliente(id: Int) {
-        roomRepository.validateCliente(id)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<Int> {
-                override fun onComplete() {
-
-                }
-
-                override fun onSubscribe(d: Disposable) {
-
-                }
-
-                override fun onNext(t: Int) {
-                    sendCliente(t,id)
-                }
-
-                override fun onError(e: Throwable) {
-                    mensajeError.value = e.toString()
-                }
-            })
-    }
-
-    fun sendCliente(id: Int,pedidoId:Int) {
-        val pedidos: Observable<Cliente> = roomRepository.getClienteByIdTask(id)
-        pedidos.flatMap { a ->
-            val json = Gson().toJson(a)
-            Log.i("TAG", json)
-            val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
-            Observable.zip(
-                Observable.just(a), roomRepository.sendCliente(body),
-                BiFunction<Cliente, Mensaje, Mensaje> { _, mensaje ->
-                    mensaje
-                })
-        }.subscribeOn(Schedulers.io())
-            .delay(1000, TimeUnit.MILLISECONDS)
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<Mensaje> {
-
-                override fun onSubscribe(d: Disposable) {
-                    Log.i("TAG", d.toString())
-                }
-
-                override fun onNext(m: Mensaje) {
-                    Log.i("TAG", "RECIBIENDO LOS DATOS")
-                    updateCliente(m,pedidoId)
-                }
-
-                override fun onError(e: Throwable) {
-                    if (e is HttpException) {
-                        val body = e.response().errorBody()
-                        try {
-                            val error = retrofit.errorConverter.convert(body!!)
-                            mensajeError.postValue(error.Message)
-                        } catch (e1: IOException) {
-                            mensajeError.postValue(e1.toString())
-                        }
-                    } else {
-                        mensajeError.postValue(e.toString())
-                    }
-                }
-
-                override fun onComplete() {
-                    mensajeSuccess.postValue("ENVIADO")
-                }
-            })
-    }
-
-    private fun updateCliente(m:Mensaje,id:Int){
-        roomRepository.updateCliente(m,id)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : CompletableObserver{
-                override fun onComplete() {
-                    sendPedido(id)
-                }
-
-                override fun onSubscribe(d: Disposable) {
-
-                }
-
-                override fun onError(e: Throwable) {
-                    mensajeError.postValue(e.toString())
-                }
-
-            })
-    }
-
 }

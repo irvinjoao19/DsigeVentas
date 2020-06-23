@@ -11,14 +11,12 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.Cliente
-import com.dsige.dsigeventas.data.local.model.Pedido
 import com.dsige.dsigeventas.data.local.model.PedidoDetalle
 import com.dsige.dsigeventas.data.viewModel.ProductoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
@@ -161,17 +159,15 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         )
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = productoPedidoAdapter
-
         productoViewModel.pedidoId.value = pedidoId
-
-        productoViewModel.mensajeError.observe(this, Observer<String> { s ->
+        productoViewModel.mensajeError.observe(this, Observer { s ->
             if (s != null) {
                 loadFinish()
                 Util.toastMensaje(this, s)
             }
         })
 
-        productoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+        productoViewModel.mensajeSuccess.observe(this, Observer { s ->
             if (s != null) {
                 when (s) {
                     "Ok" -> sendPedido(pedidoId)
@@ -184,12 +180,12 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             }
         })
 
-        productoViewModel.pedidoId.observe(this, Observer<Int> { i ->
+        productoViewModel.pedidoId.observe(this, Observer { i ->
             if (i != 0) {
                 linearLayoutCliente.visibility = View.GONE
                 pedidoId = i
                 productoViewModel.getPedidoCliente(i)
-                    .observe(this@OrdenActivity, Observer<Pedido> { p ->
+                    .observe(this@OrdenActivity, Observer { p ->
                         if (p != null) {
                             textViewNombre.text = p.nombreCliente
                             textViewTotal.text = String.format("Total : S/. %.2f", p.totalNeto)
@@ -200,7 +196,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                         }
                     })
                 productoViewModel.getProductoByPedido(i)
-                    .observe(this@OrdenActivity, Observer<PagedList<PedidoDetalle>> { p ->
+                    .observe(this@OrdenActivity, Observer { p ->
                         if (p.size != 0) {
                             updateProducto(p)
                             productoPedidoAdapter.submitList(p)

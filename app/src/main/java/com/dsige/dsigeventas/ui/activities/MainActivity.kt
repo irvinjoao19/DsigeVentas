@@ -52,16 +52,16 @@ class MainActivity : DaggerAppCompatActivity() {
                     }
                     "Vendedor" -> {
                         bottomNavigation.menu.removeItem(R.id.map)
-                        fragmentByDefault(ClientFragment.newInstance("", ""))
+                        fragmentByDefault(ClientFragment.newInstance(u.usuarioId))
                     }
-                    else -> fragmentByDefault(ClientFragment.newInstance("", ""))
+                    else -> fragmentByDefault(ClientFragment.newInstance(u.usuarioId))
                 }
                 bottomNavigation.setOnNavigationItemSelectedListener(object :
                     BottomNavigationView.OnNavigationItemSelectedListener {
                     override fun onNavigationItemSelected(item: MenuItem): Boolean {
                         when (item.itemId) {
                             R.id.client -> {
-                                changeFragment(ClientFragment.newInstance("", ""))
+                                changeFragment(ClientFragment.newInstance(u.usuarioId))
                                 return true
                             }
                             R.id.product -> {

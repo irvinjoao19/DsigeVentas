@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +15,7 @@ import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.databinding.ActivityFileClientBinding
 import com.dsige.dsigeventas.ui.listeners.NavigationItemSelectedListener
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 
@@ -22,16 +24,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.pedidos ->
-                if (c.identity != 0) {
-                    startActivity(
-                        Intent(this, OrdenActivity::class.java).putExtra("clienteId", c.identity)
-                    )
-                } else {
-                    startActivity(
-                        Intent(this, OrdenActivity::class.java).putExtra("clienteId", c.clienteId)
-                    )
-                }
+            R.id.pedidos -> mensajeCliente()
             R.id.foto -> {
                 return true
             }
@@ -87,4 +80,26 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
             }
         })
     }
+
+    private fun mensajeCliente() {
+        val material =
+            MaterialAlertDialogBuilder(
+                ContextThemeWrapper(this@FileClientActivity, R.style.AppTheme)
+            )
+                .setTitle("Mensaje")
+                .setMessage("Deseas generar pedido?")
+                .setPositiveButton("SI") { dialogInterface, _ ->
+                    startActivity(
+                        Intent(this, OrdenActivity::class.java)
+                            .putExtra("clienteId", c.clienteId)
+                    )
+                    dialogInterface.dismiss()
+                }
+                .setNegativeButton("No") { dialogInterface, _ ->
+
+                    dialogInterface.dismiss()
+                }
+        material.show()
+    }
 }
+

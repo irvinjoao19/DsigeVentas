@@ -50,7 +50,7 @@ interface AppRepository {
 
     fun getClienteById(id: Int): LiveData<Cliente>
 
-    fun insertOrUpdateCliente(c: Cliente): Completable
+    fun insertOrUpdateCliente(c: Cliente,m:Mensaje?): Completable
 
     fun getDepartamentos(): LiveData<List<Departamento>>
 
@@ -112,8 +112,6 @@ interface AppRepository {
     fun saveGpsTask(body: RequestBody): Call<Mensaje>
 
     fun saveMovilTask(body: RequestBody): Call<Mensaje>
-
-    fun validateCliente(id: Int): Observable<Int>
 
     fun getClienteByIdTask(id: Int): Observable<Cliente>
 

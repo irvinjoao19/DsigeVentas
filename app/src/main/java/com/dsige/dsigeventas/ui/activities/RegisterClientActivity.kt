@@ -28,6 +28,7 @@ import com.dsige.dsigeventas.helper.Gps
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.adapters.*
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_register_client.*
@@ -53,8 +54,10 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var clienteViewModel: ClienteViewModel
+    lateinit var builder: AlertDialog.Builder
+    var dialog: AlertDialog? = null
     lateinit var c: Cliente
-
+    lateinit var f: Filtro
     lateinit var binding: ActivityRegisterClientBinding
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -65,7 +68,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.register) {
-            formRegisterCliente()
+            mensajeCliente()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -81,12 +84,13 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         val b = intent.extras
         if (b != null) {
             c = Cliente()
-            bindUI(b.getInt("clienteId"))
+            f = Filtro()
+            bindUI(b.getInt("clienteId"), b.getInt("usuarioId"))
             message()
         }
     }
 
-    private fun bindUI(id: Int) {
+    private fun bindUI(id: Int, usuarioId: Int) {
         setSupportActionBar(binding.toolbar)
         supportActionBar!!.title = "Cliente"
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -95,7 +99,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         binding.listener = this
         binding.c = clienteViewModel
 
-        clienteViewModel.getClienteById(id).observe(this, Observer<Cliente> { cliente ->
+        c.personalVendedorId = usuarioId
+        clienteViewModel.getClienteById(id).observe(this, Observer { cliente ->
             if (cliente != null) {
                 editTextProductoInteres.visibility = View.GONE
                 c = cliente
@@ -105,15 +110,17 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     }
 
     private fun message() {
-        clienteViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+        clienteViewModel.mensajeSuccess.observe(this, Observer { s ->
             if (s != null) {
+                loadFinish()
                 Util.toastMensaje(this, s)
                 finish()
             }
         })
 
-        clienteViewModel.mensajeError.observe(this, Observer<String> { s ->
+        clienteViewModel.mensajeError.observe(this, Observer { s ->
             if (s != null) {
+                loadFinish()
                 Util.toastMensaje(this, s)
             }
         })
@@ -196,7 +203,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 val departamentoAdapter =
                     DepartamentoAdapter(object : OnItemClickListener.DepartamentoListener {
                         override fun onItemClick(d: Departamento, v: View, position: Int) {
-                            c.departamentoId = d.codigo.toInt()
+                            c.departamentoId = d.departamentoId
+                            f.departamentoId = d.codigo
                             editTextDepartamento.setText(d.departamento)
                             editTextProvincia.text = null
                             editTextDistrito.text = null
@@ -206,7 +214,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 recyclerView.adapter = departamentoAdapter
 
                 clienteViewModel.getDepartamentos()
-                    .observe(this, Observer<List<Departamento>> { d ->
+                    .observe(this, Observer { d ->
                         if (d != null) {
                             departamentoAdapter.addItems(d)
                         }
@@ -233,7 +241,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 val provinciaAdapter =
                     ProvinciAdapter(object : OnItemClickListener.ProvinciaListener {
                         override fun onItemClick(p: Provincia, v: View, position: Int) {
-                            c.provinciaId = p.codigo.toInt()
+                            c.provinciaId = p.provinciaId
+                            f.provinciaId = p.codigo
                             editTextProvincia.setText(p.provincia)
                             editTextDistrito.text = null
                             dialogSpinner.dismiss()
@@ -241,8 +250,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                     })
                 recyclerView.adapter = provinciaAdapter
 
-                clienteViewModel.getProvinciasById(c.departamentoId.toString())
-                    .observe(this, Observer<List<Provincia>> { d ->
+                clienteViewModel.getProvinciasById(f.departamentoId)
+                    .observe(this, Observer { d ->
                         if (d != null) {
                             provinciaAdapter.addItems(d)
                         }
@@ -269,16 +278,14 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 val distritoAdapter =
                     DistritoAdapter(object : OnItemClickListener.DistritoListener {
                         override fun onItemClick(d: Distrito, v: View, position: Int) {
+                            c.distritoId = d.distritoId
                             editTextDistrito.setText(d.nombre)
                             dialogSpinner.dismiss()
                         }
                     })
                 recyclerView.adapter = distritoAdapter
-                clienteViewModel.getDistritosById(
-                    c.departamentoId.toString(),
-                    c.provinciaId.toString()
-                )
-                    .observe(this, Observer<List<Distrito>> { d ->
+                clienteViewModel.getDistritosById(f.departamentoId, f.provinciaId)
+                    .observe(this, Observer { d ->
                         if (d != null) {
                             distritoAdapter.addItems(d)
                         }
@@ -321,7 +328,33 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         }
     }
 
-    private fun formRegisterCliente() {
+    private fun mensajeCliente() {
+        val material =
+            MaterialAlertDialogBuilder(
+                ContextThemeWrapper(
+                    this@RegisterClientActivity,
+                    R.style.AppTheme
+                )
+            )
+                .setTitle("Mensaje")
+                .setMessage("Deseas enviar los datos ?")
+                .setPositiveButton("SI") { dialogInterface, _ ->
+                    formRegisterCliente(1)
+                    dialogInterface.dismiss()
+                }
+                .setNegativeButton("Otro momento") { dialogInterface, _ ->
+                    formRegisterCliente(2)
+                    dialogInterface.dismiss()
+                }
+        material.show()
+    }
+
+    /**
+     * tipo : 1 -> enviar
+     *        2 -> guardar
+     *
+     */
+    private fun formRegisterCliente(tipo: Int) {
         val gps = Gps(this@RegisterClientActivity)
         if (gps.isLocationEnabled()) {
             if (gps.latitude.toString() != "0.0" || gps.longitude.toString() != "0.0") {
@@ -340,10 +373,35 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 c.nombreGiroNegocio = editTextPago.text.toString()
                 c.latitud = gps.latitude.toString()
                 c.longitud = gps.longitude.toString()
-                clienteViewModel.validateCliente(c)
+                if (tipo == 1) {
+                    load()
+                }
+                clienteViewModel.validateCliente(c, tipo)
             }
         } else {
             gps.showSettingsAlert(this@RegisterClientActivity)
         }
     }
+
+    private fun load() {
+        builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(this).inflate(R.layout.dialog_login, null)
+        builder.setView(view)
+        val textView: TextView = view.findViewById(R.id.textViewLado)
+        textView.text = String.format("%s", "Enviando")
+        dialog = builder.create()
+        dialog!!.setCanceledOnTouchOutside(false)
+        dialog!!.setCancelable(false)
+        dialog!!.show()
+    }
+
+    private fun loadFinish() {
+        if (dialog != null) {
+            if (dialog!!.isShowing) {
+                dialog!!.dismiss()
+            }
+        }
+    }
+
 }

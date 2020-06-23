@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.fragment_client.*
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+//private const val ARG_PARAM2 = "param2"
 
 class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditorActionListener {
 
@@ -57,8 +57,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var clienteViewModel: ClienteViewModel
 
-    private var param1: String? = null
-    private var param2: String? = null
+    private var usuarioId: Int = 0
     var activeOrClose: Int = 0
     var topMenu: Menu? = null
     lateinit var f: Filtro
@@ -78,9 +77,9 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                     0 -> startActivity(
                         Intent(context, RegisterClientActivity::class.java)
                             .putExtra("clienteId", 0)
+                            .putExtra("usuarioId", usuarioId)
                     )
                     1 -> {
-
                         f.search = editTextSearch.text.toString()
                         val json = Gson().toJson(f)
                         clienteViewModel.search.value = json
@@ -119,8 +118,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         super.onCreate(savedInstanceState)
         f = Filtro()
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            usuarioId = it.getInt(ARG_PARAM1)
         }
         setHasOptionsMenu(true)
     }
@@ -163,17 +161,16 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         )
         recyclerView.adapter = clientePagingAdapter
         clienteViewModel.getCliente()
-            .observe(this, Observer(clientePagingAdapter::submitList))
+            .observe(viewLifecycleOwner, Observer(clientePagingAdapter::submitList))
         clienteViewModel.search.value = ""
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: Int) =
             ClientFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putInt(ARG_PARAM1, param1)
                 }
             }
     }

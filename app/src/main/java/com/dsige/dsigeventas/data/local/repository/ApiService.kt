@@ -18,7 +18,7 @@ interface ApiService {
     fun getLogout(@Body body: RequestBody): Observable<Mensaje>
 
     @Headers("Cache-Control: no-cache")
-    @GET("Sync")
+    @GET("SyncNew")
     fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String): Observable<Sync>
 
     @Headers("Cache-Control: no-cache")

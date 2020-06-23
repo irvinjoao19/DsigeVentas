@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 open class Departamento {
     @PrimaryKey
+    var departamentoId: Int = 0
     var codigo: String = ""
     var departamento: String = ""
 }
