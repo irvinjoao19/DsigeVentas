@@ -34,6 +34,7 @@ class ClientePagingAdapter(private var listener: OnItemClickListener.ClienteList
                 textViewNombre.text = s.nombreCliente
                 textViewDocumento.text = s.documento
                 textViewDireccion.text = s.direccion
+                textViewDistrito.text = s.nombreDistrito
                 textViewVisita.text = String.format("Ultima Visita : %s", s.fechaVisita)
                 itemView.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
                 imageViewMap.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }

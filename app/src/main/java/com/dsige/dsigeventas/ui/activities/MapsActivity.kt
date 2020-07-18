@@ -334,7 +334,6 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
         }
 
         override fun onPostExecute(result: List<List<HashMap<String, String>>>?) {
-
             val colorVariable = arrayOf(Color.RED, Color.BLUE, Color.GRAY, Color.GREEN)
             var points: ArrayList<LatLng>
             var lineOptions: PolylineOptions?

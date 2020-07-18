@@ -46,6 +46,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
         menu.findItem(R.id.add).setVisible(false).isEnabled = false
         menu.findItem(R.id.search).setVisible(false).isEnabled = false
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
+        menu.findItem(R.id.map).setVisible(false).isEnabled = false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -35,14 +35,18 @@
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <!--        <activity-->
-        <!--            android:name=".ui.activities.ResultadoActivity"-->
-        <!--            android:screenOrientation="landscape">-->
-        <!--           -->
-        <!--        </activity>-->
+        <activity android:name=".ui.activities.RepartoActivity"></activity>
+        <activity android:name=".ui.activities.ClientGeneralMapActivity" />
+        <activity android:name=".ui.activities.ClientMapActivity" />
+        <activity android:name=".ui.activities.PreviewCameraActivity" />
+        <activity android:name=".ui.activities.CameraActivity" /> <!-- <activity -->
+        <!-- android:name=".ui.activities.ResultadoActivity" -->
+        <!-- android:screenOrientation="landscape"> -->
+        <!--  -->
+        <!-- </activity> -->
         <activity
             android:name=".ui.activities.PersonalMapActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="fullSensor" />
 
         <receiver
             android:name=".ui.broadcasts.GpsReceiver"

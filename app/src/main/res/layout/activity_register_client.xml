@@ -174,6 +174,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:orientation="horizontal">
 
                         <ImageView
@@ -206,6 +207,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:visibility="gone"
                         android:orientation="horizontal">
 
                         <View
@@ -448,7 +450,6 @@
                                 android:id="@+id/editTextProductoInteres"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:focusable="false"
                                 android:inputType="text"
                                 android:onClick="@{listener::onClick}"
                                 android:text="@={c.cliente.productoInteres}" />

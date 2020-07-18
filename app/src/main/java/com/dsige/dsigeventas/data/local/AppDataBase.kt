@@ -28,7 +28,7 @@ import com.dsige.dsigeventas.data.local.model.*
         Grupo::class,
         Local::class
     ],
-    version = 9, // version 9 en play store
+    version = 10, // version 10 en play store
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {

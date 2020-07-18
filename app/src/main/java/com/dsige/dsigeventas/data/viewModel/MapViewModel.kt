@@ -1,6 +1,5 @@
 package com.dsige.dsigeventas.data.viewModel
 
-import android.location.Address
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

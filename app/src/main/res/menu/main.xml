@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/map"
+        android:icon="@drawable/ic_world"
+        android:orderInCategory="100"
+        android:title="Mapa Cliente"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/filter"
         android:icon="@drawable/ic_search_white"
         android:orderInCategory="100"
@@ -26,7 +32,6 @@
         android:orderInCategory="200"
         android:title="@string/ok"
         app:showAsAction="ifRoom" />
-
     <item
         android:id="@+id/logout"
         android:icon="@drawable/ic_exit"

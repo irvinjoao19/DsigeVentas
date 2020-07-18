@@ -18,7 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 open class Gps(var context: Context) : LocationListener {
 
     private var locationManager: LocationManager? = null
-    private var location: Location? = null
+    var location: Location? = null
     internal var latitude: Double = 0.toDouble()
     internal var longitude: Double = 0.toDouble()
     private val MIN_DISTANCE_CHANGE_FOR_UPDATES: Long = 10

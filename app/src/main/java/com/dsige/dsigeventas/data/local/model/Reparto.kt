@@ -28,6 +28,8 @@ open class Reparto {
     var motivo: String = ""
     var docVTA: String = ""
     var localId: Int = 0
+    var distritoId : Int = 0
+    var nombreDistrito : String = ""
 
     @Ignore
     var detalle: List<RepartoDetalle>? = null

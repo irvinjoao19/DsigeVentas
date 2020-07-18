@@ -33,6 +33,7 @@ import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.DataParser
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.MapsActivity
+import com.dsige.dsigeventas.ui.activities.RepartoActivity
 import com.dsige.dsigeventas.ui.adapters.LocalAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -62,7 +63,10 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     GoogleMap.OnMarkerClickListener, View.OnClickListener {
 
     override fun onClick(v: View) {
-        dialogLocal()
+        when (v.id) {
+            R.id.fab -> startActivity(Intent(context, RepartoActivity::class.java))
+            R.id.editTextLocal -> dialogLocal()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -147,6 +151,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         editTextLocal.setOnClickListener(this)
+        fab.setOnClickListener(this)
 
         repartoViewModel.getReparto().observe(viewLifecycleOwner, Observer { count ->
             mMap.clear()
@@ -155,7 +160,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 var i = 1
                 val y = count.size
                 textViewPendientes.setText(
-                    Util.getTextHTML("<strong>Pendientes: </string>$y"),
+                    Util.getTextHTML("<strong>Pendientes: </strong>$y"),
                     TextView.BufferType.SPANNABLE
                 )
                 for (s: Reparto in count) {
@@ -254,7 +259,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     }
 
     override fun onLocationChanged(location: Location) {
-
         if (isFirstTime) {
             zoomToLocation(location)
         }

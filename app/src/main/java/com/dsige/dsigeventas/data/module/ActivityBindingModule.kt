@@ -33,4 +33,16 @@ abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     internal abstract fun bindPersonalMapActivity(): PersonalMapActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindClientMapActivity(): ClientMapActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindPreviewCameraActivity(): PreviewCameraActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindClientGeneralMapActivity(): ClientGeneralMapActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindRepartoActivity(): RepartoActivity
 }

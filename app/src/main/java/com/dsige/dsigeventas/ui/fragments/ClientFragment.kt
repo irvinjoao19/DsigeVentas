@@ -21,6 +21,9 @@ import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
+import com.dsige.dsigeventas.helper.Util
+import com.dsige.dsigeventas.ui.activities.ClientGeneralMapActivity
+import com.dsige.dsigeventas.ui.activities.ClientMapActivity
 import com.dsige.dsigeventas.ui.activities.FileClientActivity
 import com.dsige.dsigeventas.ui.activities.RegisterClientActivity
 import com.dsige.dsigeventas.ui.adapters.*
@@ -28,11 +31,11 @@ import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import dagger.android.support.DaggerFragment
+import kotlinx.android.synthetic.main.cardview_client.view.*
 import kotlinx.android.synthetic.main.fragment_client.*
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
-//private const val ARG_PARAM2 = "param2"
 
 class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditorActionListener {
 
@@ -110,6 +113,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                     }
                 }
             }
+            R.id.map -> startActivity(Intent(context, ClientGeneralMapActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
     }
@@ -147,12 +151,24 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         val clientePagingAdapter =
             ClientePagingAdapter(object : OnItemClickListener.ClienteListener {
                 override fun onItemClick(c: Cliente, v: View, position: Int) {
-                    startActivity(
-                        Intent(context, FileClientActivity::class.java)
-                            .putExtra("clienteId", c.clienteId)
-                    )
+                    when (v.id) {
+                        R.id.imageViewMap -> if (c.latitud.isNotEmpty() && c.longitud.isNotEmpty()) {
+                            startActivity(
+                                Intent(context, ClientMapActivity::class.java)
+                                    .putExtra("latitud", c.latitud)
+                                    .putExtra("longitud", c.longitud)
+                                    .putExtra("title", c.nombreCliente)
+                            )
+                        } else
+                            clienteViewModel.setError("No cuenta con ubicación")
+                        else -> startActivity(
+                            Intent(context, FileClientActivity::class.java)
+                                .putExtra("clienteId", c.clienteId)
+                        )
+                    }
                 }
             })
+
         val layoutManager = LinearLayoutManager(context)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
@@ -163,6 +179,10 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         clienteViewModel.getCliente()
             .observe(viewLifecycleOwner, Observer(clientePagingAdapter::submitList))
         clienteViewModel.search.value = ""
+
+        clienteViewModel.mensajeError.observe(viewLifecycleOwner, Observer {
+            Util.toastMensaje(context!!, it)
+        })
     }
 
     companion object {
@@ -197,6 +217,9 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         recyclerView.layoutManager = layoutManager
         textViewTitle.text = title
 
+        f.departamentoId = "15"
+        f.provinciaId = "1"
+
         when (tipo) {
             1 -> {
                 val departamentoAdapter =
@@ -212,7 +235,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                 recyclerView.adapter = departamentoAdapter
 
                 clienteViewModel.getDepartamentos()
-                    .observe(this, Observer<List<Departamento>> { d ->
+                    .observe(this, Observer { d ->
                         if (d != null) {
                             departamentoAdapter.addItems(d)
                         }
@@ -249,7 +272,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                 recyclerView.adapter = provinciaAdapter
 
                 clienteViewModel.getProvinciasById(f.departamentoId)
-                    .observe(this, Observer<List<Provincia>> { d ->
+                    .observe(this, Observer { d ->
                         if (d != null) {
                             provinciaAdapter.addItems(d)
                         }
@@ -276,14 +299,14 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                 val distritoAdapter =
                     DistritoAdapter(object : OnItemClickListener.DistritoListener {
                         override fun onItemClick(d: Distrito, v: View, position: Int) {
-                            f.distritoId = d.codigoDistrito
+                            f.distritoId = d.distritoId.toString()
                             editTextDistrito.setText(d.nombre)
                             dialogSpinner.dismiss()
                         }
                     })
                 recyclerView.adapter = distritoAdapter
                 clienteViewModel.getDistritosById(f.departamentoId, f.provinciaId)
-                    .observe(this, Observer<List<Distrito>> { d ->
+                    .observe(this, Observer { d ->
                         if (d != null) {
                             distritoAdapter.addItems(d)
                         }

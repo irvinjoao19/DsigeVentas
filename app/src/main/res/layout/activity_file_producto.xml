@@ -64,6 +64,17 @@
                 android:layout_height="match_parent">
 
                 <TextView
+                    android:id="@+id/textViewCodigo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@={s.producto.codigoProducto}"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
                     android:id="@+id/textViewNombre"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -72,7 +83,19 @@
                     android:text="@={s.producto.nombreProducto}"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewCodigo" />
+
+                <TextView
+                    android:id="@+id/textViewCategoria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="@={s.producto.nombreCategoria}"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewNombre" />
+
 
                 <ImageView
                     android:id="@+id/imageView2"
@@ -82,8 +105,8 @@
                     android:layout_marginTop="8dp"
                     android:contentDescription="@string/imagen"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewNombre"
-                    app:srcCompat="@drawable/ic_person" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewCategoria"
+                    app:srcCompat="@drawable/ic_money" />
 
                 <TextView
                     android:id="@+id/textViewTipo"
@@ -93,7 +116,7 @@
                     android:layout_marginTop="8dp"
                     android:text="@{Double.toString(s.producto.precio)}"
                     app:layout_constraintStart_toEndOf="@+id/imageView2"
-                    app:layout_constraintTop_toBottomOf="@+id/textViewNombre" />
+                    app:layout_constraintTop_toBottomOf="@+id/textViewCategoria" />
 
                 <ImageView
                     android:id="@+id/imageView5"
@@ -103,7 +126,6 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:contentDescription="@string/imagen"
-                    app:layout_constraintBottom_toTopOf="@+id/imageView6"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imageView2"
                     app:srcCompat="@drawable/ic_card_cancel" />
@@ -112,54 +134,12 @@
                     android:id="@+id/textViewPago"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_margin="16dp"
                     android:text="@{Double.toString(s.producto.precio)}"
                     app:layout_constraintStart_toEndOf="@+id/imageView5"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
-                <ImageView
-                    android:id="@+id/imageView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:contentDescription="@string/imagen"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView5"
-                    app:srcCompat="@drawable/ic_place" />
-
-<!--                android:text="@={c.cliente.nombreDepartamento}"-->
-                <TextView
-                    android:id="@+id/textViewDepartamento"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toEndOf="@+id/imageView6"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView5" />
-
-<!--                android:text="@={c.cliente.nombreProvincia}"-->
-                <TextView
-                    android:id="@+id/textViewProvincia"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/imageView7"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView6" />
-
-                <ImageView
-                    android:id="@+id/imageView7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:contentDescription="@string/imagen"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView6"
-                    app:srcCompat="@drawable/ic_local_phone" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
 

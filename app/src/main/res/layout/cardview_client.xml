@@ -2,7 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="150dp">
+    android:layout_height="150dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.adapters.ClientePagingAdapter">
 
     <ImageView
         android:id="@+id/imageViewFoto"
@@ -57,13 +59,27 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewNombre" />
 
     <TextView
+        android:id="@+id/textViewDistrito"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="@color/colorBlack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageViewFoto"
+        app:layout_constraintTop_toBottomOf="@+id/textViewDireccion" />
+
+    <TextView
         android:id="@+id/textViewVisita"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@+id/imageViewFoto"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDireccion" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewDistrito" />
 
     <ImageView
         android:id="@+id/imageViewMap"

@@ -26,13 +26,11 @@ interface ClienteDao {
     @Query("SELECT * FROM Cliente WHERE (nombreCliente LIKE :search OR documento LIKE :search) ")
     fun getCliente(search: String): DataSource.Factory<Int, Cliente>
 
-    @Query("SELECT * FROM Cliente WHERE departamentoId=:d AND provinciaId=:p AND distritoId=:s AND (nombreCliente LIKE :search OR documento LIKE :search) ")
-    fun getCliente(
-        d: Int, p: Int, s: Int, search: String
-    ): DataSource.Factory<Int, Cliente>
+    @Query("SELECT * FROM Cliente WHERE distritoId=:s AND (nombreCliente LIKE :search OR documento LIKE :search) ")
+    fun getCliente(s: Int, search: String): DataSource.Factory<Int, Cliente>
 
-    @Query("SELECT * FROM Cliente WHERE departamentoId=:d AND provinciaId=:p AND distritoId=:s ")
-    fun getCliente(d: Int, p: Int, s: Int): DataSource.Factory<Int, Cliente>
+    @Query("SELECT * FROM Cliente WHERE distritoId=:s")
+    fun getCliente(s: Int): DataSource.Factory<Int, Cliente>
 
     @Query("SELECT * FROM Cliente")
     fun getClienteTask(): Cliente
@@ -54,4 +52,10 @@ interface ClienteDao {
 
     @Query("UPDATE Cliente SET identity =:codigoRetorno WHERE clienteId =:codigoBase")
     fun updateCliente(codigoBase: Int, codigoRetorno: Int)
+
+    @Query("UPDATE Cliente SET nameImg =:name WHERE clienteId =:id")
+    fun updatePhotoCliente(id: Int, name: String)
+
+    @Query("SELECT * FROM Cliente WHERE nombreDistrito LIKE :d  ")
+    fun getClienteByDistrito(d: String): LiveData<List<Cliente>>
 }

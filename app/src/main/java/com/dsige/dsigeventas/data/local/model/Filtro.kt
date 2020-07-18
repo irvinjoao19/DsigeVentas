@@ -14,6 +14,10 @@ open class Filtro {
     var provinciaId: String = ""
     var distritoId: String = ""
 
+    var localId : Int = 0
+    var distritoRId : Int = 0
+
+
     constructor()
 
     constructor(login: String) {

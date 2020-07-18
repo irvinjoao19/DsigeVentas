@@ -44,13 +44,13 @@ interface AppRepository {
 
     fun getCliente(search: String): LiveData<PagedList<Cliente>>
 
-    fun getCliente(d: Int, p: Int, s: Int, search: String): LiveData<PagedList<Cliente>>
+    fun getCliente(s: Int, search: String): LiveData<PagedList<Cliente>>
 
-    fun getCliente(d: Int, p: Int, s: Int): LiveData<PagedList<Cliente>>
+    fun getCliente(s: Int): LiveData<PagedList<Cliente>>
 
     fun getClienteById(id: Int): LiveData<Cliente>
 
-    fun insertOrUpdateCliente(c: Cliente,m:Mensaje?): Completable
+    fun insertOrUpdateCliente(c: Cliente, m: Mensaje?): Completable
 
     fun getDepartamentos(): LiveData<List<Departamento>>
 
@@ -101,7 +101,15 @@ interface AppRepository {
 
     fun getRepartoCount(valor: Int): LiveData<Int>
 
-    fun getReparto(): LiveData<List<Reparto>>
+    fun getRepartoList(): LiveData<List<Reparto>>
+
+    fun getReparto(): LiveData<PagedList<Reparto>>
+
+    fun getReparto(s: String): LiveData<PagedList<Reparto>>
+
+    fun getReparto(localId: Int, distritoId: Int): LiveData<PagedList<Reparto>>
+
+    fun getReparto(localId: Int, distritoId: Int, s: String): LiveData<PagedList<Reparto>>
 
     fun deletePedidoDetalle(p: PedidoDetalle): Completable
 
@@ -146,4 +154,8 @@ interface AppRepository {
     fun getLocales(): LiveData<List<Local>>
 
     fun getOrdenById(id: Int): Observable<Orden>
+
+    fun updatePhotoCliente(clienteId: Int, nameImg: String): Completable
+
+    fun getClienteByDistrito(distrito: String): LiveData<List<Cliente>>
 }

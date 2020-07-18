@@ -7,6 +7,8 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.graphics.*
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.os.Build
@@ -20,6 +22,7 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -32,12 +35,18 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import io.reactivex.Observable
+import io.reactivex.Observer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_client_general_map.*
 import java.io.*
 import java.nio.channels.FileChannel
 import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.math.*
 
 object Util {
@@ -181,8 +190,8 @@ object Util {
         return result
     }
 
-    fun getFolder(): File {
-        val folder = File(Environment.getExternalStorageDirectory(), FolderImg)
+    fun getFolder(context: Context): File {
+        val folder = File(context.getExternalFilesDir(null)!!.absolutePath)
         if (!folder.exists()) {
             val success = folder.mkdirs()
             if (!success) {
@@ -381,101 +390,46 @@ object Util {
         }
     }
 
-    fun shrinkBitmapOnlyReduceCamera2(
-        file: String,
-        width: Int,
-        height: Int,
-        captionString: String?
+    private fun shrinkBitmapOnlyReduceCamera2(
+        file: String
     ) {
-
-        val targetW: Int = width
-        val targetH: Int = height
-
-        val bmOptions = BitmapFactory.Options().apply {
-            // Get the dimensions of the bitmap
-            inJustDecodeBounds = true
-
-            val photoW: Int = outWidth
-            val photoH: Int = outHeight
-
-            // Determine how much to scale down the image
-            val scaleFactor: Int = (photoW / targetW).coerceAtMost(photoH / targetH)
-
-            // Decode the image file into a Bitmap sized to fill the View
-            inJustDecodeBounds = false
-            inSampleSize = scaleFactor
-
+        val b = BitmapFactory.decodeFile(file)
+        val text = getDateTimeFormatString()
+        var config: Bitmap.Config? = b.config
+        if (config == null) {
+            config = Bitmap.Config.ARGB_8888
         }
-//        BitmapFactory.decodeFile(file, bmOptions)?.also { bitmap ->
-//            try {
-//                val newCanvas = Canvas(bitmap)
-//                newCanvas.drawBitmap(bitmap, 0f, 0f, null)
-//
-//                if (captionString != null) {
-//                    val paintText = Paint(Paint.ANTI_ALIAS_FLAG)
-//                    paintText.color = Color.RED
-//                    paintText.textSize = 22f
-//                    paintText.style = Paint.Style.FILL
-//                    paintText.setShadowLayer(0.7f, 0.7f, 0.7f, Color.YELLOW)
-//
-//                    val rectText = Rect()
-//                    paintText.getTextBounds(captionString, 0, captionString.length, rectText)
-//                    newCanvas.drawText(captionString, 0f, rectText.height().toFloat(), paintText)
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//        }
+        val newBitmap = Bitmap.createBitmap(b.width, b.height, config)
+        val newCanvas = Canvas(newBitmap)
+        newCanvas.drawBitmap(b, 0f, 0f, null)
 
+        val paintText = Paint(Paint.ANTI_ALIAS_FLAG)
+        paintText.color = Color.RED
+        paintText.textSize = 22f
+        paintText.style = Paint.Style.FILL
+        paintText.setShadowLayer(0.7f, 0.7f, 0.7f, Color.YELLOW)
 
-        try {
+        val rectText = Rect()
+        paintText.getTextBounds(text, 0, text.length, rectText)
+        newCanvas.drawText(text, 0f, rectText.height().toFloat(), paintText)
 
+        val fOut = FileOutputStream(file)
+        val imageName = file.substring(file.lastIndexOf("/") + 1)
+        val imageType = imageName.substring(imageName.lastIndexOf(".") + 1)
 
-            val b = BitmapFactory.decodeFile(file, bmOptions)
-
-            var config: Bitmap.Config? = b.config
-            if (config == null) {
-                config = Bitmap.Config.ARGB_8888
-            }
-            val newBitmap = Bitmap.createBitmap(b.width, b.height, config)
-
-            val newCanvas = Canvas(newBitmap)
-            newCanvas.drawBitmap(b, 0f, 0f, null)
-
-            if (captionString != null) {
-
-                val paintText = Paint(Paint.ANTI_ALIAS_FLAG)
-                paintText.color = Color.RED
-                paintText.textSize = 22f
-                paintText.style = Paint.Style.FILL
-                paintText.setShadowLayer(0.7f, 0.7f, 0.7f, Color.YELLOW)
-
-                val rectText = Rect()
-                paintText.getTextBounds(captionString, 0, captionString.length, rectText)
-                newCanvas.drawText(captionString, 0f, rectText.height().toFloat(), paintText)
-            }
-
-            val fOut = FileOutputStream(file)
-            val imageName = file.substring(file.lastIndexOf("/") + 1)
-            val imageType = imageName.substring(imageName.lastIndexOf(".") + 1)
-
-            val out = FileOutputStream(file)
-            if (imageType.equals("png", ignoreCase = true)) {
-                newBitmap.compress(Bitmap.CompressFormat.PNG, 70, out)
-            } else if (imageType.equals("jpeg", ignoreCase = true) || imageType.equals(
-                    "jpg",
-                    ignoreCase = true
-                )
-            ) {
-                newBitmap.compress(Bitmap.CompressFormat.JPEG, 70, out)
-            }
-            fOut.flush()
-            fOut.close()
-            newBitmap.recycle()
-
-        } catch (e: Exception) {
-            e.printStackTrace()
+        val out = FileOutputStream(file)
+        if (imageType.equals("png", ignoreCase = true)) {
+            newBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        } else if (imageType.equals("jpeg", ignoreCase = true) || imageType.equals(
+                "jpg",
+                ignoreCase = true
+            )
+        ) {
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
         }
+        fOut.flush()
+        fOut.close()
+        newBitmap.recycle()
     }
 
     // TODO SOBRE ROTAR LA PHOTO
@@ -821,6 +775,106 @@ object Util {
                 Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
             draw(Canvas(bitmap))
             BitmapDescriptorFactory.fromBitmap(bitmap)
+        }
+    }
+
+    fun getAngleImage(photoPath: String): String {
+        try {
+            val ei = ExifInterface(photoPath)
+            val orientation =
+                ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            val degree: Int
+
+            degree = when (orientation) {
+                ExifInterface.ORIENTATION_NORMAL -> 0
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                ExifInterface.ORIENTATION_UNDEFINED -> 0
+                else -> 90
+            }
+
+            return rotateNewImage(degree, photoPath)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return photoPath
+    }
+
+    private fun rotateNewImage(degree: Int, imagePath: String): String {
+        if (degree <= 0) {
+            shrinkBitmapOnlyReduceCamera2(imagePath)
+            return imagePath
+        }
+        try {
+
+            var b: Bitmap? = BitmapFactory.decodeFile(imagePath)
+            val matrix = Matrix()
+            if (b!!.width > b.height) {
+                matrix.setRotate(degree.toFloat())
+                b = Bitmap.createBitmap(b, 0, 0, b.width, b.height, matrix, true)
+                b = processingBitmapSetDateTime(
+                    b,
+                    getDateTimeFormatString(Date(File(imagePath).lastModified()))
+                )
+            }
+
+            val fOut = FileOutputStream(imagePath)
+            val imageName = imagePath.substring(imagePath.lastIndexOf("/") + 1)
+            val imageType = imageName.substring(imageName.lastIndexOf(".") + 1)
+
+            val out = FileOutputStream(imagePath)
+            if (imageType.equals("png", ignoreCase = true)) {
+                b!!.compress(Bitmap.CompressFormat.PNG, 100, out)
+            } else if (imageType.equals("jpeg", ignoreCase = true) || imageType.equals(
+                    "jpg",
+                    ignoreCase = true
+                )
+            ) {
+                b!!.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
+            fOut.flush()
+            fOut.close()
+            b!!.recycle()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return imagePath
+    }
+
+    fun getLocationName(context: Context, location: Location, input: TextInputEditText) {
+        try {
+            val addressObservable = Observable.just(
+                Geocoder(context).getFromLocation(
+                    location.latitude,
+                    location.longitude,
+                    1
+                )[0]
+            )
+            addressObservable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(object : Observer<Address> {
+                    override fun onSubscribe(d: Disposable) {
+
+                    }
+
+                    override fun onNext(address: Address) {
+                        input.setText(address.getAddressLine(0))
+                    }
+
+                    override fun onError(e: Throwable) {
+
+                    }
+
+                    override fun onComplete() {
+
+                    }
+                })
+        } catch (e: IOException) {
+
         }
     }
 }

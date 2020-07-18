@@ -33,11 +33,13 @@ class PedidoPagingAdapter(private var listener: OnItemClickListener.PedidoListen
             with(itemView) {
                 textViewNroPedido.text = String.format("Nro Pedido : %s", s.pedidoId)
                 textViewCliente.text = s.nombreCliente
+                textViewTotalPedido.text = String.format("Total pedido : S/. %.2f",s.totalNeto)
                 when (s.estado) {
                     0 -> textViewEstado.text = String.format("Estado : %s", "Por Enviar")
                     1 -> textViewEstado.text = String.format("Estado : %s", "Enviado")
                 }
                 itemView.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
+                imageViewMap.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
             }
     }
 

@@ -57,7 +57,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 roomRepository.getCliente()
             } else {
                 val f = Gson().fromJson(search.value, Filtro::class.java)
-                if (f.departamentoId.isEmpty() || f.provinciaId.isEmpty() || f.distritoId.isEmpty()) {
+                if (f.distritoId.isEmpty()) {
                     if (f.search.isNotEmpty()) {
                         roomRepository.getCliente(String.format("%s%s%s", "%", f.search, "%"))
                     } else {
@@ -65,13 +65,10 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                     }
                 } else {
                     if (f.search.isEmpty()) {
-                        roomRepository.getCliente(
-                            f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt()
-                        )
+                        roomRepository.getCliente(f.distritoId.toInt())
                     } else {
                         roomRepository.getCliente(
-                            f.departamentoId.toInt(), f.provinciaId.toInt(), f.distritoId.toInt(),
-                            String.format("%s%s%s", "%", f.search, "%")
+                            f.distritoId.toInt(), String.format("%s%s%s", "%", f.search, "%")
                         )
                     }
                 }
@@ -87,7 +84,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         cliente.value = c
     }
 
-    fun validateCliente(c: Cliente,tipo:Int) {
+    fun validateCliente(c: Cliente, tipo: Int) {
         if (c.tipo.isEmpty()) {
             mensajeError.value = "Seleccione tipo"
             return
@@ -98,14 +95,14 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             return
         }
 
-        if (c.tipo == "Natural"){
+        if (c.tipo == "Natural") {
             if (c.documento.length != 8) {
                 mensajeError.value = "Se requiere de 8 digitos"
                 return
             }
         }
 
-        if (c.tipo == "Juridico"){
+        if (c.tipo == "Juridico") {
             if (c.documento.length != 11) {
                 mensajeError.value = "Se requiere 11 digitos si el tipo es Juridico"
                 return
@@ -141,14 +138,14 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             return
         }
 
-        if(tipo == 1)
+        if (tipo == 1)
             sendCliente(c)
         else
-            insertOrUpdateCliente(c,null)
+            insertOrUpdateCliente(c, null)
     }
 
-    private fun insertOrUpdateCliente(c: Cliente,m:Mensaje?) {
-        roomRepository.insertOrUpdateCliente(c,m)
+    private fun insertOrUpdateCliente(c: Cliente, m: Mensaje?) {
+        roomRepository.insertOrUpdateCliente(c, m)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
@@ -170,7 +167,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    fun sendCliente(c:Cliente) {
+    private fun sendCliente(c: Cliente) {
         val json = Gson().toJson(c)
         Log.i("TAG", json)
         val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
@@ -178,7 +175,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             .delay(1000, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<Mensaje>{
+            .subscribe(object : Observer<Mensaje> {
                 override fun onComplete() {
 
                 }
@@ -188,12 +185,40 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 }
 
                 override fun onNext(t: Mensaje) {
-                    insertOrUpdateCliente(c,t)
+                    insertOrUpdateCliente(c, t)
                 }
 
                 override fun onError(e: Throwable) {
 
                 }
             })
+    }
+
+    fun updatePhotoCliente(clienteId: Int, nameImg: String) {
+        roomRepository.updatePhotoCliente(clienteId, nameImg)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+                    mensajeSuccess.value = "Cliente Actualizado"
+
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.toString()
+                }
+            })
+    }
+
+    fun personalSearch(s: String): LiveData<PagedList<Cliente>> {
+        return roomRepository.getCliente(String.format("%s%s%s", "%", s, "%"))
+    }
+
+    fun getClienteByDistrito(s: String): LiveData<List<Cliente>> {
+        return roomRepository.getClienteByDistrito(String.format("%s%s%s", "%", s, "%"))
     }
 }

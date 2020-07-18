@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,10 +14,15 @@ import com.dsige.dsigeventas.data.local.model.Cliente
 import com.dsige.dsigeventas.data.viewModel.ClienteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.databinding.ActivityFileClientBinding
+import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.listeners.NavigationItemSelectedListener
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_file_client.*
+import java.io.File
 import javax.inject.Inject
 
 class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
@@ -25,9 +31,11 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.pedidos -> mensajeCliente()
-            R.id.foto -> {
-                return true
-            }
+            R.id.foto -> startActivity(
+                Intent(
+                    this, CameraActivity::class.java
+                ).putExtra("clienteId", c.clienteId)
+            )
             R.id.reubica -> {
                 return true
             }
@@ -76,6 +84,10 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
         clienteViewModel.getClienteById(id).observe(this, Observer { cliente ->
             if (cliente != null) {
                 c = cliente
+                val f = File(Util.getFolder(this),c.nameImg)
+                Picasso.get().load(f)
+                    .error(ContextCompat.getDrawable(this,R.drawable.material_flat)!!)
+                    .into(fondo)
                 clienteViewModel.setCliente(c)
             }
         })

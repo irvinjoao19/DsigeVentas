@@ -34,15 +34,15 @@ class FileProductoActivity : DaggerAppCompatActivity() {
         }
     }
 
-    private fun bindUI(id:Int){
+    private fun bindUI(id: Int) {
         setSupportActionBar(binding.toolbar)
         supportActionBar!!.title = "Producto"
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.s = productoViewModel
-        productoViewModel.getProductoById(id).observe(this, Observer<Stock> { stock ->
+        productoViewModel.getProductoById(id).observe(this, Observer { stock ->
             if (stock != null) {
-               p = stock
+                p = stock
                 productoViewModel.setProducto(p)
             }
         })

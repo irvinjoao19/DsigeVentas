@@ -40,6 +40,7 @@ class ProductsFragment : DaggerFragment() {
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.add).setVisible(false).isEnabled = false
         menu.findItem(R.id.logout).setVisible(false).isEnabled = false
+        menu.findItem(R.id.map).setVisible(false).isEnabled = false
         val searchView = menu.findItem(R.id.search).actionView as SearchView
         search(searchView)
     }

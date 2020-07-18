@@ -16,6 +16,7 @@ import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.Pedido
 import com.dsige.dsigeventas.data.viewModel.ProductoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
+import com.dsige.dsigeventas.ui.activities.ClientMapActivity
 import com.dsige.dsigeventas.ui.activities.OrdenActivity
 import com.dsige.dsigeventas.ui.adapters.PedidoPagingAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
@@ -42,6 +43,7 @@ class PedidoFragment : DaggerFragment() {
         menu.findItem(R.id.ok).setVisible(false).isEnabled = false
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.logout).setVisible(false).isEnabled = false
+        menu.findItem(R.id.map).setVisible(false).isEnabled = false
         val searchView = menu.findItem(R.id.search).actionView as SearchView
         search(searchView)
     }
@@ -85,20 +87,30 @@ class PedidoFragment : DaggerFragment() {
 
         val pedidoAdapter = PedidoPagingAdapter(object : OnItemClickListener.PedidoListener {
             override fun onItemClick(p: Pedido, v: View, position: Int) {
-                if (p.estado == 0) {
-                    val popupMenu = PopupMenu(context!!, v)
-                    popupMenu.menu.add(0, 1, 0, getText(R.string.goPedido))
-                    popupMenu.menu.add(0, 2, 0, getText(R.string.delete))
-                    popupMenu.setOnMenuItemClickListener { item ->
-                        when (item.itemId) {
-                            1 -> goOrdenActivity(p)
-                            2 -> deletePedidoDialog(p)
+                when (v.id) {
+                    R.id.imageViewMap -> if (p.latitud.isNotEmpty() && p.longitud.isNotEmpty()) {
+                        startActivity(
+                            Intent(context, ClientMapActivity::class.java)
+                                .putExtra("latitud", p.latitud)
+                                .putExtra("longitud", p.longitud)
+                                .putExtra("title", p.nombreCliente)
+                        )
+                    } else
+                        productoViewModel.setError("No cuenta con ubicación")
+                    else -> if (p.estado == 0) {
+                        val popupMenu = PopupMenu(context!!, v)
+                        popupMenu.menu.add(0, 1, 0, getText(R.string.goPedido))
+                        popupMenu.menu.add(0, 2, 0, getText(R.string.delete))
+                        popupMenu.setOnMenuItemClickListener { item ->
+                            when (item.itemId) {
+                                1 -> goOrdenActivity(p)
+                                2 -> deletePedidoDialog(p)
+                            }
+                            false
                         }
-                        false
-                    }
-                    popupMenu.show()
-                } else goOrdenActivity(p)
-
+                        popupMenu.show()
+                    } else goOrdenActivity(p)
+                }
             }
         })
 
@@ -110,7 +122,7 @@ class PedidoFragment : DaggerFragment() {
         )
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = pedidoAdapter
-        productoViewModel.getPedido().observe(this, Observer(pedidoAdapter::submitList))
+        productoViewModel.getPedido().observe(viewLifecycleOwner, Observer(pedidoAdapter::submitList))
         productoViewModel.searchPedido.value = ""
     }
 

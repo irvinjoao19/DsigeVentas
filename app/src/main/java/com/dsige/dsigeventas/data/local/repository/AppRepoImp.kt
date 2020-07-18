@@ -173,16 +173,14 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
-    override fun getCliente(
-        d: Int, p: Int, s: Int, search: String
-    ): LiveData<PagedList<Cliente>> {
-        return dataBase.clienteDao().getCliente(d, p, s, search).toLiveData(
+    override fun getCliente(s: Int, search: String): LiveData<PagedList<Cliente>> {
+        return dataBase.clienteDao().getCliente(s, search).toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
-    override fun getCliente(d: Int, p: Int, s: Int): LiveData<PagedList<Cliente>> {
-        return dataBase.clienteDao().getCliente(d, p, s).toLiveData(
+    override fun getCliente(s: Int): LiveData<PagedList<Cliente>> {
+        return dataBase.clienteDao().getCliente(s).toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
         )
     }
@@ -390,8 +388,32 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.repartoDao().getRepartoCount(valor)
     }
 
-    override fun getReparto(): LiveData<List<Reparto>> {
-        return dataBase.repartoDao().getReparto(8)
+    override fun getRepartoList(): LiveData<List<Reparto>> {
+        return dataBase.repartoDao().getRepartoList(8)
+    }
+
+    override fun getReparto(): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getReparto(8).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
+    }
+
+    override fun getReparto(s: String): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getReparto(8, s).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
+    }
+
+    override fun getReparto(localId: Int, distritoId: Int): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getReparto(8, localId, distritoId).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
+    }
+
+    override fun getReparto(localId: Int, distritoId: Int, s: String): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getReparto(8, localId, distritoId, s).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
     }
 
     override fun deletePedidoDetalle(p: PedidoDetalle): Completable {
@@ -502,7 +524,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getRepartoByTipo(t: Int): LiveData<List<Reparto>> {
         return when (t) {
-            0 -> dataBase.repartoDao().getReparto(8)
+            0 -> dataBase.repartoDao().getRepartoList(8)
             else -> dataBase.repartoDao().getRepartoByTipo(8, t)
         }
     }
@@ -526,5 +548,15 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             e.onNext(o)
             e.onComplete()
         }
+    }
+
+    override fun updatePhotoCliente(clienteId: Int, nameImg: String): Completable {
+        return Completable.fromAction {
+            dataBase.clienteDao().updatePhotoCliente(clienteId, nameImg)
+        }
+    }
+
+    override fun getClienteByDistrito(distrito: String): LiveData<List<Cliente>> {
+        return dataBase.clienteDao().getClienteByDistrito(distrito)
     }
 }

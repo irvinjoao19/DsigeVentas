@@ -32,6 +32,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
     val tipo: MutableLiveData<Int> = MutableLiveData()
+    val search: MutableLiveData<String> = MutableLiveData()
 
     fun setError(s: String) {
         mensajeError.value = s
@@ -45,10 +46,35 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         return roomRepository.getRepartoByTipo(id)
     }
 
+    fun getListReparto(): LiveData<PagedList<Reparto>> {
+        return Transformations.switchMap(search) { input ->
+            if (input == null) {
+                roomRepository.getReparto()
+            } else {
+                val f = Gson().fromJson(input, Filtro::class.java)
+                if (f.localId == 0 || f.distritoRId == 0) {
+                    if (f.search.isNotEmpty()) {
+                        roomRepository.getReparto(String.format("%s%s%s", "%", f.search, "%"))
+                    } else {
+                        roomRepository.getReparto()
+                    }
+                } else {
+                    if (f.search.isEmpty()) {
+                        roomRepository.getReparto(f.localId, f.distritoRId)
+                    } else {
+                        roomRepository.getReparto(
+                            f.localId, f.distritoRId, String.format("%s%s%s", "%", f.search, "%")
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     fun getReparto(): LiveData<List<Reparto>> {
         return Transformations.switchMap(tipo) { input ->
             if (input == 0 || input == null) {
-                roomRepository.getReparto()
+                roomRepository.getRepartoList()
             } else {
                 roomRepository.getRepartoByTipo(input)
             }
@@ -113,7 +139,8 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         pedidos.flatMap { a ->
             val json = Gson().toJson(a)
             Log.i("TAG", json)
-            val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+            val body =
+                RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
             Observable.zip(
                 Observable.just(a), roomRepository.sendUpdateReparto(body),
                 BiFunction<Reparto, Mensaje, Mensaje> { _, mensaje ->

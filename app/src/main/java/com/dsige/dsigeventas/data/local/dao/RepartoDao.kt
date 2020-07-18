@@ -39,10 +39,22 @@ interface RepartoDao {
     fun getRepartoById(id: Int): LiveData<Reparto>
 
     @Query("SELECT * FROM Reparto WHERE estado =:e")
-    fun getReparto(e: Int): LiveData<List<Reparto>>
+    fun getRepartoList(e: Int): LiveData<List<Reparto>>
+
+    @Query("SELECT * FROM Reparto WHERE estado =:e")
+    fun getReparto(e: Int): DataSource.Factory<Int, Reparto>
+
+    @Query("SELECT * FROM Reparto WHERE estado =:e AND apellidoNombreCliente LIKE :s")
+    fun getReparto(e: Int, s: String): DataSource.Factory<Int, Reparto>
+
+    @Query("SELECT * FROM Reparto WHERE estado =:e AND localId =:l AND distritoId =:d")
+    fun getReparto(e: Int, l: Int, d: Int): DataSource.Factory<Int, Reparto>
+
+    @Query("SELECT * FROM Reparto WHERE estado =:e AND localId =:l AND distritoId =:d AND apellidoNombreCliente LIKE :s")
+    fun getReparto(e: Int, l: Int, d: Int,s:String): DataSource.Factory<Int, Reparto>
 
     @Query("SELECT * FROM Reparto WHERE estado =:e AND localId =:t")
-    fun getRepartoByTipo(e: Int,t:Int): LiveData<List<Reparto>>
+    fun getRepartoByTipo(e: Int, t: Int): LiveData<List<Reparto>>
 
     @Query("SELECT count(*) FROM Reparto")
     fun getReparto(): LiveData<Int>

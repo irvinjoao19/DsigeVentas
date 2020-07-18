@@ -35,4 +35,6 @@ open class Cliente {
     var condFacturacion: Int = 0
     var estado: Int = 0
     var identity: Int = 0
+
+    var nameImg: String = ""
 }

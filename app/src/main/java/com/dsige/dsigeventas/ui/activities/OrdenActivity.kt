@@ -332,7 +332,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                 editTextTipo.text = null
                 clienteId = id
                 productoViewModel.generarPedidoCliente(
-                    gps.latitude.toString(), gps.latitude.toString(), id
+                    gps.latitude.toString(), gps.longitude.toString(), id
                 )
             }
         } else {

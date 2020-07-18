@@ -67,7 +67,7 @@ class PersonalMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
             .build()
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
 
-        mapViewModel.getPersonal().observe(this, Observer<List<Personal>> { t ->
+        mapViewModel.getPersonal().observe(this, Observer { t ->
             if (t != null) {
                 for (p: Personal in t) {
                     if (p.latitud.isNotEmpty() || p.longitud.isNotEmpty()) {

@@ -2,6 +2,7 @@ package com.dsige.dsigeventas.ui.activities
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Handler
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
@@ -95,18 +96,31 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         supportActionBar!!.title = "Cliente"
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener { finish() }
-        binding.editTextVisita.setText(Util.getFecha())
         binding.listener = this
         binding.c = clienteViewModel
 
         c.personalVendedorId = usuarioId
-        clienteViewModel.getClienteById(id).observe(this, Observer { cliente ->
-            if (cliente != null) {
-                editTextProductoInteres.visibility = View.GONE
-                c = cliente
-                clienteViewModel.setCliente(c)
-            }
-        })
+        if (id == 0) {
+            Handler().postDelayed({
+                editTextVisita.setText(Util.getFecha())
+                editTextTipo.setText(String.format("Natural"))
+                editTextDocumento.filters =
+                    arrayOf<InputFilter>(InputFilter.LengthFilter(8))
+                c.giroNegocioId = 2
+                editTextPago.setText(String.format("CONTADO C/ ENTREGA"))
+                val gps = Gps(this)
+                if (gps.isLocationEnabled()) {
+                    Util.getLocationName(this, gps.location!!, editTextDireccion)
+                }
+            }, 200)
+        } else {
+            clienteViewModel.getClienteById(id).observe(this, Observer { cliente ->
+                if (cliente != null) {
+                    c = cliente
+                    clienteViewModel.setCliente(c)
+                }
+            })
+        }
     }
 
     private fun message() {
@@ -172,12 +186,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     }
 
     private fun dialogSpinner(title: String, tipo: Int) {
-        val builder = AlertDialog.Builder(
-            android.view.ContextThemeWrapper(
-                this,
-                R.style.AppTheme
-            )
-        )
+        val builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
             LayoutInflater.from(this).inflate(R.layout.dialog_combo, null)
         val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
@@ -191,12 +200,13 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         val layoutManager = LinearLayoutManager(this)
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.addItemDecoration(
-            DividerItemDecoration(
-                recyclerView.context, DividerItemDecoration.VERTICAL
-            )
+            DividerItemDecoration(recyclerView.context, DividerItemDecoration.VERTICAL)
         )
         recyclerView.layoutManager = layoutManager
         textViewTitle.text = title
+
+        f.departamentoId = "15"
+        f.provinciaId = "1"
 
         when (tipo) {
             1 -> {
@@ -362,8 +372,10 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 c.documento = editTextDocumento.text.toString()
                 c.nombreCliente = editTextNombre.text.toString()
                 c.nombreGiroNegocio = editTextPago.text.toString()
-                c.nombreDepartamento = editTextDepartamento.text.toString()
-                c.nombreDistrito = editTextDistrito.text.toString()
+                c.nombreDepartamento = "Lima"
+                c.nombreProvincia = "Lima"
+                c.departamentoId = 1390
+                c.provinciaId = 1390
                 c.direccion = editTextDireccion.text.toString()
                 c.nroCelular = editTextTelefono.text.toString()
                 c.email = editTextEmail.text.toString()
@@ -403,5 +415,4 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
             }
         }
     }
-
 }
