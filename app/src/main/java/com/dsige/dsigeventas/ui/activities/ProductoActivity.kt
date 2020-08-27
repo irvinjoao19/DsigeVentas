@@ -33,6 +33,7 @@ class ProductoActivity : DaggerAppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menu.findItem(R.id.map).setVisible(false).isEnabled = false
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.add).setVisible(false).isEnabled = false
         menu.findItem(R.id.logout).setVisible(false).isEnabled = false
@@ -88,12 +89,12 @@ class ProductoActivity : DaggerAppCompatActivity() {
         productoViewModel.getProductos()
             .observe(this, Observer(checkProductoPagingAdapter::submitList))
         productoViewModel.searchProducto.value = ""
-        productoViewModel.mensajeError.observe(this, Observer<String> { s ->
+        productoViewModel.mensajeError.observe(this, Observer { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)
             }
         })
-        productoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+        productoViewModel.mensajeSuccess.observe(this, Observer { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)
                 finish()

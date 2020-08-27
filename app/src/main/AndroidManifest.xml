@@ -35,7 +35,8 @@
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
-        <activity android:name=".ui.activities.RepartoActivity"></activity>
+        <activity android:name=".ui.activities.RepartoGeneralMapActivity" />
+        <activity android:name=".ui.activities.RepartoActivity" />
         <activity android:name=".ui.activities.ClientGeneralMapActivity" />
         <activity android:name=".ui.activities.ClientMapActivity" />
         <activity android:name=".ui.activities.PreviewCameraActivity" />

@@ -31,7 +31,6 @@ import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import dagger.android.support.DaggerFragment
-import kotlinx.android.synthetic.main.cardview_client.view.*
 import kotlinx.android.synthetic.main.fragment_client.*
 import javax.inject.Inject
 

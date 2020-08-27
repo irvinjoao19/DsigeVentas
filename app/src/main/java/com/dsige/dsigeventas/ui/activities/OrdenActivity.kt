@@ -64,6 +64,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         topMenu = menu
+        menu.findItem(R.id.map).setVisible(false).isEnabled = false
         menu.findItem(R.id.filter).setVisible(false).isEnabled = false
         menu.findItem(R.id.search).setVisible(false).isEnabled = false
         menu.findItem(R.id.logout).setVisible(false).isEnabled = false
@@ -120,22 +121,14 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                                 if (nNegative == 0.0) {
                                     p.estado = 0
                                 }
-                                p.cantidad = nNegative
-                                p.unidadMedida = nNegative
-                                p.subTotal = nNegative * p.precioVenta
-                                p.totalPedido = p.subTotal
-                                productoViewModel.updateProducto(p)
+                                calculoPedido(nNegative, p)
                             }
                         }
                         R.id.imageViewPositive -> {
                             val sTotal = (p.cantidad + 1).toString()
                             val nPositive = sTotal.toDouble()
-                            p.cantidad = nPositive
-                            p.unidadMedida = nPositive
-                            p.subTotal = nPositive * p.precioVenta
-                            p.totalPedido = p.subTotal
                             p.estado = 2
-                            productoViewModel.updateProducto(p)
+                            calculoPedido(nPositive, p)
                         }
                         else -> {
                             val popupMenu = PopupMenu(this@OrdenActivity, v)
@@ -242,11 +235,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                 else
                     p.estado = 2
 
-                p.cantidad = nPositive
-                p.unidadMedida = nPositive
-                p.subTotal = nPositive * p.precioVenta
-                p.totalPedido = p.subTotal
-                productoViewModel.updateProducto(p)
+                calculoPedido(nPositive, p)
                 Util.hideKeyboardFrom(this, v)
                 dialog.dismiss()
             } else {
@@ -352,5 +341,29 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                 dialog.dismiss()
             }
         dialog.show()
+    }
+
+    private fun calculoPedido(cantidad: Double, p: PedidoDetalle) {
+        val factor = p.factor
+        val abreviaturaUnidad = p.abreviaturaProducto
+
+        val caja = if (abreviaturaUnidad.trim() == "UNIDAD") {
+            cantidad / factor
+        } else {
+            cantidad
+        }
+
+        val precio = if (caja > 5) {
+            p.precio2
+        } else {
+            p.precio1
+        }
+
+        p.cantidad = cantidad
+        p.unidadMedida = caja
+        p.precioVenta = precio
+        p.subTotal = caja * precio
+        p.totalPedido = p.subTotal
+        productoViewModel.updateProducto(p)
     }
 }

@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
-import com.dsige.dsigeventas.data.local.model.Usuario
 import com.dsige.dsigeventas.data.viewModel.UsuarioViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.ui.fragments.*
@@ -39,7 +38,7 @@ class MainActivity : DaggerAppCompatActivity() {
     private fun bindUI() {
         usuarioViewModel =
             ViewModelProvider(this, viewModelFactory).get(UsuarioViewModel::class.java)
-        usuarioViewModel.user.observe(this, Observer<Usuario> { u ->
+        usuarioViewModel.user.observe(this, Observer { u ->
             if (u != null) {
                 setSupportActionBar(toolbar)
                 supportActionBar!!.setDisplayShowTitleEnabled(false)
@@ -73,7 +72,8 @@ class MainActivity : DaggerAppCompatActivity() {
                                 return true
                             }
                             R.id.map -> {
-                                changeFragment(MapsFragment.newInstance("", ""))
+                                changeFragment(RepartosFragment.newInstance("", ""))
+//                                changeFragment(MapsFragment.newInstance("", ""))
                                 return true
                             }
                             R.id.info -> {

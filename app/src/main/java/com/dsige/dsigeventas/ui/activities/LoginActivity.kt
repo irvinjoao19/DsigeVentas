@@ -82,7 +82,7 @@ class LoginActivity : DaggerAppCompatActivity(), View.OnClickListener {
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var usuarioViewModel: UsuarioViewModel
     lateinit var builder: AlertDialog.Builder
-    var dialog: AlertDialog? = null
+    private var dialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,7 +123,7 @@ class LoginActivity : DaggerAppCompatActivity(), View.OnClickListener {
     }
 
     private fun message() {
-        usuarioViewModel.mensajeError.observe(this, Observer<String> { s ->
+        usuarioViewModel.mensajeError.observe(this, Observer { s ->
             if (s != null) {
                 if (dialog != null) {
                     if (dialog!!.isShowing) {
@@ -133,7 +133,7 @@ class LoginActivity : DaggerAppCompatActivity(), View.OnClickListener {
                 Util.toastMensaje(this, s)
             }
         })
-        usuarioViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+        usuarioViewModel.mensajeSuccess.observe(this, Observer { s ->
             if (s != null) {
                 if (dialog != null) {
                     if (dialog!!.isShowing) {

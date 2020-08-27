@@ -108,7 +108,7 @@ class PersonalMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
         imageViewClose.setOnClickListener { dialogSpinner.dismiss() }
 
         Handler().postDelayed({
-            mapViewModel.getPersonalById(title.toInt()).observe(this, Observer<Personal> { p ->
+            mapViewModel.getPersonalById(title.toInt()).observe(this, Observer { p ->
                 if (p != null) {
                     textViewTitle.setText(
                         Util.getTextHTML("<strong>${p.nombrePersonal}</strong>"),

@@ -36,7 +36,7 @@ class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPe
                 textViewCodigo.text = p.codigo
                 textViewPrecio.text = p.precioVenta.toString()
                 textViewSubTotal.text =
-                    String.format("S/. %.2f", p.subTotal)
+                    String.format("S/. %.6f", p.subTotal)
                 editTextCantidad.setText(p.cantidad.toString())
 
                 if (p.estado == 1) {

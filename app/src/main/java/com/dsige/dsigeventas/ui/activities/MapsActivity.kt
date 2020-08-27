@@ -109,13 +109,13 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
                 .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
 
-            repartoViewModel.mensajeError.observe(this, Observer<String> { s ->
+            repartoViewModel.mensajeError.observe(this, Observer { s ->
                 if (s != null) {
                     loadFinish()
                     Util.toastMensaje(this, s)
                 }
             })
-            repartoViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+            repartoViewModel.mensajeSuccess.observe(this, Observer { s ->
                 if (s != null) {
                     loadFinish()
                     Util.toastMensaje(this, s)
@@ -481,7 +481,7 @@ class MapsActivity : DaggerAppCompatActivity(), OnMapReadyCallback, LocationList
 
                                 if (distance <= 20) {
                                     repartoViewModel.getRepartoById(s.repartoId)
-                                        .observe(this, Observer<Reparto> { r ->
+                                        .observe(this, Observer { r ->
                                             if (r != null) {
                                                 textViewRuc.text = r.numeroDocumento
                                                 textViewDoc.setText(

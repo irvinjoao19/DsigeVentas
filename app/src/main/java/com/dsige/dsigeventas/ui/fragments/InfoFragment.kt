@@ -11,8 +11,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
 import com.dsige.dsigeventas.R
-import com.dsige.dsigeventas.data.local.model.Resumen
-import com.dsige.dsigeventas.data.local.model.Usuario
 import com.dsige.dsigeventas.data.viewModel.UsuarioViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
@@ -81,7 +79,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
         toolbar.visibility = View.VISIBLE
         usuarioViewModel =
             ViewModelProvider(this, viewModelFactory).get(UsuarioViewModel::class.java)
-        usuarioViewModel.user.observe(this, Observer<Usuario> { u ->
+        usuarioViewModel.user.observe(viewLifecycleOwner, Observer { u ->
             if (u != null) {
                 login = u.login
                 toolbar.title = u.apellidos
@@ -92,7 +90,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             }
         })
 
-        usuarioViewModel.mensajeSuccess.observe(this, Observer<String> { s ->
+        usuarioViewModel.mensajeSuccess.observe(viewLifecycleOwner, Observer { s ->
             if (s != null) {
                 loadFinish()
                 val intent = Intent(context, LoginActivity::class.java)
@@ -102,7 +100,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             }
         })
 
-        usuarioViewModel.mensajeError.observe(this, Observer<String> { s ->
+        usuarioViewModel.mensajeError.observe(viewLifecycleOwner, Observer { s ->
             if (s != null) {
                 loadFinish()
                 Util.toastMensaje(context!!, s)
@@ -114,7 +112,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             fabResumen.visibility = View.GONE
         } else {
             usuarioViewModel.getResumen(Util.getFecha())
-            usuarioViewModel.resumen.observe(this, Observer<Resumen> { r ->
+            usuarioViewModel.resumen.observe(viewLifecycleOwner, Observer { r ->
                 if (r != null) {
                     textView1.setText(
                         Util.getTextHTML("<strong>S/.</strong> " + r.totalVenta),
@@ -183,7 +181,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
     }
 
     private fun logout() {
-        val dialog = MaterialAlertDialogBuilder(context)
+        val dialog = MaterialAlertDialogBuilder(context!!)
             .setTitle("Mensaje")
             .setMessage(
                 String.format(

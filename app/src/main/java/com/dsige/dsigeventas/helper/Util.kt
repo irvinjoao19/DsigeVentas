@@ -107,14 +107,14 @@ object Util {
     fun getFecha(): String {
         date = Date()
         @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("dd/MM/yyyy")
-        return format.format(date)
+        return format.format(date!!)
 //        return "05/10/2019"
     }
 
     fun getHora(): String {
         date = Date()
         @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("HH:mm aaa")
-        return format.format(date)
+        return format.format(date!!)
     }
 
     fun getFechaActual(): String {
@@ -126,13 +126,13 @@ object Util {
     fun getHoraActual(): String {
         date = Date()
         @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("HH:mm:ss aaa")
-        return format.format(date)
+        return format.format(date!!)
     }
 
     fun getFechaEditar(): String? {
         date = Date()
         @SuppressLint("SimpleDateFormat") val format = SimpleDateFormat("ddMMyyyy_HHmmssSSSS")
-        FechaActual = format.format(date)
+        FechaActual = format.format(date!!)
         return FechaActual
     }
 
@@ -201,8 +201,8 @@ object Util {
         return folder
     }
 
-    fun getFolderPhoto(): File {
-        val folder = File(Environment.getExternalStorageDirectory(), FolderImg)
+    fun getFolderPhoto(context: Context): File {
+        val folder = File(context.getExternalFilesDir(null)!!.absolutePath)
         if (!folder.exists()) {
             folder.mkdirs()
         }
@@ -222,7 +222,7 @@ object Util {
             val result = getRightAngleImage(PathFile)
             result == PathFile
         } catch (ex: Exception) {
-            Log.i("exception", ex.message)
+            Log.i("exception", ex.message!!)
             false
         }
     }
@@ -317,10 +317,7 @@ object Util {
     }
 
     private fun shrinkBitmapOnlyReduce(
-        file: String,
-        width: Int,
-        height: Int,
-        captionString: String?
+        file: String, width: Int, height: Int, captionString: String?
     ) {
 
         val options = BitmapFactory.Options()
@@ -750,6 +747,25 @@ object Util {
     }
 
     fun calculationByDistance(StartP: Location, EndP: LatLng): Double {
+        val radius = 6371 * 1000  // radius of earth in Km * meters
+        val lat1 = StartP.latitude
+        val lat2 = EndP.latitude
+        val lon1 = StartP.longitude
+        val lon2 = EndP.longitude
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+        val a = sin(dLat / 2) * sin(dLat / 2) + (cos(Math.toRadians(lat1))
+                * cos(Math.toRadians(lat2)) * sin(dLon / 2)
+                * sin(dLon / 2))
+        val c = 2 * asin(sqrt(a))
+        val valueResult = radius * c
+        val km = valueResult / 1
+        val newFormat = DecimalFormat("####")
+        val kmInDec = Integer.valueOf(newFormat.format(km))
+        return kmInDec.toDouble()
+    }
+
+    fun calculationByDistance(StartP: Location, EndP: Location): Double {
         val radius = 6371 * 1000  // radius of earth in Km * meters
         val lat1 = StartP.latitude
         val lat2 = EndP.latitude

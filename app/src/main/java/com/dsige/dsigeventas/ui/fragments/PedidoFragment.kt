@@ -37,7 +37,6 @@ class PedidoFragment : DaggerFragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.ok).setVisible(false).isEnabled = false
@@ -146,7 +145,7 @@ class PedidoFragment : DaggerFragment() {
     }
 
     private fun deletePedidoDialog(p: Pedido) {
-        val dialog = MaterialAlertDialogBuilder(context)
+        val dialog = MaterialAlertDialogBuilder(context!!)
             .setTitle("Mensaje")
             .setMessage("Deseas eliminar el producto ?")
             .setPositiveButton("SI") { dialog, _ ->

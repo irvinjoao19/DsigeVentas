@@ -24,7 +24,7 @@ open class PedidoDetalle {
     var subTotal: Double = 0.0
     var fecha: String = ""
     var pedidoItem : Int = 0
-    var precioVenta: Double = 0.0
+    var precioVenta: Double = 0.0 // se enviara como guardado
     var porcentajeDescuento: Double = 0.0
     var descuentoPedido: Double = 0.0
     var cantidad :Double = 0.0
@@ -32,4 +32,9 @@ open class PedidoDetalle {
     var totalPedido :Double = 0.0
     var numeroPedido: String = ""
     var estado: Int = 0
+
+    var factor: Double = 0.0
+    var precio1 : Double = 0.0
+    var precio2: Double = 0.0
+
 }

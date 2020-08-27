@@ -25,5 +25,8 @@ abstract class FragmentBindingModule {
 
         @ContributesAndroidInjector
         internal abstract fun providInfoFragment(): InfoFragment
+
+        @ContributesAndroidInjector
+        internal abstract fun providRepartosFragment(): RepartosFragment
     }
 }

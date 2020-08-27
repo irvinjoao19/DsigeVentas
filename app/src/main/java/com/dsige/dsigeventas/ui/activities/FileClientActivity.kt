@@ -114,4 +114,3 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
         material.show()
     }
 }
-

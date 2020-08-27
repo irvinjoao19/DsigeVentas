@@ -8,12 +8,12 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dsige.dsigeventas.R
-import com.dsige.dsigeventas.data.local.model.Cliente
+import com.dsige.dsigeventas.data.local.model.Reparto
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import kotlinx.android.synthetic.main.cardview_combo.view.*
 
-class ClienteAdapter(private val listener: OnItemClickListener.ClienteListener) :
-    PagedListAdapter<Cliente, ClienteAdapter.ViewHolder>(diffCallback) {
+class RepartoSearchAdapter(private val listener: OnItemClickListener.RepartoListener) :
+    PagedListAdapter<Reparto, RepartoSearchAdapter.ViewHolder>(diffCallback) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val s = getItem(position)
@@ -29,20 +29,20 @@ class ClienteAdapter(private val listener: OnItemClickListener.ClienteListener) 
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal fun bind(s: Cliente, listener: OnItemClickListener.ClienteListener) =
+        internal fun bind(s: Reparto, listener: OnItemClickListener.RepartoListener) =
             with(itemView) {
-                textViewTitulo.text = s.nombreCliente
+                textViewTitulo.text = s.apellidoNombreCliente
                 itemView.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
             }
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<Cliente>() {
-            override fun areItemsTheSame(oldItem: Cliente, newItem: Cliente): Boolean =
+        private val diffCallback = object : DiffUtil.ItemCallback<Reparto>() {
+            override fun areItemsTheSame(oldItem: Reparto, newItem: Reparto): Boolean =
                 oldItem.clienteId == newItem.clienteId
 
             @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(oldItem: Cliente, newItem: Cliente): Boolean =
+            override fun areContentsTheSame(oldItem: Reparto, newItem: Reparto): Boolean =
                 oldItem == newItem
         }
     }

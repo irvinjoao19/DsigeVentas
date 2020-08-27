@@ -1,5 +1,6 @@
 package com.dsige.dsigeventas.data.local.repository
 
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.paging.Config
@@ -8,6 +9,7 @@ import androidx.paging.toLiveData
 import com.dsige.dsigeventas.data.local.AppDataBase
 import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.helper.Mensaje
+import com.dsige.dsigeventas.helper.Util
 import com.google.gson.Gson
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -253,8 +255,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 a.nombre = s.nombreProducto
                 a.descripcion = s.descripcionProducto
                 a.stockMinimo = s.stock
-                a.precioVenta = s.precio
                 a.abreviaturaProducto = s.abreviaturaProducto
+                a.precio1 = s.precio
+                a.precio2 = s.precio2
+                a.factor = s.factor
 
                 if (!dataBase.pedidoDetalleDao().getProductoExits(a.pedidoId, a.productoId)) {
                     dataBase.pedidoDetalleDao().insertProductoTask(a)
@@ -380,12 +384,12 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
-    override fun getTotalReparto(): LiveData<Int> {
-        return dataBase.repartoDao().getReparto()
+    override fun getTotalReparto(id: Int): LiveData<Int> {
+        return dataBase.repartoDao().getTotalReparto(id)
     }
 
-    override fun getRepartoCount(valor: Int): LiveData<Int> {
-        return dataBase.repartoDao().getRepartoCount(valor)
+    override fun getRepartoCount(valor: Int, id: Int): LiveData<Int> {
+        return dataBase.repartoDao().getRepartoCount(valor, id)
     }
 
     override fun getRepartoList(): LiveData<List<Reparto>> {
@@ -404,13 +408,35 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
+    override fun getReparto(localId: Int): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getReparto(8, localId).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
+    }
+
+    override fun getRepartoDistrito(d: Int): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getRepartoDistrito(8, d).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
+    }
+
     override fun getReparto(localId: Int, distritoId: Int): LiveData<PagedList<Reparto>> {
         return dataBase.repartoDao().getReparto(8, localId, distritoId).toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
         )
     }
 
-    override fun getReparto(localId: Int, distritoId: Int, s: String): LiveData<PagedList<Reparto>> {
+    override fun getReparto(localId: Int, s: String): LiveData<PagedList<Reparto>> {
+        return dataBase.repartoDao().getReparto(8, localId, s).toLiveData(
+            Config(pageSize = 20, enablePlaceholders = true)
+        )
+    }
+
+    override fun getReparto(
+        localId: Int,
+        distritoId: Int,
+        s: String
+    ): LiveData<PagedList<Reparto>> {
         return dataBase.repartoDao().getReparto(8, localId, distritoId, s).toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
         )
@@ -558,5 +584,34 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getClienteByDistrito(distrito: String): LiveData<List<Cliente>> {
         return dataBase.clienteDao().getClienteByDistrito(distrito)
+    }
+
+    override fun personalRepartoSearch(l: Int, s: String): LiveData<PagedList<Reparto>> {
+        return when (l) {
+            0 -> dataBase.repartoDao().personalRepartoSearch(8, s).toLiveData(
+                Config(pageSize = 20, enablePlaceholders = true)
+            )
+            else -> dataBase.repartoDao().personalRepartoSearch(8, l, s).toLiveData(
+                Config(pageSize = 20, enablePlaceholders = true)
+            )
+        }
+    }
+
+    override fun calculando(latitud: String, longitud: String): Completable {
+        return Completable.fromAction {
+            val m = Location("me")
+            m.latitude = latitud.toDouble()
+            m.longitude = longitud.toDouble()
+            val repartos = dataBase.repartoDao().getRepartoTask(8)
+            for (s in repartos) {
+                if (s.latitud.isNotEmpty() || s.longitud.isNotEmpty()) {
+                    val l1 = Location("reparto")
+                    l1.latitude = s.latitud.toDouble()
+                    l1.longitude = s.longitud.toDouble()
+                    val distance = Util.calculationByDistance(l1, m)
+                    dataBase.repartoDao().updateRepartoDistance(s.repartoId, distance)
+                }
+            }
+        }
     }
 }

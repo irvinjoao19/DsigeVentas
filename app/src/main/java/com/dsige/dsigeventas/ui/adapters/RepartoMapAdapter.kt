@@ -36,6 +36,7 @@ class RepartoMapAdapter(private val listener: OnItemClickListener.RepartoListene
                 textViewDireccion.text = r.direccion
                 textViewDistrito.text = r.nombreDistrito
                 textViewTotal.text = String.format("Total %s", r.subTotal)
+                imageViewFactura.setOnClickListener { v -> listener.onItemClick(r, v, adapterPosition) }
                 imageViewMap.setOnClickListener { v -> listener.onItemClick(r, v, adapterPosition) }
             }
     }

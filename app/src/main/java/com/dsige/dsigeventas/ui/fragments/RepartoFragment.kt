@@ -78,7 +78,7 @@ class RepartoFragment : DaggerFragment() {
         )
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = repartoAdapter
-        repartoViewModel.getRepartos().observe(this, Observer(repartoAdapter::submitList))
+        repartoViewModel.getRepartos().observe(viewLifecycleOwner, Observer(repartoAdapter::submitList))
     }
 
     companion object {

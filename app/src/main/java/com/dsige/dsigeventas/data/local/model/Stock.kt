@@ -15,5 +15,7 @@ open class Stock {
     var precio: Double = 0.0
     var nombreCategoria: String = ""
     var nombreMarca: String = ""
+    var factor: Double = 0.0
+    var precio2: Double = 0.0
     var isSelected: Boolean = false
 }

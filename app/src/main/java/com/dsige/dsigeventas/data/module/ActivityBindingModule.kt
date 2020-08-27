@@ -44,5 +44,8 @@ abstract class ActivityBindingModule {
     internal abstract fun bindClientGeneralMapActivity(): ClientGeneralMapActivity
 
     @ContributesAndroidInjector
+    internal abstract fun bindRepartoGeneralMapActivity(): RepartoGeneralMapActivity
+
+    @ContributesAndroidInjector
     internal abstract fun bindRepartoActivity(): RepartoActivity
 }

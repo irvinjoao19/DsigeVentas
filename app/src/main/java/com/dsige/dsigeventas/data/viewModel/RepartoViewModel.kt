@@ -31,6 +31,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
+    val goMap: MutableLiveData<String> = MutableLiveData()
     val tipo: MutableLiveData<Int> = MutableLiveData()
     val search: MutableLiveData<String> = MutableLiveData()
 
@@ -51,20 +52,39 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             if (input == null) {
                 roomRepository.getReparto()
             } else {
-                val f = Gson().fromJson(input, Filtro::class.java)
-                if (f.localId == 0 || f.distritoRId == 0) {
-                    if (f.search.isNotEmpty()) {
-                        roomRepository.getReparto(String.format("%s%s%s", "%", f.search, "%"))
+                val f = Gson().fromJson(search.value, Filtro::class.java)
+                if (f.localId == 0) {
+                    if (f.distritoRId == 0) {
+                        if (f.search.isNotEmpty()) {
+                            roomRepository.getReparto(String.format("%s%s%s", "%", f.search, "%"))
+                        } else {
+                            roomRepository.getReparto()
+                        }
                     } else {
-                        roomRepository.getReparto()
+                        if (f.search.isEmpty()) {
+                            roomRepository.getRepartoDistrito(f.distritoRId)
+                        } else {
+                            roomRepository.getReparto(String.format("%s%s%s", "%", f.search, "%"))
+                        }
                     }
                 } else {
-                    if (f.search.isEmpty()) {
-                        roomRepository.getReparto(f.localId, f.distritoRId)
+                    if (f.distritoRId == 0) {
+                        if (f.search.isEmpty()) {
+                            roomRepository.getReparto(f.localId)
+                        } else {
+                            roomRepository.getReparto(
+                                f.localId, String.format("%s%s%s", "%", f.search, "%")
+                            )
+                        }
                     } else {
-                        roomRepository.getReparto(
-                            f.localId, f.distritoRId, String.format("%s%s%s", "%", f.search, "%")
-                        )
+                        if (f.search.isEmpty()) {
+                            roomRepository.getReparto(f.localId, f.distritoRId)
+                        } else {
+                            roomRepository.getReparto(
+                                f.localId, f.distritoRId,
+                                String.format("%s%s%s", "%", f.search, "%")
+                            )
+                        }
                     }
                 }
             }
@@ -73,28 +93,32 @@ internal constructor(private val roomRepository: AppRepository, private val retr
 
     fun getReparto(): LiveData<List<Reparto>> {
         return Transformations.switchMap(tipo) { input ->
-            if (input == 0 || input == null) {
-                roomRepository.getRepartoList()
-            } else {
-                roomRepository.getRepartoByTipo(input)
-            }
+            roomRepository.getRepartoByTipo(input)
         }
     }
 
     fun getTotalReparto(): LiveData<Int> {
-        return roomRepository.getTotalReparto()
+        return Transformations.switchMap(tipo) { input ->
+            roomRepository.getTotalReparto(input)
+        }
     }
 
     fun getTotalEntregado(): LiveData<Int> {
-        return roomRepository.getRepartoCount(31)
+        return Transformations.switchMap(tipo) { input ->
+            roomRepository.getRepartoCount(31, input)
+        }
     }
 
     fun getTotalDevuelto(): LiveData<Int> {
-        return roomRepository.getRepartoCount(30)
+        return Transformations.switchMap(tipo) { input ->
+            roomRepository.getRepartoCount(30, input)
+        }
     }
 
     fun getTotalParciales(): LiveData<Int> {
-        return roomRepository.getRepartoCount(32)
+        return Transformations.switchMap(tipo) { input ->
+            roomRepository.getRepartoCount(32, input)
+        }
     }
 
     fun getRepartoById(id: Int): LiveData<Reparto> {
@@ -213,11 +237,33 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 override fun onError(e: Throwable) {
                     mensajeError.value = e.toString()
                 }
-
             })
     }
 
     fun getLocales(): LiveData<List<Local>> {
         return roomRepository.getLocales()
+    }
+
+    fun personalSearch(l: Int, s: String): LiveData<PagedList<Reparto>> {
+        return roomRepository.personalRepartoSearch(l, String.format("%s%s%s", "%", s, "%"))
+    }
+
+    fun calculando(latitud: String, longitud: String) {
+        roomRepository.calculando(latitud, longitud)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CompletableObserver {
+                override fun onComplete() {
+                    goMap.value = "Completado"
+                }
+
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onError(e: Throwable) {
+                    mensajeError.value = e.message
+                }
+            })
     }
 }

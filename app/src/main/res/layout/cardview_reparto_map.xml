@@ -68,6 +68,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/imageViewFactura"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/img"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewMap"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_check_green" />
+
+    <ImageView
         android:id="@+id/imageViewMap"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

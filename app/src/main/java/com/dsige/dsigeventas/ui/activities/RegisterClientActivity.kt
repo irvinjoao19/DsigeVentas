@@ -374,6 +374,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 c.nombreGiroNegocio = editTextPago.text.toString()
                 c.nombreDepartamento = "Lima"
                 c.nombreProvincia = "Lima"
+                c.nombreDistrito = editTextDistrito.text.toString()
                 c.departamentoId = 1390
                 c.provinciaId = 1390
                 c.direccion = editTextDireccion.text.toString()

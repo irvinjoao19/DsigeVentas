@@ -31,6 +31,7 @@ import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.viewModel.RepartoViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.DataParser
+import com.dsige.dsigeventas.helper.Gps
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.MapsActivity
 import com.dsige.dsigeventas.ui.activities.RepartoActivity
@@ -112,17 +113,17 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
     lateinit var locationManager: LocationManager
     lateinit var camera: CameraPosition
 
-    var MIN_DISTANCE_CHANGE_FOR_UPDATES: Int = 10
-    var MIN_TIME_BW_UPDATES: Int = 5000
-    var isFirstTime: Boolean = true
-    var waypoints: String = ""
+    private var MIN_DISTANCE_CHANGE_FOR_UPDATES: Int = 10
+    private var MIN_TIME_BW_UPDATES: Int = 5000
+    private var isFirstTime: Boolean = true
+    private var waypoints: String = ""
 
-    var lat: String = ""
-    var lat2: String = ""
-    var lng: String = ""
-    var lng2: String = ""
-    var title: String = ""
-    var localId: Int = 0
+    private var lat: String = ""
+    private var lat2: String = ""
+    private var lng: String = ""
+    private var lng2: String = ""
+    private var title: String = ""
+    private var localId: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,6 +151,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        editTextLocal.setText(String.format("ATE"))
         editTextLocal.setOnClickListener(this)
         fab.setOnClickListener(this)
 
@@ -182,9 +184,8 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 FetchURL().execute(getUrl(lat, lng, lat2, lng2))
             }
         })
-        repartoViewModel.tipo.value = 0
 
-        repartoViewModel.getTotalReparto().observe(viewLifecycleOwner, Observer<Int> { c ->
+        repartoViewModel.getTotalReparto().observe(viewLifecycleOwner, Observer { c ->
             textViewAsignados.setText(
                 Util.getTextHTML("<strong>Asignados: </string>$c"),
                 TextView.BufferType.SPANNABLE
@@ -211,6 +212,8 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
                 TextView.BufferType.SPANNABLE
             )
         })
+
+        repartoViewModel.tipo.value = 1
     }
 
     private fun zoomToLocation(location: Location?) {
@@ -450,7 +453,6 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         }
         imageViewClose.setOnClickListener { dialog.dismiss() }
     }
-
 
     private fun dialogLocal() {
         val builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))

@@ -94,12 +94,11 @@ interface AppRepository {
 
     fun getPedido(search: String): LiveData<PagedList<Pedido>>
 
-
     fun getRepartos(): LiveData<PagedList<Reparto>>
 
-    fun getTotalReparto(): LiveData<Int>
+    fun getTotalReparto(id: Int): LiveData<Int>
 
-    fun getRepartoCount(valor: Int): LiveData<Int>
+    fun getRepartoCount(valor: Int, id: Int): LiveData<Int>
 
     fun getRepartoList(): LiveData<List<Reparto>>
 
@@ -107,7 +106,13 @@ interface AppRepository {
 
     fun getReparto(s: String): LiveData<PagedList<Reparto>>
 
+    fun getReparto(localId: Int): LiveData<PagedList<Reparto>>
+
+    fun getRepartoDistrito(d: Int): LiveData<PagedList<Reparto>>
+
     fun getReparto(localId: Int, distritoId: Int): LiveData<PagedList<Reparto>>
+
+    fun getReparto(localId: Int, s: String): LiveData<PagedList<Reparto>>
 
     fun getReparto(localId: Int, distritoId: Int, s: String): LiveData<PagedList<Reparto>>
 
@@ -158,4 +163,8 @@ interface AppRepository {
     fun updatePhotoCliente(clienteId: Int, nameImg: String): Completable
 
     fun getClienteByDistrito(distrito: String): LiveData<List<Cliente>>
+
+    fun personalRepartoSearch(l: Int, s: String): LiveData<PagedList<Reparto>>
+
+    fun calculando(latitud: String, longitud: String): Completable
 }

@@ -224,4 +224,5 @@
     <string name="resumen">Resumen</string>
     <string name="DNI">DNI</string>
     <string name="local">Local</string>
+    <string name="search_cliente">Buscar Cliente</string>
 </resources>
