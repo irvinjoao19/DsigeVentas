@@ -259,6 +259,8 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 a.precio1 = s.precio
                 a.precio2 = s.precio2
                 a.factor = s.factor
+                a.precioMayMenor = s.precioMayMenor
+                a.precioMayMayor = s.precioMayMayor
 
                 if (!dataBase.pedidoDetalleDao().getProductoExits(a.pedidoId, a.productoId)) {
                     dataBase.pedidoDetalleDao().insertProductoTask(a)
@@ -345,6 +347,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 dataBase.clienteDao().getClienteTaskById(clienteId)
             o.nombreCliente = c.nombreCliente
             o.empresaId = c.empresaId
+            o.tipoPersonal = c.tipoPersonal
             o.porcentajeIGV = 18.0
             o.tipoDocumento = 2
             o.almacenId = 18

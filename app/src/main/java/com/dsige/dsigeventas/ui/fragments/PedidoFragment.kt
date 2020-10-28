@@ -53,6 +53,7 @@ class PedidoFragment : DaggerFragment() {
                 Intent(context, OrdenActivity::class.java)
                     .putExtra("pedidoId", 0)
                     .putExtra("clienteId", 0)
+                    .putExtra("tipoPersonal", 0)
             )
         }
         return super.onOptionsItemSelected(item)
@@ -130,6 +131,7 @@ class PedidoFragment : DaggerFragment() {
             Intent(context, OrdenActivity::class.java)
                 .putExtra("pedidoId", p.pedidoId)
                 .putExtra("clienteId", p.clienteId)
+                .putExtra("tipoPersonal", p.tipoPersonal)
         )
     }
 

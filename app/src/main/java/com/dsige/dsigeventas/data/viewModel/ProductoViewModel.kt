@@ -88,7 +88,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
                 override fun onComplete() {
-                    mensajeSuccess.value = "Ok"
+                    mensajeSuccess.value = "Productos Agregados"
                 }
 
                 override fun onSubscribe(d: Disposable) {

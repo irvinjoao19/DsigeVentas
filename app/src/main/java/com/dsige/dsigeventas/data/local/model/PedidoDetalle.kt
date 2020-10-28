@@ -36,5 +36,7 @@ open class PedidoDetalle {
     var factor: Double = 0.0
     var precio1 : Double = 0.0
     var precio2: Double = 0.0
+    var precioMayMenor: Double = 0.0
+    var precioMayMayor: Double = 0.0
 
 }

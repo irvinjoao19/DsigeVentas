@@ -104,6 +104,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
                     startActivity(
                         Intent(this, OrdenActivity::class.java)
                             .putExtra("clienteId", c.clienteId)
+                            .putExtra("tipoPersonal", c.tipoPersonal)
                     )
                     dialogInterface.dismiss()
                 }

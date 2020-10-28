@@ -230,18 +230,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                         }
                     })
                 editTextSearch.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
+                    override fun beforeTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
+                    override fun onTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
                     override fun afterTextChanged(editable: Editable) {
                         departamentoAdapter.getFilter().filter(editable)
                     }
@@ -267,18 +257,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                         }
                     })
                 editTextSearch.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
+                    override fun beforeTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
+                    override fun onTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
                     override fun afterTextChanged(editable: Editable) {
                         provinciaAdapter.getFilter().filter(editable)
                     }

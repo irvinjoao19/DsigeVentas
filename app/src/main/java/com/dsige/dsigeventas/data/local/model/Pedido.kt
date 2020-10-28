@@ -36,6 +36,7 @@ open class Pedido {
     var fechaFacturaPedido: String = ""
 
     var nombreCliente: String = ""
+    var tipoPersonal : Int = 0
 
     @Ignore
     var detalles: List<PedidoDetalle>? = null

@@ -56,10 +56,11 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
 
     lateinit var productoPedidoAdapter: ProductoPedidoAdapter
     lateinit var builder: AlertDialog.Builder
-    var dialog: AlertDialog? = null
-    var topMenu: Menu? = null
-    var clienteId: Int = 0
-    var pedidoId: Int = 0
+    private var dialog: AlertDialog? = null
+    private var topMenu: Menu? = null
+    private var clienteId: Int = 0
+    private var pedidoId: Int = 0
+    private var tipoPersonal: Int = 0
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -93,6 +94,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         if (b != null) {
             pedidoId = b.getInt("pedidoId")
             clienteId = b.getInt("clienteId")
+            tipoPersonal = b.getInt("tipoPersonal")
             bindUI()
         }
     }
@@ -199,7 +201,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         })
         if (pedidoId == 0) {
             if (clienteId != 0) {
-                generateCliente(clienteId)
+                generateCliente(clienteId, tipoPersonal)
             }
         }
     }
@@ -306,7 +308,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         val clienteAdapter =
             ClienteAdapter(object : OnItemClickListener.ClienteListener {
                 override fun onItemClick(c: Cliente, v: View, position: Int) {
-                    generateCliente(c.clienteId)
+                    generateCliente(c.clienteId, c.tipoPersonal)
                     dialog.dismiss()
                 }
             })
@@ -314,12 +316,13 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         productoViewModel.personalSearch(s).observe(this, Observer(clienteAdapter::submitList))
     }
 
-    private fun generateCliente(id: Int) {
+    private fun generateCliente(id: Int, tipo: Int) {
         val gps = Gps(this@OrdenActivity)
         if (gps.isLocationEnabled()) {
             if (gps.latitude.toString() != "0.0" || gps.longitude.toString() != "0.0") {
                 editTextTipo.text = null
                 clienteId = id
+                tipoPersonal = tipo
                 productoViewModel.generarPedidoCliente(
                     gps.latitude.toString(), gps.longitude.toString(), id
                 )
@@ -353,16 +356,21 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             cantidad
         }
 
-        val precio = if (caja > 5) {
-            p.precio2
-        } else {
-            p.precio1
+        val precio = when (factor) {
+            24.0 -> when (tipoPersonal) {
+                1 -> if (caja >= 10) p.precio2 else p.precio1
+                else -> if (caja > 50) p.precioMayMayor else p.precioMayMenor
+            }
+            else -> when (tipoPersonal) {
+                1 -> if (caja >= 5) p.precio2 else p.precio1
+                else -> if (caja > 50) p.precioMayMayor else p.precioMayMenor
+            }
         }
 
         p.cantidad = cantidad
-        p.unidadMedida = caja
+        p.unidadMedida = cantidad
         p.precioVenta = precio
-        p.subTotal = caja * precio
+        p.subTotal = cantidad * precio
         p.totalPedido = p.subTotal
         productoViewModel.updateProducto(p)
     }
