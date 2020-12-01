@@ -17,7 +17,9 @@ open class Stock {
     var nombreMarca: String = ""
     var factor: Double = 0.0
     var precio2: Double = 0.0
-    var precioMayMenor : Double =0.0
-    var precioMayMayor : Double =0.0
+    var precioMayMenor: Double = 0.0
+    var precioMayMayor: Double = 0.0
+    var rangoCajaHorizontal: Double = 0.0
+    var rangoCajaMayorista: Double = 0.0
     var isSelected: Boolean = false
 }

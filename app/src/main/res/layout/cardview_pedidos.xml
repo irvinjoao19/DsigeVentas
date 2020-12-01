@@ -31,26 +31,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewNombre" />
 
-    <!--    <TextView-->
-    <!--        android:id="@+id/textViewStock"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="4dp"-->
-    <!--        android:text="100.0 PZA"-->
-    <!--        android:visibility="gone"-->
-    <!--        app:layout_constraintStart_toEndOf="@+id/imageViewMap"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/textViewCodigo" />-->
-
-    <!--    <ImageView-->
-    <!--        android:id="@+id/imageViewMap"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginStart="8dp"-->
-    <!--        android:contentDescription="@string/imagen"-->
-    <!--        android:visibility="gone"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/textViewCodigo"-->
-    <!--        app:srcCompat="@drawable/ic_map" />-->
 
     <EditText
         android:id="@+id/editTextCantidad"
@@ -111,6 +91,25 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageViewPrecio" />
+
+    <TextView
+        android:id="@+id/textViewStock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView3" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/img"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textViewPrecio"
+        app:srcCompat="@drawable/ic_materials" />
 
     <TextView
         android:id="@+id/textViewSubTotal"

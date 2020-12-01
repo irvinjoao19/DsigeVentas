@@ -21,4 +21,5 @@ open class Usuario {
     var perfil: Int = 0
     var descripcionPerfil: String = ""
     var estado: Int = 0
+    var localId : Int = 0
 }

@@ -33,12 +33,12 @@ interface PedidoDetalleDao {
     fun getProductoById(id: Int): LiveData<PedidoDetalle>
 
     @Query("SELECT * FROM PedidoDetalle WHERE pedidoId=:pedido AND productoId =:producto")
-    fun getProductoExits(pedido: Int,producto : Int): Boolean
+    fun getProductoExits(pedido: Int, producto: Int): Boolean
 
     @Query("DELETE FROM PedidoDetalle")
     fun deleteAll()
 
-    @Query("SELECT * FROM PedidoDetalle WHERE pedidoId=:id")
+    @Query("SELECT * FROM PedidoDetalle WHERE pedidoId=:id AND active = 1")
     fun getProductoByPedido(id: Int): DataSource.Factory<Int, PedidoDetalle>
 
     @Query("SELECT * FROM PedidoDetalle WHERE pedidoId=:id")
@@ -54,6 +54,20 @@ interface PedidoDetalleDao {
     fun updatePedidoEnabled(id: Int)
 
     @Query("DELETE FROM PedidoDetalle WHERE pedidoId =:id")
-    fun deletePedidoById(id:Int)
+    fun deletePedidoById(id: Int)
 
+    @Query("SELECT * FROM PedidoDetalle WHERE pedidoId =:id AND active = 2")
+    fun getPedidoDetalleByIdTask(id: Int): List<PedidoDetalle>
+
+    @Query("SELECT * FROM PedidoDetalle WHERE pedidoDetalleId =:id")
+    fun getVerificatePedidoDetalleByIdTask(id: Int): PedidoDetalle
+
+    @Query("UPDATE PedidoDetalle SET identityDetalle =:codigoRetorno , active = 1 WHERE pedidoDetalleId=:codigoBase")
+    fun updateDetallePedidoOnline(codigoBase: Int, codigoRetorno: Int)
+
+    @Query("SELECT * FROM PedidoDetalle WHERE active = 1")
+    fun getPedidoActive(): List<PedidoDetalle>
+
+    @Query("UPDATE PedidoDetalle SET stockMinimo =:s WHERE pedidoDetalleId=:id")
+    fun updateStockPedidoDetalle(id: Int, s: Double)
 }

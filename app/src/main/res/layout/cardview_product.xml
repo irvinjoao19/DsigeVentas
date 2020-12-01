@@ -94,6 +94,4 @@
         app:layout_constraintEnd_toStartOf="@+id/textViewPrecio"
         app:layout_constraintTop_toBottomOf="@+id/textViewName"
         app:srcCompat="@drawable/ic_money" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.viewModel.UsuarioViewModel
@@ -38,7 +37,7 @@ class MainActivity : DaggerAppCompatActivity() {
     private fun bindUI() {
         usuarioViewModel =
             ViewModelProvider(this, viewModelFactory).get(UsuarioViewModel::class.java)
-        usuarioViewModel.user.observe(this, Observer { u ->
+        usuarioViewModel.user.observe(this, { u ->
             if (u != null) {
                 setSupportActionBar(toolbar)
                 supportActionBar!!.setDisplayShowTitleEnabled(false)
@@ -51,24 +50,24 @@ class MainActivity : DaggerAppCompatActivity() {
                     }
                     "Vendedor" -> {
                         bottomNavigation.menu.removeItem(R.id.map)
-                        fragmentByDefault(ClientFragment.newInstance(u.usuarioId))
+                        fragmentByDefault(ClientFragment.newInstance(u.usuarioId,u.localId))
                     }
-                    else -> fragmentByDefault(ClientFragment.newInstance(u.usuarioId))
+                    else -> fragmentByDefault(ClientFragment.newInstance(u.usuarioId,u.localId))
                 }
                 bottomNavigation.setOnNavigationItemSelectedListener(object :
                     BottomNavigationView.OnNavigationItemSelectedListener {
                     override fun onNavigationItemSelected(item: MenuItem): Boolean {
                         when (item.itemId) {
                             R.id.client -> {
-                                changeFragment(ClientFragment.newInstance(u.usuarioId))
+                                changeFragment(ClientFragment.newInstance(u.usuarioId,u.localId))
                                 return true
                             }
                             R.id.product -> {
-                                changeFragment(ProductsFragment.newInstance("", ""))
+                                changeFragment(ProductsFragment.newInstance(u.localId))
                                 return true
                             }
                             R.id.pedido -> {
-                                changeFragment(PedidoFragment.newInstance("", ""))
+                                changeFragment(PedidoFragment.newInstance(u.localId))
                                 return true
                             }
                             R.id.map -> {

@@ -26,16 +26,13 @@ import kotlinx.android.synthetic.main.fragment_pedido.*
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class PedidoFragment : DaggerFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var productoViewModel: ProductoViewModel
-
-    private var param1: String? = null
-    private var param2: String? = null
+    private var localId: Int = 0
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
@@ -53,7 +50,8 @@ class PedidoFragment : DaggerFragment() {
                 Intent(context, OrdenActivity::class.java)
                     .putExtra("pedidoId", 0)
                     .putExtra("clienteId", 0)
-                    .putExtra("tipoPersonal", 0)
+                    .putExtra("clienteId", 0)
+                    .putExtra("localId", localId)
             )
         }
         return super.onOptionsItemSelected(item)
@@ -62,8 +60,7 @@ class PedidoFragment : DaggerFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            localId = it.getInt(ARG_PARAM1)
         }
         setHasOptionsMenu(true)
     }
@@ -132,16 +129,16 @@ class PedidoFragment : DaggerFragment() {
                 .putExtra("pedidoId", p.pedidoId)
                 .putExtra("clienteId", p.clienteId)
                 .putExtra("tipoPersonal", p.tipoPersonal)
+                .putExtra("localId", p.localId)
         )
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: Int) =
             PedidoFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putInt(ARG_PARAM1, param1)
                 }
             }
     }

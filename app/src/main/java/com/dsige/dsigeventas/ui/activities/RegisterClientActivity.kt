@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -56,7 +55,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var clienteViewModel: ClienteViewModel
     lateinit var builder: AlertDialog.Builder
-    var dialog: AlertDialog? = null
+    private var dialog: AlertDialog? = null
     lateinit var c: Cliente
     lateinit var f: Filtro
     lateinit var binding: ActivityRegisterClientBinding
@@ -114,7 +113,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 }
             }, 200)
         } else {
-            clienteViewModel.getClienteById(id).observe(this, Observer { cliente ->
+            clienteViewModel.getClienteById(id).observe(this, { cliente ->
                 if (cliente != null) {
                     c = cliente
                     clienteViewModel.setCliente(c)
@@ -124,7 +123,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     }
 
     private fun message() {
-        clienteViewModel.mensajeSuccess.observe(this, Observer { s ->
+        clienteViewModel.mensajeSuccess.observe(this, { s ->
             if (s != null) {
                 loadFinish()
                 Util.toastMensaje(this, s)
@@ -132,7 +131,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
             }
         })
 
-        clienteViewModel.mensajeError.observe(this, Observer { s ->
+        clienteViewModel.mensajeError.observe(this, { s ->
             if (s != null) {
                 loadFinish()
                 Util.toastMensaje(this, s)
@@ -224,7 +223,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 recyclerView.adapter = departamentoAdapter
 
                 clienteViewModel.getDepartamentos()
-                    .observe(this, Observer { d ->
+                    .observe(this, { d ->
                         if (d != null) {
                             departamentoAdapter.addItems(d)
                         }
@@ -251,7 +250,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 recyclerView.adapter = provinciaAdapter
 
                 clienteViewModel.getProvinciasById(f.departamentoId)
-                    .observe(this, Observer { d ->
+                    .observe(this, { d ->
                         if (d != null) {
                             provinciaAdapter.addItems(d)
                         }
@@ -275,7 +274,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                     })
                 recyclerView.adapter = distritoAdapter
                 clienteViewModel.getDistritosById(f.departamentoId, f.provinciaId)
-                    .observe(this, Observer { d ->
+                    .observe(this, { d ->
                         if (d != null) {
                             distritoAdapter.addItems(d)
                         }
@@ -309,7 +308,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                         }
                     })
                 recyclerView.adapter = formaPagoAdapter
-                clienteViewModel.getFormaPago().observe(this, Observer<List<FormaPago>> { f ->
+                clienteViewModel.getFormaPago().observe(this, { f ->
                     if (f != null) {
                         formaPagoAdapter.addItems(f)
                     }

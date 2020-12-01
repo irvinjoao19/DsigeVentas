@@ -1,8 +1,14 @@
 package com.dsige.dsigeventas.ui.activities
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -17,7 +23,10 @@ import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.adapters.CheckProductoPagingAdapter
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_orden.*
 import kotlinx.android.synthetic.main.activity_producto.*
+import kotlinx.android.synthetic.main.activity_producto.recyclerView
+import kotlinx.android.synthetic.main.activity_producto.toolbar
 import javax.inject.Inject
 
 class ProductoActivity : DaggerAppCompatActivity() {
@@ -25,7 +34,10 @@ class ProductoActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var productoViewModel: ProductoViewModel
-    var pedidoId: Int = 0
+    lateinit var builder: AlertDialog.Builder
+    private var dialog: AlertDialog? = null
+    private var pedidoId: Int = 0
+    private var localId: Int = 0
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -44,7 +56,10 @@ class ProductoActivity : DaggerAppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.ok -> productoViewModel.savePedido(pedidoId)
+            R.id.ok -> {
+                load()
+                productoViewModel.savePedidoOnline(pedidoId)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -55,6 +70,7 @@ class ProductoActivity : DaggerAppCompatActivity() {
         val b = intent.extras
         if (b != null) {
             pedidoId = b.getInt("pedidoId")
+            localId = b.getInt("localId")
             bindUI()
         }
     }
@@ -62,6 +78,8 @@ class ProductoActivity : DaggerAppCompatActivity() {
     private fun bindUI() {
         setSupportActionBar(toolbar)
         supportActionBar!!.title = "Productos"
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { finish() }
 
         productoViewModel =
             ViewModelProvider(this, viewModelFactory).get(ProductoViewModel::class.java)
@@ -86,18 +104,29 @@ class ProductoActivity : DaggerAppCompatActivity() {
         )
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = checkProductoPagingAdapter
+        productoViewModel.setLoading(true)
+        productoViewModel.initProductos(localId)
         productoViewModel.getProductos()
             .observe(this, Observer(checkProductoPagingAdapter::submitList))
         productoViewModel.searchProducto.value = ""
-        productoViewModel.mensajeError.observe(this, Observer { s ->
+        productoViewModel.mensajeError.observe(this, { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)
             }
         })
-        productoViewModel.mensajeSuccess.observe(this, Observer { s ->
+        productoViewModel.mensajeSuccess.observe(this, { s ->
             if (s != null) {
                 Util.toastMensaje(this, s)
                 finish()
+            }
+        })
+        productoViewModel.loading.observe(this, {
+            if (it) {
+                recyclerView.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
             }
         })
     }
@@ -113,5 +142,18 @@ class ProductoActivity : DaggerAppCompatActivity() {
                 return true
             }
         })
+    }
+
+    private fun load() {
+        builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
+        @SuppressLint("InflateParams") val view =
+            LayoutInflater.from(this).inflate(R.layout.dialog_login, null)
+        builder.setView(view)
+        val textView: TextView = view.findViewById(R.id.textViewLado)
+        textView.text = String.format("%s", "Guardando Productos")
+        dialog = builder.create()
+        dialog!!.setCanceledOnTouchOutside(false)
+        dialog!!.setCancelable(false)
+        dialog!!.show()
     }
 }

@@ -35,6 +35,7 @@ import kotlinx.android.synthetic.main.fragment_client.*
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
 class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditorActionListener {
 
@@ -60,8 +61,9 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
     lateinit var clienteViewModel: ClienteViewModel
 
     private var usuarioId: Int = 0
-    var activeOrClose: Int = 0
-    var topMenu: Menu? = null
+    private var localId: Int = 0
+    private var activeOrClose: Int = 0
+    private var topMenu: Menu? = null
     lateinit var f: Filtro
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -122,6 +124,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         f = Filtro()
         arguments?.let {
             usuarioId = it.getInt(ARG_PARAM1)
+            localId = it.getInt(ARG_PARAM2)
         }
         setHasOptionsMenu(true)
     }
@@ -163,6 +166,7 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                         else -> startActivity(
                             Intent(context, FileClientActivity::class.java)
                                 .putExtra("clienteId", c.clienteId)
+                                .putExtra("localId", localId)
                         )
                     }
                 }
@@ -179,17 +183,18 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
             .observe(viewLifecycleOwner, Observer(clientePagingAdapter::submitList))
         clienteViewModel.search.value = ""
 
-        clienteViewModel.mensajeError.observe(viewLifecycleOwner, Observer {
+        clienteViewModel.mensajeError.observe(viewLifecycleOwner, {
             Util.toastMensaje(context!!, it)
         })
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: Int) =
+        fun newInstance(param1: Int, param2: Int) =
             ClientFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, param1)
+                    putInt(ARG_PARAM2, param2)
                 }
             }
     }
@@ -234,25 +239,15 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                 recyclerView.adapter = departamentoAdapter
 
                 clienteViewModel.getDepartamentos()
-                    .observe(this, Observer { d ->
+                    .observe(this, { d ->
                         if (d != null) {
                             departamentoAdapter.addItems(d)
                         }
                     })
 
                 editTextSearch.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
+                    override fun beforeTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
+                    override fun onTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
                     override fun afterTextChanged(editable: Editable) {
                         departamentoAdapter.getFilter().filter(editable)
                     }
@@ -271,24 +266,14 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                 recyclerView.adapter = provinciaAdapter
 
                 clienteViewModel.getProvinciasById(f.departamentoId)
-                    .observe(this, Observer { d ->
+                    .observe(this, { d ->
                         if (d != null) {
                             provinciaAdapter.addItems(d)
                         }
                     })
                 editTextSearch.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
+                    override fun beforeTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
+                    override fun onTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
                     override fun afterTextChanged(editable: Editable) {
                         provinciaAdapter.getFilter().filter(editable)
                     }
@@ -305,24 +290,14 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
                     })
                 recyclerView.adapter = distritoAdapter
                 clienteViewModel.getDistritosById(f.departamentoId, f.provinciaId)
-                    .observe(this, Observer { d ->
+                    .observe(this, { d ->
                         if (d != null) {
                             distritoAdapter.addItems(d)
                         }
                     })
                 editTextSearch.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
+                    override fun beforeTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
+                    override fun onTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
                     override fun afterTextChanged(editable: Editable) {
                         distritoAdapter.getFilter().filter(editable)
                     }

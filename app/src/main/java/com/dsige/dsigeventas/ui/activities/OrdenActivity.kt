@@ -61,6 +61,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
     private var clienteId: Int = 0
     private var pedidoId: Int = 0
     private var tipoPersonal: Int = 0
+    private var localId: Int = 0
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -78,6 +79,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                 startActivity(
                     Intent(this, ProductoActivity::class.java)
                         .putExtra("pedidoId", pedidoId)
+                        .putExtra("localId", localId)
                 )
             } else {
                 productoViewModel.setError("Eliga un cliente")
@@ -95,6 +97,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             pedidoId = b.getInt("pedidoId")
             clienteId = b.getInt("clienteId")
             tipoPersonal = b.getInt("tipoPersonal")
+            localId = b.getInt("localId")
             bindUI()
         }
     }
@@ -155,14 +158,14 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = productoPedidoAdapter
         productoViewModel.pedidoId.value = pedidoId
-        productoViewModel.mensajeError.observe(this, Observer { s ->
+        productoViewModel.mensajeError.observe(this, { s ->
             if (s != null) {
                 loadFinish()
                 Util.toastMensaje(this, s)
             }
         })
 
-        productoViewModel.mensajeSuccess.observe(this, Observer { s ->
+        productoViewModel.mensajeSuccess.observe(this, { s ->
             if (s != null) {
                 when (s) {
                     "Ok" -> sendPedido(pedidoId)
@@ -175,12 +178,12 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             }
         })
 
-        productoViewModel.pedidoId.observe(this, Observer { i ->
+        productoViewModel.pedidoId.observe(this, { i ->
             if (i != 0) {
                 linearLayoutCliente.visibility = View.GONE
                 pedidoId = i
                 productoViewModel.getPedidoCliente(i)
-                    .observe(this@OrdenActivity, Observer { p ->
+                    .observe(this@OrdenActivity, { p ->
                         if (p != null) {
                             textViewNombre.text = p.nombreCliente
                             textViewTotal.text = String.format("Total : S/. %.2f", p.totalNeto)
@@ -191,7 +194,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                         }
                     })
                 productoViewModel.getProductoByPedido(i)
-                    .observe(this@OrdenActivity, Observer { p ->
+                    .observe(this@OrdenActivity, { p ->
                         if (p.size != 0) {
                             updateProducto(p)
                             productoPedidoAdapter.submitList(p)
@@ -201,6 +204,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         })
         if (pedidoId == 0) {
             if (clienteId != 0) {
+                load("Generando pedido...")
                 generateCliente(clienteId, tipoPersonal)
             }
         }
@@ -254,7 +258,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             .setTitle("Mensaje")
             .setMessage("Deseas enviar el pedido ?")
             .setPositiveButton("SI") { dialog, _ ->
-                load()
+                load("Enviando...")
                 productoViewModel.sendPedido(id)
                 dialog.dismiss()
             }
@@ -264,13 +268,14 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         dialog.show()
     }
 
-    private fun load() {
+    private fun load(title: String) {
         builder = AlertDialog.Builder(ContextThemeWrapper(this, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
             LayoutInflater.from(this).inflate(R.layout.dialog_login, null)
         builder.setView(view)
         val textView: TextView = view.findViewById(R.id.textViewLado)
-        textView.text = String.format("%s", "Enviando")
+//        textView.text = String.format("%s", "Enviando")
+        textView.text = title
         dialog = builder.create()
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
@@ -308,8 +313,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         val clienteAdapter =
             ClienteAdapter(object : OnItemClickListener.ClienteListener {
                 override fun onItemClick(c: Cliente, v: View, position: Int) {
-                    generateCliente(c.clienteId, c.tipoPersonal)
-                    dialog.dismiss()
+                    dialogGeneratePedido(c, dialog)
                 }
             })
         recyclerView.adapter = clienteAdapter
@@ -332,6 +336,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         }
     }
 
+
     private fun deletePedidoDialog(p: PedidoDetalle) {
         val dialog = MaterialAlertDialogBuilder(this)
             .setTitle("Mensaje")
@@ -350,21 +355,15 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         val factor = p.factor
         val abreviaturaUnidad = p.abreviaturaProducto
 
-        val caja = if (abreviaturaUnidad.trim() == "UNIDAD") {
+        val caja = if (abreviaturaUnidad.trim() == "UNIDAD" && tipoPersonal == 1) {
             cantidad / factor
         } else {
             cantidad
         }
 
-        val precio = when (factor) {
-            24.0 -> when (tipoPersonal) {
-                1 -> if (caja >= 10) p.precio2 else p.precio1
-                else -> if (caja > 50) p.precioMayMayor else p.precioMayMenor
-            }
-            else -> when (tipoPersonal) {
-                1 -> if (caja >= 5) p.precio2 else p.precio1
-                else -> if (caja > 50) p.precioMayMayor else p.precioMayMenor
-            }
+        val precio = when (tipoPersonal) {
+            1 -> if (caja >= p.rangoCajaHorizontal) p.precio2 else p.precio1
+            else -> if (caja > p.rangoCajaMayorista) p.precioMayMayor else p.precioMayMenor
         }
 
         p.cantidad = cantidad
@@ -373,5 +372,21 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         p.subTotal = cantidad * precio
         p.totalPedido = p.subTotal
         productoViewModel.updateProducto(p)
+    }
+
+    private fun dialogGeneratePedido(c: Cliente, d: AlertDialog) {
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Mensaje")
+            .setMessage("Deseas generar pedido con este cliente ?")
+            .setPositiveButton("SI") { dialog, _ ->
+                load("Generando Pedido..")
+                generateCliente(c.clienteId, c.tipoPersonal)
+                dialog.dismiss()
+                d.dismiss()
+            }
+            .setNegativeButton("NO") { dialog, _ ->
+                dialog.dismiss()
+            }
+        dialog.show()
     }
 }

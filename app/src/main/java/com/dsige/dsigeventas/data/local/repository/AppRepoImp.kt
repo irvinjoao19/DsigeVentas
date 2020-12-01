@@ -111,11 +111,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (n != null) {
                 dataBase.giroNegocioDao().insertGiroNegocioListTask(n)
             }
-
-            val st: List<Stock>? = s.productos
-            if (st != null) {
-                dataBase.stockDao().insertStockListTask(st)
-            }
+//            val st: List<Stock>? = s.productos
+//            if (st != null) {
+//                dataBase.stockDao().insertStockListTask(st)
+//            }
 
             val cl: List<Cliente>? = s.clientes
             if (cl != null) {
@@ -216,6 +215,26 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.distritoDao().getDistritosById(dId, pId)
     }
 
+    override fun syncProductos(localId: Int): Observable<List<Stock>> {
+        return apiService.getProductos(localId)
+    }
+
+    override fun insertProductos(p: List<Stock>): Completable {
+        return Completable.fromAction {
+            val detalle = dataBase.pedidoDetalleDao().getPedidoActive()
+            for (d: PedidoDetalle in detalle) {
+                for (s: Stock in p) {
+                    if (d.productoId == s.productoId) {
+                        dataBase.pedidoDetalleDao()
+                            .updateStockPedidoDetalle(d.pedidoDetalleId, s.stock)
+                        break
+                    }
+                }
+            }
+            dataBase.stockDao().insertStockListTask(p)
+        }
+    }
+
     override fun getProductos(): LiveData<PagedList<Stock>> {
         return dataBase.stockDao().getProductos().toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
@@ -244,12 +263,15 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         )
     }
 
-    override fun savePedido(pedidoId: Int): Completable {
+    override fun savePedidoOnline(pedidoId: Int): Completable {
         return Completable.fromAction {
+            val p = dataBase.pedidoDao().getPedidoByIdTask(pedidoId)
             val stock = dataBase.stockDao().getStockSelected(true)
             for (s: Stock in stock) {
                 val a = PedidoDetalle()
                 a.pedidoId = pedidoId
+                a.identity = p.identity
+                a.localId = p.localId
                 a.productoId = s.productoId
                 a.codigo = s.codigoProducto
                 a.nombre = s.nombreProducto
@@ -259,8 +281,11 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 a.precio1 = s.precio
                 a.precio2 = s.precio2
                 a.factor = s.factor
+                a.active = 2
                 a.precioMayMenor = s.precioMayMenor
                 a.precioMayMayor = s.precioMayMayor
+                a.rangoCajaHorizontal = s.rangoCajaHorizontal
+                a.rangoCajaMayorista = s.rangoCajaMayorista
 
                 if (!dataBase.pedidoDetalleDao().getProductoExits(a.pedidoId, a.productoId)) {
                     dataBase.pedidoDetalleDao().insertProductoTask(a)
@@ -270,9 +295,23 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
-    override fun updateProducto(p: PedidoDetalle): Completable {
+    override fun getPedidoDetalles(pedidoId: Int): Observable<List<PedidoDetalle>> {
+        return Observable.create { e ->
+            val data = dataBase.pedidoDetalleDao().getPedidoDetalleByIdTask(pedidoId)
+            e.onNext(data)
+            e.onComplete()
+        }
+    }
+
+    override fun updateProducto(p: PedidoDetalle, t: String): Completable {
         return Completable.fromAction {
-            dataBase.pedidoDetalleDao().updateProductoTask(p)
+            if (t == "0") {
+                val d = dataBase.pedidoDetalleDao()
+                    .getVerificatePedidoDetalleByIdTask(p.pedidoDetalleId)
+                dataBase.pedidoDetalleDao().updateProductoTask(d)
+            } else {
+                dataBase.pedidoDetalleDao().updateProductoTask(p)
+            }
         }
     }
 
@@ -294,7 +333,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun updatePedido(m: Mensaje): Completable {
         return Completable.fromAction {
-            dataBase.clienteDao().updateCliente(m.codigoBaseCliente, m.codigoRetornoCliente)
+//            dataBase.clienteDao().updateCliente(m.codigoBaseCliente, m.codigoRetornoCliente)
             dataBase.pedidoDao().updatePedidoEnabled(m.codigoBase)
             dataBase.pedidoDetalleDao().updatePedidoEnabled(m.codigoBase)
         }
@@ -337,7 +376,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     // estado : 1 -> identity , 0 clienteId
     override fun generarPedidoCliente(
         latitud: String, longitud: String, clienteId: Int
-    ): Observable<Int> {
+    ): Observable<Pedido> {
         return Observable.create { e ->
             val identity = dataBase.pedidoDao().getPedidoIdentity()
             val o = Pedido()
@@ -345,6 +384,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             o.clienteId = clienteId
             val c =
                 dataBase.clienteDao().getClienteTaskById(clienteId)
+            val u = dataBase.usuarioDao().getUsuarioTask()
             o.nombreCliente = c.nombreCliente
             o.empresaId = c.empresaId
             o.tipoPersonal = c.tipoPersonal
@@ -355,12 +395,14 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             o.monedaId = 1
             o.puntoVentaId = 1
             o.codigoInternoCliente = c.codigoInterno
-            o.personalVendedorId = dataBase.usuarioDao().getUsuarioId()
+            o.personalVendedorId = u.usuarioId
+            o.localId = u.localId
             o.latitud = latitud
             o.longitud = longitud
             o.direccionPedido = ""
-            dataBase.pedidoDao().insertPedidoTask(o)
-            e.onNext(o.pedidoId)
+//            dataBase.pedidoDao().insertPedidoTask(o)
+//            e.onNext(o.pedidoId)
+            e.onNext(o)
             e.onComplete()
         }
     }
@@ -562,19 +604,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.localDao().getLocales()
     }
 
-    override fun getOrdenById(id: Int): Observable<Orden> {
+    override fun getOrdenById(id: Int): Observable<Pedido> {
         return Observable.create { e ->
-            val o = Orden()
-            val c = dataBase.clienteDao().getClienteTaskById(dataBase.pedidoDao().getClienteId(id))
-            o.cliente = c
             val p = dataBase.pedidoDao().getPedidoByIdTask(id)
-            val d: List<PedidoDetalle>? = dataBase.pedidoDetalleDao().getPedidoById(id)
-            if (d != null) {
-                p.detalles = d
-            }
-            o.pedido = p
-
-            e.onNext(o)
+            e.onNext(p)
             e.onComplete()
         }
     }
@@ -616,5 +649,41 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
                 }
             }
         }
+    }
+
+    override fun sendCabeceraPedido(p: Pedido): Observable<Mensaje> {
+        val json = Gson().toJson(p)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+        return apiService.sendCabeceraPedido(body)
+    }
+
+    override fun insertPedido(p: Pedido, t: Mensaje): Completable {
+        return Completable.fromAction {
+            p.identity = t.codigoRetorno
+            dataBase.pedidoDao().insertPedidoTask(p)
+        }
+    }
+
+    override fun sendDetallePedidoGroup(p: List<PedidoDetalle>): Observable<List<Mensaje>> {
+        val json = Gson().toJson(p)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+        return apiService.sendDetallePedidoGroup(body)
+    }
+
+    override fun saveDetallePedidoGroup(t: List<Mensaje>): Completable {
+        return Completable.fromAction {
+            for (m: Mensaje in t) {
+                dataBase.pedidoDetalleDao().updateDetallePedidoOnline(m.codigoBase, m.codigoRetorno)
+            }
+        }
+    }
+
+    override fun sendDetallePedido(p: PedidoDetalle): Observable<Mensaje> {
+        val json = Gson().toJson(p)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+        return apiService.sendDetallePedido(body)
     }
 }

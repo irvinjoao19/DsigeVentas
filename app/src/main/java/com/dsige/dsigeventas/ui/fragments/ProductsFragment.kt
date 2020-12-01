@@ -23,12 +23,10 @@ import kotlinx.android.synthetic.main.fragment_products.*
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 class ProductsFragment : DaggerFragment() {
 
-    private var param1: String? = null
-    private var param2: String? = null
+    private var localId: Int = 0
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -48,8 +46,7 @@ class ProductsFragment : DaggerFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            localId = it.getInt(ARG_PARAM1)
         }
         setHasOptionsMenu(true)
     }
@@ -88,18 +85,30 @@ class ProductsFragment : DaggerFragment() {
         )
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = productoPagingAdapter
+        productoViewModel.setLoading(true)
+        productoViewModel.initProductos(localId)
         productoViewModel.getProductos()
-            .observe(this, Observer(productoPagingAdapter::submitList))
+            .observe(viewLifecycleOwner, Observer(productoPagingAdapter::submitList))
+
+        productoViewModel.loading.observe(viewLifecycleOwner, {
+            if (it) {
+                recyclerView.visibility = View.GONE
+                progressBar.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
+            }
+        })
+
         productoViewModel.searchProducto.value = ""
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(param1: Int) =
             ProductsFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putInt(ARG_PARAM1, param1)
                 }
             }
     }

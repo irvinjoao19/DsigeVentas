@@ -57,6 +57,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
     lateinit var clienteViewModel: ClienteViewModel
     lateinit var c: Cliente
     lateinit var binding: ActivityFileClientBinding
+    private var localId : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +69,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
         val b = intent.extras
         if (b != null) {
             c = Cliente()
+            localId = b.getInt("localId")
             bindUI(b.getInt("clienteId"))
         }
     }
@@ -105,6 +107,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
                         Intent(this, OrdenActivity::class.java)
                             .putExtra("clienteId", c.clienteId)
                             .putExtra("tipoPersonal", c.tipoPersonal)
+                            .putExtra("localId", c.tipoPersonal)
                     )
                     dialogInterface.dismiss()
                 }

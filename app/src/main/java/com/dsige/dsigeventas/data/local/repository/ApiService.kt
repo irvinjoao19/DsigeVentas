@@ -63,4 +63,20 @@ interface ApiService {
 
     @GET("GetResumen")
     fun getResumen(@Query("fecha") fecha: String): Observable<Resumen>
+
+    @GET("GetProductos")
+    fun getProductos(@Query("local") local: Int): Observable<List<Stock>>
+
+
+    @Headers("Cache-Control: no-cache")
+    @POST("SaveCabeceraPedido")
+    fun sendCabeceraPedido(@Body body: RequestBody): Observable<Mensaje>
+
+    @Headers("Cache-Control: no-cache")
+    @POST("SaveDetallePedidoGroup")
+    fun sendDetallePedidoGroup(@Body body: RequestBody): Observable<List<Mensaje>>
+
+    @Headers("Cache-Control: no-cache")
+    @POST("SaveDetallePedido")
+    fun sendDetallePedido(@Body body: RequestBody): Observable<Mensaje>
 }
