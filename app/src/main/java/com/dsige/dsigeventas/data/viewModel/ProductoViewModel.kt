@@ -10,7 +10,6 @@ import com.dsige.dsigeventas.data.local.model.*
 import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.AppRepository
 import com.dsige.dsigeventas.helper.Mensaje
-import com.google.gson.Gson
 import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
 import io.reactivex.CompletableObserver
 import io.reactivex.Observable
@@ -18,8 +17,6 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import okhttp3.MediaType
-import okhttp3.RequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -317,34 +314,43 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     fun initProductos(localId: Int) {
-        roomRepository.syncProductos(localId)
+        roomRepository.clearProductos()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<List<Stock>> {
-                override fun onSubscribe(d: Disposable) {
-                }
-
-                override fun onNext(t: List<Stock>) {
-                    insertProductos(t)
-                }
-
-                override fun onError(e: Throwable) {
-                    if (e is HttpException) {
-                        val body = e.response().errorBody()
-                        try {
-                            val error = retrofit.errorConverter.convert(body!!)
-                            mensajeError.postValue(error.Message)
-                        } catch (e1: IOException) {
-                            mensajeError.postValue(e1.toString())
-                        }
-                    } else {
-                        mensajeError.postValue(e.toString())
-                    }
-                    loading.value = false
-                }
-
+            .subscribe(object : CompletableObserver {
+                override fun onSubscribe(d: Disposable) {}
+                override fun onError(e: Throwable) {}
                 override fun onComplete() {
-                    loading.value = false
+                    roomRepository.syncProductos(localId)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<List<Stock>> {
+                            override fun onSubscribe(d: Disposable) {
+                            }
+
+                            override fun onNext(t: List<Stock>) {
+                                insertProductos(t)
+                            }
+
+                            override fun onError(e: Throwable) {
+                                if (e is HttpException) {
+                                    val body = e.response().errorBody()
+                                    try {
+                                        val error = retrofit.errorConverter.convert(body!!)
+                                        mensajeError.postValue(error.Message)
+                                    } catch (e1: IOException) {
+                                        mensajeError.postValue(e1.toString())
+                                    }
+                                } else {
+                                    mensajeError.postValue(e.toString())
+                                }
+                                loading.value = false
+                            }
+
+                            override fun onComplete() {
+                                loading.value = false
+                            }
+                        })
                 }
             })
     }

@@ -32,9 +32,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_register_client.*
-import kotlinx.android.synthetic.main.activity_register_client.editTextDepartamento
-import kotlinx.android.synthetic.main.activity_register_client.editTextDistrito
-import kotlinx.android.synthetic.main.activity_register_client.editTextProvincia
 import java.util.ArrayList
 import javax.inject.Inject
 
@@ -48,6 +45,12 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
             R.id.editTextProvincia -> dialogSpinner("Provincia", 2)
             R.id.editTextDistrito -> dialogSpinner("Distrito", 3)
             R.id.editTextPago -> dialogSpinner("Forma de Pago", 4)
+            R.id.imgPlace -> {
+                val gps = Gps(this)
+                if (gps.isLocationEnabled()) {
+                    Util.getLocationName(this, gps.location!!, editTextDireccion,editTextDistrito)
+                }
+            }
         }
     }
 
@@ -68,7 +71,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         if (id == R.id.register) {
-            mensajeCliente()
+            formRegisterCliente(1)
+//            mensajeCliente()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -109,7 +113,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 editTextPago.setText(String.format("CONTADO C/ ENTREGA"))
                 val gps = Gps(this)
                 if (gps.isLocationEnabled()) {
-                    Util.getLocationName(this, gps.location!!, editTextDireccion)
+                    Util.getLocationName(this, gps.location!!, editTextDireccion,editTextDistrito)
                 }
             }, 200)
         } else {
@@ -365,9 +369,9 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 c.nombreGiroNegocio = editTextPago.text.toString()
                 c.latitud = gps.latitude.toString()
                 c.longitud = gps.longitude.toString()
-                if (tipo == 1) {
+//                if (tipo == 1) {
                     load()
-                }
+//                }
                 clienteViewModel.validateCliente(c, tipo)
             }
         } else {

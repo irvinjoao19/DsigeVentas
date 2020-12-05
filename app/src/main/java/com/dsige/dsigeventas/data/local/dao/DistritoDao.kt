@@ -31,4 +31,6 @@ interface DistritoDao {
     @Query("DELETE FROM Distrito")
     fun deleteAll()
 
+    @Query("SELECT distritoId FROM Distrito WHERE nombre LIKE :d")
+    fun searchDistritoId(d: String): Int
 }

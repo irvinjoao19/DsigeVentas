@@ -16,6 +16,7 @@ import io.reactivex.Observable
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Call
+import java.util.*
 
 class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDataBase) :
     AppRepository {
@@ -685,5 +686,29 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         Log.i("TAG", json)
         val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
         return apiService.sendDetallePedido(body)
+    }
+
+    override fun verificateDistrito(c: Cliente): Observable<Cliente> {
+        return Observable.create {
+            if (c.distritoId == 0) {
+                c.distritoId = dataBase.distritoDao()
+                    .searchDistritoId(
+                        String.format(
+                            "%s%s%s",
+                            "%",
+                            c.nombreDistrito.toUpperCase(Locale.getDefault()),
+                            "%"
+                        )
+                    )
+            }
+            it.onNext(c)
+            it.onComplete()
+        }
+    }
+
+    override fun clearProductos(): Completable {
+        return Completable.fromAction {
+            dataBase.stockDao().deleteAll()
+        }
     }
 }

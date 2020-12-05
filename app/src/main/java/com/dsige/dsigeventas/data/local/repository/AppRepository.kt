@@ -52,7 +52,7 @@ interface AppRepository {
     fun getProductoByPedido(id: Int): LiveData<PagedList<PedidoDetalle>>
     fun savePedidoOnline(pedidoId: Int): Completable
     fun getPedidoDetalles(pedidoId: Int): Observable<List<PedidoDetalle>>
-    fun updateProducto(p: PedidoDetalle,t:String): Completable
+    fun updateProducto(p: PedidoDetalle, t: String): Completable
     fun getPedidoById(id: Int): Observable<Pedido>
     fun sendPedido(body: RequestBody): Observable<Mensaje>
     fun updatePedido(m: Mensaje): Completable
@@ -111,6 +111,9 @@ interface AppRepository {
     fun insertPedido(p: Pedido, t: Mensaje): Completable
     fun sendDetallePedidoGroup(p: List<PedidoDetalle>): Observable<List<Mensaje>>
     fun saveDetallePedidoGroup(t: List<Mensaje>): Completable
-    fun sendDetallePedido(p: PedidoDetalle) : Observable<Mensaje>
+    fun sendDetallePedido(p: PedidoDetalle): Observable<Mensaje>
+
+    fun verificateDistrito(c: Cliente): Observable<Cliente>
+    fun clearProductos(): Completable
 
 }

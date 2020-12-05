@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
+
         <variable
             name="listener"
             type="com.dsige.dsigeventas.ui.listeners.OnItemClickListener" />
@@ -174,8 +176,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -207,8 +209,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
                         <View
                             android:layout_width="24dp"
@@ -272,13 +274,17 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-                        <View
+                        <ImageView
+                            android:id="@+id/imgPlace"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_marginStart="16sp"
                             android:layout_marginTop="16sp"
                             android:layout_marginEnd="16sp"
-                            android:contentDescription="@string/img" />
+                            android:contentDescription="@string/img"
+                            android:onClick="@{listener::onClick}"
+                            app:srcCompat="@drawable/ic_place" />
+
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

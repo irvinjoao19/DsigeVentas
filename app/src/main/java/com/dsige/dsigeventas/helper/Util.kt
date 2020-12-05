@@ -649,8 +649,7 @@ object Util {
         val mYear = c.get(Calendar.YEAR)
         val mMonth = c.get(Calendar.MONTH)
         val mDay = c.get(Calendar.DAY_OF_MONTH)
-        val datePickerDialog = DatePickerDialog(context, { _, year
-                                                           , monthOfYear, dayOfMonth ->
+        val datePickerDialog = DatePickerDialog(context, { _, year, monthOfYear, dayOfMonth ->
             val month =
                 if (((monthOfYear + 1) / 10) == 0) "0" + (monthOfYear + 1).toString() else (monthOfYear + 1).toString()
             val day = if (((dayOfMonth + 1) / 10) == 0) "0$dayOfMonth" else dayOfMonth.toString()
@@ -861,7 +860,12 @@ object Util {
         return imagePath
     }
 
-    fun getLocationName(context: Context, location: Location, input: TextInputEditText) {
+    fun getLocationName(
+        context: Context,
+        location: Location,
+        input: TextInputEditText,
+        input2: TextInputEditText
+    ) {
         try {
             val addressObservable = Observable.just(
                 Geocoder(context).getFromLocation(
@@ -873,20 +877,12 @@ object Util {
             addressObservable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : Observer<Address> {
-                    override fun onSubscribe(d: Disposable) {
-
-                    }
-
+                    override fun onSubscribe(d: Disposable) {}
+                    override fun onError(e: Throwable) {}
+                    override fun onComplete() {}
                     override fun onNext(address: Address) {
                         input.setText(address.getAddressLine(0))
-                    }
-
-                    override fun onError(e: Throwable) {
-
-                    }
-
-                    override fun onComplete() {
-
+                        input2.setText(address.locality)
                     }
                 })
         } catch (e: IOException) {

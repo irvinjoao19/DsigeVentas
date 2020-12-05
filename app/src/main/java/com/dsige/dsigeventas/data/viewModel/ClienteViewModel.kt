@@ -138,10 +138,25 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             return
         }
 
-        if (tipo == 1)
+        if (c.distritoId == 0) {
+            verificateDistrito(c)
+        } else {
             sendCliente(c)
-        else
-            insertOrUpdateCliente(c, null)
+        }
+    }
+
+    private fun verificateDistrito(c: Cliente) {
+        roomRepository.verificateDistrito(c)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Cliente> {
+                override fun onSubscribe(d: Disposable) {}
+                override fun onError(e: Throwable) {}
+                override fun onComplete() {}
+                override fun onNext(t: Cliente) {
+                    sendCliente(t)
+                }
+            })
     }
 
     private fun insertOrUpdateCliente(c: Cliente, m: Mensaje?) {
