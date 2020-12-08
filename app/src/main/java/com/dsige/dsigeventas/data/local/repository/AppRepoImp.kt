@@ -152,6 +152,17 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
             if (l != null) {
                 dataBase.localDao().insertLocalListTask(l)
             }
+
+            val p1: List<Pedido>? = s.pedidos
+            if (p1 != null) {
+                dataBase.pedidoDao().insertPedidoListTask(p1)
+                for (r1: Pedido in p1) {
+                    val de: List<PedidoDetalle>? = r1.detalles
+                    if (de != null) {
+                        dataBase.pedidoDetalleDao().insertProductoListTask(de)
+                    }
+                }
+            }
         }
     }
 
@@ -191,11 +202,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return dataBase.clienteDao().getClienteById(id)
     }
 
-    override fun insertOrUpdateCliente(c: Cliente, m: Mensaje?): Completable {
+    override fun insertOrUpdateCliente(c: Cliente, m: Mensaje): Completable {
         return Completable.fromAction {
-            if (m != null) {
-                c.identity = m.codigoRetorno
-            }
+            c.identity = m.codigoRetorno
+
             if (c.clienteId == 0) {
                 dataBase.clienteDao().insertClienteTask(c)
             } else {
@@ -479,13 +489,18 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun getReparto(
-        localId: Int,
-        distritoId: Int,
-        s: String
+        localId: Int, distritoId: Int, s: String
     ): LiveData<PagedList<Reparto>> {
         return dataBase.repartoDao().getReparto(8, localId, distritoId, s).toLiveData(
             Config(pageSize = 20, enablePlaceholders = true)
         )
+    }
+
+    override fun deletePedidoDetalleOnline(p: PedidoDetalle): Observable<Mensaje> {
+        val json = Gson().toJson(p)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+        return apiService.deletePedidoDetalleOnline(body)
     }
 
     override fun deletePedidoDetalle(p: PedidoDetalle): Completable {
@@ -521,7 +536,10 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
-    override fun sendCliente(body: RequestBody): Observable<Mensaje> {
+    override fun sendCliente(c: Cliente): Observable<Mensaje> {
+        val json = Gson().toJson(c)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
         return apiService.sendCliente(body)
     }
 
@@ -710,5 +728,12 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return Completable.fromAction {
             dataBase.stockDao().deleteAll()
         }
+    }
+
+    override fun deletePedidoOnline(p: Pedido): Observable<Mensaje> {
+        val json = Gson().toJson(p)
+        Log.i("TAG", json)
+        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
+        return apiService.deletePedidoOnline(body)
     }
 }

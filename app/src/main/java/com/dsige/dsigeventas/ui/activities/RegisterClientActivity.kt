@@ -48,7 +48,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
             R.id.imgPlace -> {
                 val gps = Gps(this)
                 if (gps.isLocationEnabled()) {
-                    Util.getLocationName(this, gps.location!!, editTextDireccion,editTextDistrito)
+                    Util.getLocationName(this, gps.location!!, editTextDireccion, editTextDistrito)
                 }
             }
         }
@@ -101,8 +101,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
         binding.toolbar.setNavigationOnClickListener { finish() }
         binding.listener = this
         binding.c = clienteViewModel
-
         c.personalVendedorId = usuarioId
+
         if (id == 0) {
             Handler().postDelayed({
                 editTextVisita.setText(Util.getFecha())
@@ -113,7 +113,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 editTextPago.setText(String.format("CONTADO C/ ENTREGA"))
                 val gps = Gps(this)
                 if (gps.isLocationEnabled()) {
-                    Util.getLocationName(this, gps.location!!, editTextDireccion,editTextDistrito)
+                    Util.getLocationName(this, gps.location!!, editTextDireccion, editTextDistrito)
                 }
             }, 200)
         } else {
@@ -284,18 +284,8 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                         }
                     })
                 editTextSearch.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
+                    override fun beforeTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
+                    override fun onTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
                     override fun afterTextChanged(editable: Editable) {
                         distritoAdapter.getFilter().filter(editable)
                     }
@@ -370,7 +360,7 @@ class RegisterClientActivity : DaggerAppCompatActivity(), OnItemClickListener {
                 c.latitud = gps.latitude.toString()
                 c.longitud = gps.longitude.toString()
 //                if (tipo == 1) {
-                    load()
+                load()
 //                }
                 clienteViewModel.validateCliente(c, tipo)
             }

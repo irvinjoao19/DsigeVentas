@@ -159,21 +159,18 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             })
     }
 
-    private fun insertOrUpdateCliente(c: Cliente, m: Mensaje?) {
+    private fun insertOrUpdateCliente(c: Cliente, m: Mensaje) {
         roomRepository.insertOrUpdateCliente(c, m)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
+                override fun onSubscribe(d: Disposable) {}
                 override fun onComplete() {
                     if (c.clienteId == 0) {
                         mensajeSuccess.value = "Cliente Registrado"
                     } else {
                         mensajeSuccess.value = "Cliente Actualizado"
                     }
-                }
-
-                override fun onSubscribe(d: Disposable) {
-
                 }
 
                 override fun onError(e: Throwable) {
@@ -183,10 +180,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     private fun sendCliente(c: Cliente) {
-        val json = Gson().toJson(c)
-        Log.i("TAG", json)
-        val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
-        roomRepository.sendCliente(body)
+        roomRepository.sendCliente(c)
             .delay(1000, TimeUnit.MILLISECONDS)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

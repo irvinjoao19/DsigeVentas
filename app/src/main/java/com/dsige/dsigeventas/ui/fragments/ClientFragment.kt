@@ -180,9 +180,8 @@ class ClientFragment : DaggerFragment(), View.OnClickListener, TextView.OnEditor
         )
         recyclerView.adapter = clientePagingAdapter
         clienteViewModel.getCliente()
-            .observe(viewLifecycleOwner, Observer(clientePagingAdapter::submitList))
+            .observe(viewLifecycleOwner, { clientePagingAdapter.addItems(it) })
         clienteViewModel.search.value = ""
-
         clienteViewModel.mensajeError.observe(viewLifecycleOwner, {
             Util.toastMensaje(context!!, it)
         })

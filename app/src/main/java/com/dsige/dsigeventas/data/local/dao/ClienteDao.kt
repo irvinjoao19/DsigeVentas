@@ -41,7 +41,7 @@ interface ClienteDao {
     @Query("DELETE FROM Cliente")
     fun deleteAll()
 
-    @Query("SELECT * FROM Cliente WHERE clienteId =:id")
+    @Query("SELECT * FROM Cliente WHERE identity =:id")
     fun getClienteTaskById(id: Int): Cliente
 
     @Query("SELECT identity FROM Cliente WHERE clienteId =:id")

@@ -283,33 +283,87 @@ internal constructor(private val roomRepository: AppRepository, private val retr
         }
     }
 
+    fun deletePedidoDetalleOnline(p: PedidoDetalle) {
+        roomRepository.deletePedidoDetalleOnline(p)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Mensaje> {
+                override fun onSubscribe(d: Disposable) {}
+                override fun onComplete() {}
+                override fun onNext(t: Mensaje) {
+                    deletePedidoDetalle(p)
+                }
+
+                override fun onError(e: Throwable) {
+                    if (e is HttpException) {
+                        val response = e.response().errorBody()
+                        try {
+                            val error = retrofit.errorConverter.convert(response!!)
+                            mensajeError.postValue(error.Message)
+                        } catch (e1: IOException) {
+                            mensajeError.postValue(e1.toString())
+                        }
+                    } else {
+                        mensajeError.postValue(e.toString())
+                    }
+                }
+            })
+    }
+
     fun deletePedidoDetalle(p: PedidoDetalle) {
         roomRepository.deletePedidoDetalle(p)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
+                override fun onSubscribe(d: Disposable) {}
+                override fun onError(e: Throwable) {}
                 override fun onComplete() {
-
-                }
-
-                override fun onSubscribe(d: Disposable) {
-
-                }
-
-                override fun onError(e: Throwable) {
-
+                    mensajeSuccess.value = "Producto eliminado"
                 }
             })
     }
 
-    fun deletePedido(p: Pedido) {
+    fun deletePedidoOnline(p: Pedido) {
+        roomRepository.deletePedidoOnline(p)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : Observer<Mensaje> {
+                override fun onSubscribe(d: Disposable) {}
+
+                override fun onNext(t: Mensaje) {
+                    deletePedido(p)
+                }
+
+                override fun onError(e: Throwable) {
+                    if (e is HttpException) {
+                        val response = e.response().errorBody()
+                        try {
+                            val error = retrofit.errorConverter.convert(response!!)
+                            mensajeError.postValue(error.Message)
+                        } catch (e1: IOException) {
+                            mensajeError.postValue(e1.toString())
+                        }
+                    } else {
+                        mensajeError.postValue(e.toString())
+                    }
+                }
+
+                override fun onComplete() {
+                }
+            })
+
+    }
+
+    private fun deletePedido(p: Pedido) {
         roomRepository.deletePedido(p)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
-                override fun onComplete() {}
                 override fun onSubscribe(d: Disposable) {}
                 override fun onError(e: Throwable) {}
+                override fun onComplete() {
+                    mensajeSuccess.value = "Pedido Eliminado"
+                }
             })
     }
 
@@ -402,7 +456,17 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                 override fun onSubscribe(d: Disposable) {}
                 override fun onComplete() {}
                 override fun onError(e: Throwable) {
-                    mensajeError.value = e.message.toString()
+                    if (e is HttpException) {
+                        val body = e.response().errorBody()
+                        try {
+                            val error = retrofit.errorConverter.convert(body!!)
+                            mensajeError.postValue(error.Message)
+                        } catch (e1: IOException) {
+                            mensajeError.postValue(e1.toString())
+                        }
+                    } else {
+                        mensajeError.postValue(e.toString())
+                    }
                 }
 
                 override fun onNext(t: List<Mensaje>) {

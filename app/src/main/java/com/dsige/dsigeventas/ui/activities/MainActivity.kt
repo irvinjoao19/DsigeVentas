@@ -67,7 +67,7 @@ class MainActivity : DaggerAppCompatActivity() {
                                 return true
                             }
                             R.id.pedido -> {
-                                changeFragment(PedidoFragment.newInstance(u.localId))
+                                changeFragment(PedidoFragment.newInstance(u.localId,u.usuarioId))
                                 return true
                             }
                             R.id.map -> {

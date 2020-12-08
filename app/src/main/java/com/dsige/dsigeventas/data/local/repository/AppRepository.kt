@@ -37,7 +37,7 @@ interface AppRepository {
     fun getCliente(s: Int, search: String): LiveData<PagedList<Cliente>>
     fun getCliente(s: Int): LiveData<PagedList<Cliente>>
     fun getClienteById(id: Int): LiveData<Cliente>
-    fun insertOrUpdateCliente(c: Cliente, m: Mensaje?): Completable
+    fun insertOrUpdateCliente(c: Cliente, m: Mensaje): Completable
     fun getDepartamentos(): LiveData<List<Departamento>>
     fun getProvinciasById(id: String): LiveData<List<Provincia>>
     fun getDistritosById(dId: String, pId: String): LiveData<List<Distrito>>
@@ -74,6 +74,7 @@ interface AppRepository {
     fun getReparto(localId: Int, distritoId: Int): LiveData<PagedList<Reparto>>
     fun getReparto(localId: Int, s: String): LiveData<PagedList<Reparto>>
     fun getReparto(localId: Int, distritoId: Int, s: String): LiveData<PagedList<Reparto>>
+    fun deletePedidoDetalleOnline(p: PedidoDetalle): Observable<Mensaje>
     fun deletePedidoDetalle(p: PedidoDetalle): Completable
     fun getRepartoById(id: Int): LiveData<Reparto>
     fun deletePedido(p: Pedido): Completable
@@ -81,7 +82,7 @@ interface AppRepository {
     fun saveGpsTask(body: RequestBody): Call<Mensaje>
     fun saveMovilTask(body: RequestBody): Call<Mensaje>
     fun getClienteByIdTask(id: Int): Observable<Cliente>
-    fun sendCliente(body: RequestBody): Observable<Mensaje>
+    fun sendCliente(c:Cliente): Observable<Mensaje>
     fun updateCliente(m: Mensaje, pedidoId: Int): Completable
     fun getDetalleRepartoById(id: Int): LiveData<PagedList<RepartoDetalle>>
 
@@ -115,5 +116,6 @@ interface AppRepository {
 
     fun verificateDistrito(c: Cliente): Observable<Cliente>
     fun clearProductos(): Completable
+    fun deletePedidoOnline(p: Pedido) : Observable<Mensaje>
 
 }

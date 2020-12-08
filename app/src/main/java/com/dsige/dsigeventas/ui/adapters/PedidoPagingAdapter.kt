@@ -37,6 +37,8 @@ class PedidoPagingAdapter(private var listener: OnItemClickListener.PedidoListen
                 when (s.estado) {
                     0 -> textViewEstado.text = String.format("Estado : %s", "Por Enviar")
                     1 -> textViewEstado.text = String.format("Estado : %s", "Enviado")
+                    else -> textViewEstado.text = String.format("Estado : %s", "Enviado")
+
                 }
                 itemView.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }
                 imageViewMap.setOnClickListener { v -> listener.onItemClick(s, v, adapterPosition) }

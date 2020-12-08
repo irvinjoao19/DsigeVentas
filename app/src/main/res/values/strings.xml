@@ -198,7 +198,7 @@
     <string name="ver">Ver Pedido</string>
     <string name="delete">Eliminar</string>
     <string name="go">Ver Ruta</string>
-    <string name="goPedido">Ver Pedido</string>
+    <string name="goPedido">Editar Pedido</string>
     <string name="search">Buscar</string>
     <string name="filtro">Filtro</string>
     <string name="ver_ruta">Ver ruta</string>

@@ -39,6 +39,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             R.id.imageViewAddPerson -> startActivity(
                 Intent(this, RegisterClientActivity::class.java)
                     .putExtra("clienteId", 0)
+                    .putExtra("usuarioId", usuarioId)
             )
         }
     }
@@ -62,6 +63,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
     private var pedidoId: Int = 0
     private var tipoPersonal: Int = 0
     private var localId: Int = 0
+    private var usuarioId: Int = 0
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
@@ -98,6 +100,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             clienteId = b.getInt("clienteId")
             tipoPersonal = b.getInt("tipoPersonal")
             localId = b.getInt("localId")
+            usuarioId = b.getInt("usuarioId")
             bindUI()
         }
     }
@@ -174,6 +177,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                         Util.toastMensaje(this, s)
                         finish()
                     }
+                    else -> Util.toastMensaje(this, s)
                 }
             }
         })
@@ -197,7 +201,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
                     .observe(this@OrdenActivity, { p ->
                         if (p.size != 0) {
                             updateProducto(p)
-                            productoPedidoAdapter.submitList(p)
+                            productoPedidoAdapter.addItems(p)
                         }
                     })
             }
@@ -342,7 +346,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             .setTitle("Mensaje")
             .setMessage("Deseas eliminar el producto ?")
             .setPositiveButton("SI") { dialog, _ ->
-                productoViewModel.deletePedidoDetalle(p)
+                productoViewModel.deletePedidoDetalleOnline(p)
                 dialog.dismiss()
             }
             .setNegativeButton("NO") { dialog, _ ->
@@ -360,7 +364,6 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
         } else {
             cantidad
         }
-
         val precio = when (tipoPersonal) {
             1 -> if (caja >= p.rangoCajaHorizontal) p.precio2 else p.precio1
             else -> if (caja > p.rangoCajaMayorista) p.precioMayMayor else p.precioMayMenor
@@ -380,7 +383,7 @@ class OrdenActivity : DaggerAppCompatActivity(), View.OnClickListener,
             .setMessage("Deseas generar pedido con este cliente ?")
             .setPositiveButton("SI") { dialog, _ ->
                 load("Generando Pedido..")
-                generateCliente(c.clienteId, c.tipoPersonal)
+                generateCliente(c.identity, c.tipoPersonal)
                 dialog.dismiss()
                 d.dismiss()
             }

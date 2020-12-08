@@ -36,6 +36,5 @@ open class Cliente {
     var estado: Int = 0
     var identity: Int = 0
     var tipoPersonal:Int = 0
-
     var nameImg: String = ""
 }

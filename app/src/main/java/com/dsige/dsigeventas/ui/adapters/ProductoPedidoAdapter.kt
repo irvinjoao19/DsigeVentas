@@ -1,32 +1,37 @@
 package com.dsige.dsigeventas.ui.adapters
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.paging.PagedListAdapter
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.PedidoDetalle
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import kotlinx.android.synthetic.main.cardview_pedidos.view.*
-import java.text.DecimalFormat
 
 class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPedidoListener) :
-    PagedListAdapter<PedidoDetalle, ProductoPedidoAdapter.ViewHolder>(diffCallback) {
+    RecyclerView.Adapter<ProductoPedidoAdapter.ViewHolder>() {
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val s = getItem(position)
-        if (s != null) {
-            holder.bind(s, listener)
-        }
+    private var count = emptyList<PedidoDetalle>()
+
+    fun addItems(list: List<PedidoDetalle>) {
+        count = list
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v =
             LayoutInflater.from(parent.context).inflate(R.layout.cardview_pedidos, parent, false)
         return ViewHolder(v!!)
+    }
+
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(count[position], listener)
+    }
+
+    override fun getItemCount(): Int {
+        return count.size
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -40,35 +45,21 @@ class ProductoPedidoAdapter(private var listener: OnItemClickListener.ProductoPe
                 textViewStock.text = p.stockMinimo.toString()
                 editTextCantidad.setText(p.cantidad.toString())
 
-                if (p.estado == 1) {
-                    imageViewPositive.visibility = View.GONE
-                    imageViewNegative.visibility = View.GONE
-                } else {
-                    editTextCantidad.setOnClickListener { v ->
-                        listener.onItemClick(p, v, adapterPosition)
-                    }
-                    imageViewNegative.setOnClickListener { v ->
-                        listener.onItemClick(p, v, adapterPosition)
-                    }
-                    imageViewPositive.setOnClickListener { v ->
-                        listener.onItemClick(p, v, adapterPosition)
-                    }
-                    itemView.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
+//                if (p.estado == 1) {
+//                    imageViewPositive.visibility = View.GONE
+//                    imageViewNegative.visibility = View.GONE
+//                } else {
+                editTextCantidad.setOnClickListener { v ->
+                    listener.onItemClick(p, v, adapterPosition)
                 }
+                imageViewNegative.setOnClickListener { v ->
+                    listener.onItemClick(p, v, adapterPosition)
+                }
+                imageViewPositive.setOnClickListener { v ->
+                    listener.onItemClick(p, v, adapterPosition)
+                }
+                itemView.setOnClickListener { v -> listener.onItemClick(p, v, adapterPosition) }
+//                }
             }
-    }
-
-    companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<PedidoDetalle>() {
-            override fun areItemsTheSame(oldItem: PedidoDetalle, newItem: PedidoDetalle): Boolean =
-                oldItem.productoId == newItem.productoId
-
-            @SuppressLint("DiffUtilEquals")
-            override fun areContentsTheSame(
-                oldItem: PedidoDetalle,
-                newItem: PedidoDetalle
-            ): Boolean =
-                oldItem == newItem
-        }
     }
 }

@@ -111,11 +111,13 @@ class ProductoActivity : DaggerAppCompatActivity() {
         productoViewModel.searchProducto.value = ""
         productoViewModel.mensajeError.observe(this, { s ->
             if (s != null) {
+                loadFinish()
                 Util.toastMensaje(this, s)
             }
         })
         productoViewModel.mensajeSuccess.observe(this, { s ->
             if (s != null) {
+                loadFinish()
                 Util.toastMensaje(this, s)
                 finish()
             }
@@ -155,5 +157,13 @@ class ProductoActivity : DaggerAppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
         dialog!!.setCancelable(false)
         dialog!!.show()
+    }
+
+    private fun loadFinish() {
+        if (dialog != null) {
+            if (dialog!!.isShowing) {
+                dialog!!.dismiss()
+            }
+        }
     }
 }

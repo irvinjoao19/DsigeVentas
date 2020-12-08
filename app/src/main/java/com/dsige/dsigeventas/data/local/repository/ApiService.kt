@@ -18,7 +18,7 @@ interface ApiService {
     fun getLogout(@Body body: RequestBody): Observable<Mensaje>
 
     @Headers("Cache-Control: no-cache")
-    @GET("SyncNew")
+    @GET("Sync")
     fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String): Observable<Sync>
 
     @Headers("Cache-Control: no-cache")
@@ -79,4 +79,12 @@ interface ApiService {
     @Headers("Cache-Control: no-cache")
     @POST("SaveDetallePedido")
     fun sendDetallePedido(@Body body: RequestBody): Observable<Mensaje>
+
+    @Headers("Cache-Control: no-cache")
+    @POST("DeletePedidoDetalle")
+    fun deletePedidoDetalleOnline(@Body body: RequestBody): Observable<Mensaje>
+
+    @Headers("Cache-Control: no-cache")
+    @POST("DeletePedido")
+    fun deletePedidoOnline(@Body body: RequestBody): Observable<Mensaje>
 }

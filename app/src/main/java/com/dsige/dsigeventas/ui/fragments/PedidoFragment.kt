@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.fragment_pedido.*
 import javax.inject.Inject
 
 private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
 class PedidoFragment : DaggerFragment() {
 
@@ -33,6 +34,7 @@ class PedidoFragment : DaggerFragment() {
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var productoViewModel: ProductoViewModel
     private var localId: Int = 0
+    private var usuarioId: Int = 0
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
@@ -50,7 +52,7 @@ class PedidoFragment : DaggerFragment() {
                 Intent(context, OrdenActivity::class.java)
                     .putExtra("pedidoId", 0)
                     .putExtra("clienteId", 0)
-                    .putExtra("clienteId", 0)
+                    .putExtra("usuarioId", usuarioId)
                     .putExtra("localId", localId)
             )
         }
@@ -61,6 +63,7 @@ class PedidoFragment : DaggerFragment() {
         super.onCreate(savedInstanceState)
         arguments?.let {
             localId = it.getInt(ARG_PARAM1)
+            usuarioId = it.getInt(ARG_PARAM2)
         }
         setHasOptionsMenu(true)
     }
@@ -127,18 +130,20 @@ class PedidoFragment : DaggerFragment() {
         startActivity(
             Intent(context, OrdenActivity::class.java)
                 .putExtra("pedidoId", p.pedidoId)
-                .putExtra("clienteId", p.clienteId)
+                .putExtra("clienteId", p.identity)
                 .putExtra("tipoPersonal", p.tipoPersonal)
                 .putExtra("localId", p.localId)
+                .putExtra("usuarioId", usuarioId)
         )
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(param1: Int) =
+        fun newInstance(param1: Int,param2:Int) =
             PedidoFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, param1)
+                    putInt(ARG_PARAM2, param2)
                 }
             }
     }
@@ -146,9 +151,9 @@ class PedidoFragment : DaggerFragment() {
     private fun deletePedidoDialog(p: Pedido) {
         val dialog = MaterialAlertDialogBuilder(context!!)
             .setTitle("Mensaje")
-            .setMessage("Deseas eliminar el producto ?")
+            .setMessage("Deseas eliminar el pedido ?")
             .setPositiveButton("SI") { dialog, _ ->
-                productoViewModel.deletePedido(p)
+                productoViewModel.deletePedidoOnline(p)
                 dialog.dismiss()
             }
             .setNegativeButton("NO") { dialog, _ ->

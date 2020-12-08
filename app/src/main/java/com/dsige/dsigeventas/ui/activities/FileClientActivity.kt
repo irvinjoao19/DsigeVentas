@@ -7,7 +7,6 @@ import android.view.View
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.Cliente
@@ -18,7 +17,6 @@ import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.listeners.NavigationItemSelectedListener
 import com.dsige.dsigeventas.ui.listeners.OnItemClickListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_file_client.*
@@ -48,6 +46,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
             R.id.fabEdit -> startActivity(
                 Intent(this, RegisterClientActivity::class.java)
                     .putExtra("clienteId", c.clienteId)
+                    .putExtra("usuarioId", c.personalVendedorId)
             )
         }
     }
@@ -83,7 +82,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
         binding.navigate = this
         binding.c = clienteViewModel
 
-        clienteViewModel.getClienteById(id).observe(this, Observer { cliente ->
+        clienteViewModel.getClienteById(id).observe(this, { cliente ->
             if (cliente != null) {
                 c = cliente
                 val f = File(Util.getFolder(this),c.nameImg)
@@ -105,7 +104,7 @@ class FileClientActivity : DaggerAppCompatActivity(), OnItemClickListener,
                 .setPositiveButton("SI") { dialogInterface, _ ->
                     startActivity(
                         Intent(this, OrdenActivity::class.java)
-                            .putExtra("clienteId", c.clienteId)
+                            .putExtra("clienteId", c.identity)
                             .putExtra("tipoPersonal", c.tipoPersonal)
                             .putExtra("localId", c.tipoPersonal)
                     )
