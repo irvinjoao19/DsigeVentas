@@ -84,4 +84,8 @@ interface OnItemClickListener {
     }
 
     fun onClick(v: View)
+
+    interface VentaSupervisorListener {
+        fun onItemClick(s: VentaSupervisor, v: View, position: Int)
+    }
 }

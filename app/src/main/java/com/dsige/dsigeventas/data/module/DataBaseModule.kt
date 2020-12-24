@@ -118,4 +118,9 @@ class DataBaseModule {
     internal fun provideLocalDao(appDataBase: AppDataBase): LocalDao {
         return appDataBase.localDao()
     }
+
+    @Provides
+    internal fun provideVentaUbicacionDao(appDataBase: AppDataBase): VentaUbicacionDao {
+        return appDataBase.ventaUbicacionDao()
+    }
 }

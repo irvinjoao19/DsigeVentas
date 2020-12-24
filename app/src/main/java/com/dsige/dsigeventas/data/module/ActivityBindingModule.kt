@@ -48,4 +48,13 @@ abstract class ActivityBindingModule {
 
     @ContributesAndroidInjector
     internal abstract fun bindRepartoActivity(): RepartoActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindReporteVentaActivity(): ReporteVentaActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindReporteSupervisorActivity(): ReporteSupervisorActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindVendedorMapActivity(): VendedorMapActivity
 }

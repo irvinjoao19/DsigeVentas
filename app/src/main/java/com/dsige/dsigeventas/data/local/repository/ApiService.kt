@@ -19,7 +19,10 @@ interface ApiService {
 
     @Headers("Cache-Control: no-cache")
     @GET("Sync")
-    fun getSync(@Query("operarioId") operarioId: Int, @Query("version") version: String): Observable<Sync>
+    fun getSync(
+        @Query("operarioId") operarioId: Int,
+        @Query("version") version: String
+    ): Observable<Sync>
 
     @Headers("Cache-Control: no-cache")
     @POST("Save")
@@ -87,4 +90,22 @@ interface ApiService {
     @Headers("Cache-Control: no-cache")
     @POST("DeletePedido")
     fun deletePedidoOnline(@Body body: RequestBody): Observable<Mensaje>
+
+    // todo reporte
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteVentaVendedor")
+    fun getReporteVentaVendedor(@Query("u") u: Int): Observable<List<VentaVendedor>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteVentaSupervisor")
+    fun getReporteVentaSupervisor(@Query("u") u: Int): Observable<List<VentaSupervisor>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteVentaUbicacion")
+    fun getReporteVentaUbicacion(@Query("u") u: Int): Observable<List<VentaUbicacion>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteMes")
+    fun getReporteMes(@Query("u") u: Int): Observable<List<VentaMes>>
 }

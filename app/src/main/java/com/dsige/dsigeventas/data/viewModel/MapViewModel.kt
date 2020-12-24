@@ -19,7 +19,6 @@ class MapViewModel @Inject
 internal constructor(private val roomRepository: AppRepository, private val retrofit: ApiError) :
     ViewModel() {
 
-
     val mensajeError: MutableLiveData<String> = MutableLiveData()
     val mensajeSuccess: MutableLiveData<String> = MutableLiveData()
 
@@ -53,7 +52,7 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                         val body = e.response().errorBody()
                         try {
                             val error = retrofit.errorConverter.convert(body!!)
-                            mensajeError.postValue(error.Message)
+                            mensajeError.postValue(error!!.Message)
                         } catch (e1: IOException) {
                             mensajeError.postValue(e1.toString())
                         }

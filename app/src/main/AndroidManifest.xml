@@ -35,6 +35,9 @@
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="m">
+        <activity android:name=".ui.activities.VendedorMapActivity"></activity>
+        <activity android:name=".ui.activities.ReporteSupervisorActivity" />
+        <activity android:name=".ui.activities.ReporteVentaActivity" />
         <activity android:name=".ui.activities.RepartoGeneralMapActivity" />
         <activity android:name=".ui.activities.RepartoActivity" />
         <activity android:name=".ui.activities.ClientGeneralMapActivity" />

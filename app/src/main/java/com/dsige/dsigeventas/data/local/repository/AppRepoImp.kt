@@ -314,13 +314,15 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         }
     }
 
-    override fun updateProducto(p: PedidoDetalle, t: String): Completable {
+    override fun updateProducto(p: PedidoDetalle, t: Mensaje): Completable {
         return Completable.fromAction {
-            if (t == "0") {
+            if (t.mensaje == "0") {
                 val d = dataBase.pedidoDetalleDao()
                     .getVerificatePedidoDetalleByIdTask(p.pedidoDetalleId)
+                d.stockMinimo = t.stock
                 dataBase.pedidoDetalleDao().updateProductoTask(d)
             } else {
+                p.stockMinimo = t.stock
                 dataBase.pedidoDetalleDao().updateProductoTask(p)
             }
         }
@@ -735,5 +737,41 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         Log.i("TAG", json)
         val body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json)
         return apiService.deletePedidoOnline(body)
+    }
+
+    override fun syncReporteVenta(id: Int): Observable<List<VentaVendedor>> {
+        return apiService.getReporteVentaVendedor(id)
+    }
+
+    override fun syncReporteSupervisor(id: Int): Observable<List<VentaSupervisor>> {
+        return apiService.getReporteVentaSupervisor(id)
+    }
+
+    override fun syncReporteMes(id: Int): Observable<List<VentaMes>> {
+        return apiService.getReporteMes(id)
+    }
+
+    override fun deleteReporteUbicacion(): Completable {
+        return Completable.fromAction {
+            dataBase.ventaUbicacionDao().deleteAll()
+        }
+    }
+
+    override fun syncReporteUbicacion(id: Int): Observable<List<VentaUbicacion>> {
+        return apiService.getReporteVentaUbicacion(id)
+    }
+
+    override fun insertVentaUbicacion(t: List<VentaUbicacion>): Completable {
+        return Completable.fromAction {
+            dataBase.ventaUbicacionDao().insertVentaUbicacionListTask(t)
+        }
+    }
+
+    override fun getVentaUbicacion(): LiveData<List<VentaUbicacion>> {
+        return dataBase.ventaUbicacionDao().getVentaUbicacion()
+    }
+
+    override fun getVentaUbicacionById(id: Int): LiveData<VentaUbicacion> {
+        return dataBase.ventaUbicacionDao().getVentaUbicacionById(id)
     }
 }

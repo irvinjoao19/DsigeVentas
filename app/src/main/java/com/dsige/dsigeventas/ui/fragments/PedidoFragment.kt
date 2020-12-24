@@ -97,7 +97,7 @@ class PedidoFragment : DaggerFragment() {
                         )
                     } else
                         productoViewModel.setError("No cuenta con ubicación")
-                    else -> if (p.estado == 0) {
+                    else ->  {
                         val popupMenu = PopupMenu(context!!, v)
                         popupMenu.menu.add(0, 1, 0, getText(R.string.goPedido))
                         popupMenu.menu.add(0, 2, 0, getText(R.string.delete))
@@ -109,7 +109,8 @@ class PedidoFragment : DaggerFragment() {
                             false
                         }
                         popupMenu.show()
-                    } else goOrdenActivity(p)
+                    }
+//                    else goOrdenActivity(p)
                 }
             }
         })
@@ -151,7 +152,7 @@ class PedidoFragment : DaggerFragment() {
     private fun deletePedidoDialog(p: Pedido) {
         val dialog = MaterialAlertDialogBuilder(context!!)
             .setTitle("Mensaje")
-            .setMessage("Deseas eliminar el pedido ?")
+            .setMessage("Estas seguro de eliminar el pedido ?")
             .setPositiveButton("SI") { dialog, _ ->
                 productoViewModel.deletePedidoOnline(p)
                 dialog.dismiss()

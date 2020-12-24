@@ -16,6 +16,8 @@ import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
 import com.dsige.dsigeventas.ui.activities.LoginActivity
 import com.dsige.dsigeventas.ui.activities.PersonalMapActivity
+import com.dsige.dsigeventas.ui.activities.ReporteSupervisorActivity
+import com.dsige.dsigeventas.ui.activities.ReporteVentaActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_info.*
@@ -31,11 +33,14 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
     lateinit var usuarioViewModel: UsuarioViewModel
 
     lateinit var builder: AlertDialog.Builder
-    var dialog: AlertDialog? = null
+    private var dialog: AlertDialog? = null
 
-    var login: String = ""
+    private var login: String = ""
     private var cargo: String = ""
     private var param2: String? = null
+    private var usuarioId: Int = 0
+    private var nombre: String = ""
+    private var perfil: Int = 0 // 2 -> supervisor
 
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -79,10 +84,12 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
         toolbar.visibility = View.VISIBLE
         usuarioViewModel =
             ViewModelProvider(this, viewModelFactory).get(UsuarioViewModel::class.java)
-        usuarioViewModel.user.observe(viewLifecycleOwner, Observer { u ->
+        usuarioViewModel.user.observe(viewLifecycleOwner, { u ->
             if (u != null) {
+                usuarioId = u.usuarioId
+                nombre = String.format("%s %s",u.apellidos,u.nombres)
                 login = u.login
-                toolbar.title = u.apellidos
+                toolbar.title = String.format("%s %s",u.apellidos,u.nombres)
                 textViewDni.setText(Util.getTextHTML(u.documento), TextView.BufferType.SPANNABLE)
                 textViewTelefono.setText(
                     Util.getTextHTML(u.telefono), TextView.BufferType.SPANNABLE
@@ -159,6 +166,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             })
         }
         fabResumen.setOnClickListener(this)
+        fabReporte.setOnClickListener(this)
     }
 
     private fun loadFinish() {
@@ -217,6 +225,19 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
         when (v.id) {
             R.id.fabResumen -> startActivity(Intent(context, PersonalMapActivity::class.java))
             //            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
+            R.id.fabReporte -> if (perfil == 1) {
+                startActivity(
+                    Intent(context, ReporteVentaActivity::class.java)
+                        .putExtra("title", nombre)
+                        .putExtra("id", usuarioId)
+                )
+            } else {
+                startActivity(
+                    Intent(context, ReporteSupervisorActivity::class.java)
+                        .putExtra("title", nombre)
+                        .putExtra("id", usuarioId)
+                )
+            }
         }
     }
 }

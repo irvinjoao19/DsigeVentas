@@ -36,5 +36,10 @@ abstract class ViewModelModule {
     internal abstract fun bindMapViewModel(mapViewModel: MapViewModel): ViewModel
 
     @Binds
+    @IntoMap
+    @ViewModelKey(ReporteViewModel::class)
+    internal abstract fun bindReporteViewModel(reporteViewModel: ReporteViewModel): ViewModel
+
+    @Binds
     internal abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory
 }

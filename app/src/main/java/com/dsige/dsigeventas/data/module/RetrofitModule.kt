@@ -5,6 +5,7 @@ import com.dsige.dsigeventas.data.local.repository.ApiError
 import com.dsige.dsigeventas.data.local.repository.ApiService
 import com.dsige.dsigeventas.data.local.repository.AppRepoImp
 import com.dsige.dsigeventas.data.local.repository.AppRepository
+import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -12,6 +13,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+
 
 @Module(includes = [ViewModelModule::class])
 class RetrofitModule {
@@ -40,7 +42,7 @@ class RetrofitModule {
 
     @Provides
     internal fun providesGsonConverterFactory(): GsonConverterFactory {
-        return GsonConverterFactory.create()
+        return GsonConverterFactory.create(GsonBuilder().setLenient().create())
     }
 
     @Provides

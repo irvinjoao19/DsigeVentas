@@ -26,9 +26,10 @@ import com.dsige.dsigeventas.data.local.model.*
         RepartoDetalle::class,
         Estado::class,
         Grupo::class,
-        Local::class
+        Local::class,
+        VentaUbicacion::class
     ],
-    version = 20, // version 13 en play store
+    version = 21, // version 13 en play store
     exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
@@ -51,6 +52,7 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun estadoDao(): EstadoDao
     abstract fun grupoDao(): GrupoDao
     abstract fun localDao(): LocalDao
+    abstract fun ventaUbicacionDao(): VentaUbicacionDao
 
     companion object {
         @Volatile

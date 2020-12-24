@@ -52,7 +52,7 @@ interface AppRepository {
     fun getProductoByPedido(id: Int): LiveData<PagedList<PedidoDetalle>>
     fun savePedidoOnline(pedidoId: Int): Completable
     fun getPedidoDetalles(pedidoId: Int): Observable<List<PedidoDetalle>>
-    fun updateProducto(p: PedidoDetalle, t: String): Completable
+    fun updateProducto(p: PedidoDetalle, t: Mensaje): Completable
     fun getPedidoById(id: Int): Observable<Pedido>
     fun sendPedido(body: RequestBody): Observable<Mensaje>
     fun updatePedido(m: Mensaje): Completable
@@ -82,7 +82,7 @@ interface AppRepository {
     fun saveGpsTask(body: RequestBody): Call<Mensaje>
     fun saveMovilTask(body: RequestBody): Call<Mensaje>
     fun getClienteByIdTask(id: Int): Observable<Cliente>
-    fun sendCliente(c:Cliente): Observable<Mensaje>
+    fun sendCliente(c: Cliente): Observable<Mensaje>
     fun updateCliente(m: Mensaje, pedidoId: Int): Completable
     fun getDetalleRepartoById(id: Int): LiveData<PagedList<RepartoDetalle>>
 
@@ -116,6 +116,17 @@ interface AppRepository {
 
     fun verificateDistrito(c: Cliente): Observable<Cliente>
     fun clearProductos(): Completable
-    fun deletePedidoOnline(p: Pedido) : Observable<Mensaje>
+    fun deletePedidoOnline(p: Pedido): Observable<Mensaje>
+
+    //todo reporte vendedor
+    fun syncReporteVenta(id: Int): Observable<List<VentaVendedor>>
+    fun syncReporteSupervisor(id: Int): Observable<List<VentaSupervisor>>
+    fun syncReporteMes(id: Int): Observable<List<VentaMes>>
+
+    fun deleteReporteUbicacion(): Completable
+    fun syncReporteUbicacion(id: Int): Observable<List<VentaUbicacion>>
+    fun insertVentaUbicacion(t: List<VentaUbicacion>): Completable
+    fun getVentaUbicacion(): LiveData<List<VentaUbicacion>>
+    fun getVentaUbicacionById(id: Int): LiveData<VentaUbicacion>
 
 }

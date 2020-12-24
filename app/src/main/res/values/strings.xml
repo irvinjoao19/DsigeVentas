@@ -225,4 +225,6 @@
     <string name="DNI">DNI</string>
     <string name="local">Local</string>
     <string name="search_cliente">Buscar Cliente</string>
+    <string name="pedido_realizado">Ubicacion de Pedidos Realizados</string>
+    <string name="resumen_ventas_diarias">Resumen de Ventas Diarias</string>
 </resources>
