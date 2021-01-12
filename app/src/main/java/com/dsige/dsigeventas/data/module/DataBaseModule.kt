@@ -123,4 +123,9 @@ class DataBaseModule {
     internal fun provideVentaUbicacionDao(appDataBase: AppDataBase): VentaUbicacionDao {
         return appDataBase.ventaUbicacionDao()
     }
+
+    @Provides
+    internal fun provideVentaUbicacionVendedorDao(appDataBase: AppDataBase): VentaUbicacionVendedorDao {
+        return appDataBase.ventaUbicacionVendedorDao()
+    }
 }

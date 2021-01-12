@@ -381,23 +381,23 @@
                 app:icon="@drawable/ic_diagram"
                 app:iconTint="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
-
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-                android:id="@+id/fabResumen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/fab_margin"
-                android:gravity="end"
-                android:text="@string/resumen"
-                android:textColor="@color/colorWhite"
-                app:backgroundTint="@color/colorAccent"
-                app:icon="@drawable/ic_diagram"
-                app:iconTint="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+<!--            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton-->
+<!--                android:id="@+id/fabResumen"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="@dimen/fab_margin"-->
+<!--                android:gravity="end"-->
+<!--                android:text="@string/resumen"-->
+<!--                android:textColor="@color/colorWhite"-->
+<!--                app:backgroundTint="@color/colorAccent"-->
+<!--                app:icon="@drawable/ic_diagram"-->
+<!--                app:iconTint="@null"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/linearLayout" />-->
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </FrameLayout>

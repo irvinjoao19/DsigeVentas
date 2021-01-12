@@ -16,19 +16,18 @@ import com.dsige.dsigeventas.data.viewModel.ReporteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
 import dagger.android.support.DaggerAppCompatActivity
-import kotlinx.android.synthetic.main.activity_reporte_venta.*
+import kotlinx.android.synthetic.main.activity_reporte_vendedor.*
 import javax.inject.Inject
 
-class ReporteVentaActivity : DaggerAppCompatActivity() {
+class ReporteVendedorActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     lateinit var ventasViewModel: ReporteViewModel
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reporte_venta)
+        setContentView(R.layout.activity_reporte_vendedor)
         val b = intent.extras
         if (b != null) {
             bindUI(b.getString("title")!!, b.getInt("id"))
@@ -43,9 +42,9 @@ class ReporteVentaActivity : DaggerAppCompatActivity() {
 
         ventasViewModel =
             ViewModelProvider(this, viewModelFactory).get(ReporteViewModel::class.java)
-        ventasViewModel.syncReporteVenta(id)
+        ventasViewModel.syncReporteVendedor(id)
 
-        ventasViewModel.reporte.observe(this, {
+        ventasViewModel.reporteVendedor.observe(this, {
             if (it.isNotEmpty()) {
                 val v: VentaVendedor? = it[0]
                 if (v != null) {
@@ -87,6 +86,10 @@ class ReporteVentaActivity : DaggerAppCompatActivity() {
                 getData(it)
             }
         })
+
+        ventasViewModel.mensajeError.observe(this,{
+            Util.toastMensaje(this,it)
+        })
     }
 
     private fun getData(data: List<VentaVendedor>) {
@@ -94,8 +97,7 @@ class ReporteVentaActivity : DaggerAppCompatActivity() {
         val topRowMargin = 0
         val rightRowMargin = 0
         val bottomRowMargin = 0
-        val textSize = 15
-        val smallTextSize = 15
+        val textSize = 18
         val rows = data.size
 
         for (i in 0 until rows) {
@@ -119,7 +121,6 @@ class ReporteVentaActivity : DaggerAppCompatActivity() {
             tv2.gravity = Gravity.CENTER
             tv2.setBackgroundColor(Color.parseColor("#f8f8f8"))
             tv2.setTextColor(Color.parseColor("#000000"))
-            tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize.toFloat())
             tv2.text = row.total.toString()
 
             val tr = TableRow(this)

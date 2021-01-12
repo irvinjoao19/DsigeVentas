@@ -109,6 +109,10 @@ class ReporteSupervisorActivity : DaggerAppCompatActivity() {
                 reporteSupervisorAdapter.addItems(it)
             }
         })
+
+        ventasViewModel.mensajeError.observe(this,{
+            Util.toastMensaje(this,it)
+        })
 //        fabMap.setOnClickListener(this)
 //        fabResumen.setOnClickListener(this)
     }
@@ -135,8 +139,7 @@ class ReporteSupervisorActivity : DaggerAppCompatActivity() {
         val topRowMargin = 0
         val rightRowMargin = 0
         val bottomRowMargin = 0
-        val textSize = 15
-        val smallTextSize = 15
+        val textSize = 18
         val rows = data.size
 
         for (i in 0 until rows) {
@@ -160,7 +163,6 @@ class ReporteSupervisorActivity : DaggerAppCompatActivity() {
             tv2.gravity = Gravity.CENTER
             tv2.setBackgroundColor(Color.parseColor("#f8f8f8"))
             tv2.setTextColor(Color.parseColor("#000000"))
-            tv2.setTextSize(TypedValue.COMPLEX_UNIT_PX, smallTextSize.toFloat())
             tv2.text = row.total.toString()
 
             val tr = TableRow(this)

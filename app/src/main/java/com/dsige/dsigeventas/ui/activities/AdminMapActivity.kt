@@ -29,7 +29,7 @@ import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_vendedor_map.*
 import javax.inject.Inject
 
-class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
+class AdminMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener {
 
     @Inject
@@ -38,14 +38,14 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_vendedor_map)
+        setContentView(R.layout.activity_admin_map)
         val b = intent.extras
         if (b != null) {
-            bindUI(b.getString("title")!!, b.getInt("id"))
+            bindUI(b.getString("title")!!, b.getInt("id"), b.getInt("local"), b.getInt("tipo"))
         }
     }
 
-    private fun bindUI(title: String, id: Int) {
+    private fun bindUI(title: String, id: Int, local: Int, tipo: Int) {
         ventasViewModel =
             ViewModelProvider(this, viewModelFactory).get(ReporteViewModel::class.java)
 
@@ -57,7 +57,12 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        ventasViewModel.syncReporteUbicacion(id)
+
+        if (tipo == 1) {
+            ventasViewModel.syncReporteAdminSupervisor1(id, local)
+        } else {
+            ventasViewModel.syncReporteAdminVendedor1(id, local)
+        }
 
         ventasViewModel.mensajeError.observe(this, {
             Util.toastMensaje(this, it)
@@ -87,7 +92,7 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
                 }
             }
         })
-        mMap.setOnMarkerClickListener(this@VendedorMapActivity)
+        mMap.setOnMarkerClickListener(this@AdminMapActivity)
     }
 
     override fun onMarkerClick(m: Marker): Boolean {
@@ -114,7 +119,7 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
         imageViewClose.setOnClickListener { dialogSpinner.dismiss() }
 
         Handler().postDelayed({
-            ventasViewModel.getVentaUbicacionById(title.toInt()).observe(this, { p ->
+            ventasViewModel.getVentaUbicacionById(title.toInt()).observe(this) { p ->
                 if (p != null) {
                     Util.getTextStyleHtml(
                         String.format("<strong>%s</strong>", p.nombreCliente), textView1
@@ -123,7 +128,7 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
                         String.format("Dni: %s", p.nroDocCliente), textView2
                     )
                     Util.getTextStyleHtml(
-                        String.format("<strong>Dirección: </strong>%s", p.direccion), textView3
+                        String.format("Dirección: %s", p.direccion), textView3
                     )
                     Util.getTextStyleHtml(
                         String.format("<strong>Importe Total del Pedido: </strong>%s", p.total),
@@ -132,7 +137,7 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
                     linearLayoutLoad.visibility = View.GONE
                     linearLayoutPrincipal.visibility = View.VISIBLE
                 }
-            })
+            }
         }, 800)
     }
 }

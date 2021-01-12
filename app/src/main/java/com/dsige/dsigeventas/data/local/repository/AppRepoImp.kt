@@ -227,6 +227,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
     }
 
     override fun syncProductos(localId: Int): Observable<List<Stock>> {
+        Log.i("TAG", "local :$localId")
         return apiService.getProductos(localId)
     }
 
@@ -739,7 +740,7 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
         return apiService.deletePedidoOnline(body)
     }
 
-    override fun syncReporteVenta(id: Int): Observable<List<VentaVendedor>> {
+    override fun syncReporteVendedor(id: Int): Observable<List<VentaVendedor>> {
         return apiService.getReporteVentaVendedor(id)
     }
 
@@ -773,5 +774,62 @@ class AppRepoImp(private val apiService: ApiService, private val dataBase: AppDa
 
     override fun getVentaUbicacionById(id: Int): LiveData<VentaUbicacion> {
         return dataBase.ventaUbicacionDao().getVentaUbicacionById(id)
+    }
+
+    override fun syncReporteCabecera(): Observable<VentaCabecera> {
+        return apiService.getReporteCabecera()
+    }
+
+    override fun syncReporteAdminBody(tipo: Int): Observable<List<VentaAdmin>> {
+        return apiService.syncReporteAdminBody(tipo)
+    }
+
+    override fun syncReporteAdminSupervisor1(
+        id: Int,
+        local: Int
+    ): Observable<List<VentaUbicacion>> {
+        return apiService.syncReporteAdminSupervisor1(id, local)
+    }
+
+    override fun syncReporteAdminSupervisor2(id: Int, local: Int): Observable<List<VentaMes>> {
+        return apiService.syncReporteAdminSupervisor2(id, local)
+    }
+
+    override fun syncReporteAdminSupervisor3(
+        id: Int, local: Int
+    ): Observable<List<VentaAdminVendedor>> {
+        return apiService.syncReporteAdminSupervisor3(id, local)
+    }
+
+    override fun syncReporteAdminVendedor1(id: Int, local: Int): Observable<List<VentaUbicacion>> {
+        return apiService.syncReporteAdminVendedor1(id, local)
+    }
+
+    override fun syncReporteAdminVendedor2(id: Int, local: Int): Observable<List<VentaMes>> {
+        return apiService.syncReporteAdminVendedor2(id, local)
+    }
+
+    override fun deleteReporteAdminVendedorUbicacion(): Completable {
+        return Completable.fromAction {
+            dataBase.ventaUbicacionVendedorDao().deleteAll()
+        }
+    }
+
+    override fun insertVentaUbicacionVendedor(t: List<VentaUbicacionVendedor>): Completable {
+        return Completable.fromAction {
+            dataBase.ventaUbicacionVendedorDao().insertVentaUbicacionVendedorListTask(t)
+        }
+    }
+
+    override fun syncReporteAdminVendedorUbicacion(): Observable<List<VentaUbicacionVendedor>> {
+        return apiService.syncReporteAdminVendedorUbicacion()
+    }
+
+    override fun getVentaUbicacionVendedor(): LiveData<List<VentaUbicacionVendedor>> {
+        return dataBase.ventaUbicacionVendedorDao().getVentaUbicacionVendedor()
+    }
+
+    override fun getVentaUbicacionVendedorById(id: Int): LiveData<VentaUbicacionVendedor> {
+        return dataBase.ventaUbicacionVendedorDao().getVentaUbicacionVendedorById(id)
     }
 }

@@ -7,17 +7,13 @@ import android.view.*
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.viewModel.UsuarioViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
-import com.dsige.dsigeventas.ui.activities.LoginActivity
-import com.dsige.dsigeventas.ui.activities.PersonalMapActivity
-import com.dsige.dsigeventas.ui.activities.ReporteSupervisorActivity
-import com.dsige.dsigeventas.ui.activities.ReporteVentaActivity
+import com.dsige.dsigeventas.ui.activities.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_info.*
@@ -87,9 +83,10 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
         usuarioViewModel.user.observe(viewLifecycleOwner, { u ->
             if (u != null) {
                 usuarioId = u.usuarioId
-                nombre = String.format("%s %s",u.apellidos,u.nombres)
+                nombre = String.format("%s %s", u.apellidos, u.nombres)
                 login = u.login
-                toolbar.title = String.format("%s %s",u.apellidos,u.nombres)
+                perfil = u.perfil
+                toolbar.title = String.format("%s %s", u.apellidos, u.nombres)
                 textViewDni.setText(Util.getTextHTML(u.documento), TextView.BufferType.SPANNABLE)
                 textViewTelefono.setText(
                     Util.getTextHTML(u.telefono), TextView.BufferType.SPANNABLE
@@ -97,7 +94,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             }
         })
 
-        usuarioViewModel.mensajeSuccess.observe(viewLifecycleOwner, Observer { s ->
+        usuarioViewModel.mensajeSuccess.observe(viewLifecycleOwner, { s ->
             if (s != null) {
                 loadFinish()
                 val intent = Intent(context, LoginActivity::class.java)
@@ -107,7 +104,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
             }
         })
 
-        usuarioViewModel.mensajeError.observe(viewLifecycleOwner, Observer { s ->
+        usuarioViewModel.mensajeError.observe(viewLifecycleOwner, { s ->
             if (s != null) {
                 loadFinish()
                 Util.toastMensaje(context!!, s)
@@ -116,10 +113,10 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
 
         if (cargo != "Administrador") {
             linearLayout.visibility = View.GONE
-            fabResumen.visibility = View.GONE
+//            fabResumen.visibility = View.GONE
         } else {
             usuarioViewModel.getResumen(Util.getFecha())
-            usuarioViewModel.resumen.observe(viewLifecycleOwner, Observer { r ->
+            usuarioViewModel.resumen.observe(viewLifecycleOwner, { r ->
                 if (r != null) {
                     textView1.setText(
                         Util.getTextHTML("<strong>S/.</strong> " + r.totalVenta),
@@ -165,7 +162,7 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
                 }
             })
         }
-        fabResumen.setOnClickListener(this)
+//        fabResumen.setOnClickListener(this)
         fabReporte.setOnClickListener(this)
     }
 
@@ -223,16 +220,20 @@ class InfoFragment : DaggerFragment(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.fabResumen -> startActivity(Intent(context, PersonalMapActivity::class.java))
+//            R.id.fabResumen -> startActivity(Intent(context, PersonalMapActivity::class.java))
             //            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
-            R.id.fabReporte -> if (perfil == 1) {
-                startActivity(
-                    Intent(context, ReporteVentaActivity::class.java)
+            R.id.fabReporte -> when {
+                cargo == "Administrador" -> startActivity(
+                    Intent(context, ReporteAdministradorActivity::class.java)
                         .putExtra("title", nombre)
                         .putExtra("id", usuarioId)
                 )
-            } else {
-                startActivity(
+                perfil == 1 -> startActivity(
+                    Intent(context, ReporteVendedorActivity::class.java)
+                        .putExtra("title", nombre)
+                        .putExtra("id", usuarioId)
+                )
+                else -> startActivity(
                     Intent(context, ReporteSupervisorActivity::class.java)
                         .putExtra("title", nombre)
                         .putExtra("id", usuarioId)

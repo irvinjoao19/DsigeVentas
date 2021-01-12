@@ -50,11 +50,20 @@ abstract class ActivityBindingModule {
     internal abstract fun bindRepartoActivity(): RepartoActivity
 
     @ContributesAndroidInjector
-    internal abstract fun bindReporteVentaActivity(): ReporteVentaActivity
+    internal abstract fun bindReporteVentaActivity(): ReporteVendedorActivity
 
     @ContributesAndroidInjector
     internal abstract fun bindReporteSupervisorActivity(): ReporteSupervisorActivity
 
     @ContributesAndroidInjector
+    internal abstract fun bindReporteAdministradorActivity(): ReporteAdministradorActivity
+
+    @ContributesAndroidInjector
     internal abstract fun bindVendedorMapActivity(): VendedorMapActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindAdminMapActivity(): AdminMapActivity
+
+    @ContributesAndroidInjector
+    internal abstract fun bindAdminVendedoresMapActivity(): AdminVendedoresMapActivity
 }

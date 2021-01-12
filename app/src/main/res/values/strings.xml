@@ -227,4 +227,5 @@
     <string name="search_cliente">Buscar Cliente</string>
     <string name="pedido_realizado">Ubicacion de Pedidos Realizados</string>
     <string name="resumen_ventas_diarias">Resumen de Ventas Diarias</string>
+    <string name="resumen_por_vendedor">Resumen por Vendedor</string>
 </resources>

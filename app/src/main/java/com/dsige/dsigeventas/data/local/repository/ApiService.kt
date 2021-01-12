@@ -108,4 +108,48 @@ interface ApiService {
     @Headers("Cache-Control: no-cache")
     @GET("ReporteMes")
     fun getReporteMes(@Query("u") u: Int): Observable<List<VentaMes>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteCabecera")
+    fun getReporteCabecera(): Observable<VentaCabecera>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteAdminBody")
+    fun syncReporteAdminBody(@Query("tipo") t: Int): Observable<List<VentaAdmin>>
+
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteAdminSupervisor1")
+    fun syncReporteAdminSupervisor1(
+        @Query("id") id: Int, @Query("local") l: Int
+    ): Observable<List<VentaUbicacion>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteAdminSupervisor2")
+    fun syncReporteAdminSupervisor2(
+        @Query("id") id: Int, @Query("local") l: Int
+    ): Observable<List<VentaMes>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteAdminSupervisor3")
+    fun syncReporteAdminSupervisor3(
+        @Query("id") id: Int, @Query("local") l: Int
+    ): Observable<List<VentaAdminVendedor>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteAdminVendedor1")
+    fun syncReporteAdminVendedor1(
+        @Query("id") id: Int, @Query("local") l: Int
+    ): Observable<List<VentaUbicacion>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteAdminVendedor2")
+    fun syncReporteAdminVendedor2(
+        @Query("id") id: Int, @Query("local") l: Int
+    ): Observable<List<VentaMes>>
+
+    @Headers("Cache-Control: no-cache")
+    @GET("ReporteAdminVendedorUbicacion")
+    fun syncReporteAdminVendedorUbicacion(): Observable<List<VentaUbicacionVendedor>>
+
 }

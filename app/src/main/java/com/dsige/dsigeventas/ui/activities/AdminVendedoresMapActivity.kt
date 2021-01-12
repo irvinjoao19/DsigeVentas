@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.dsige.dsigeventas.R
 import com.dsige.dsigeventas.data.local.model.VentaUbicacion
+import com.dsige.dsigeventas.data.local.model.VentaUbicacionVendedor
 import com.dsige.dsigeventas.data.viewModel.ReporteViewModel
 import com.dsige.dsigeventas.data.viewModel.ViewModelFactory
 import com.dsige.dsigeventas.helper.Util
@@ -29,7 +30,7 @@ import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_vendedor_map.*
 import javax.inject.Inject
 
-class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
+class AdminVendedoresMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener {
 
     @Inject
@@ -38,14 +39,14 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_vendedor_map)
+        setContentView(R.layout.activity_admin_vendedores_map)
         val b = intent.extras
         if (b != null) {
-            bindUI(b.getString("title")!!, b.getInt("id"))
+            bindUI(b.getString("title")!!)
         }
     }
 
-    private fun bindUI(title: String, id: Int) {
+    private fun bindUI(title: String) {
         ventasViewModel =
             ViewModelProvider(this, viewModelFactory).get(ReporteViewModel::class.java)
 
@@ -57,7 +58,7 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        ventasViewModel.syncReporteUbicacion(id)
+        ventasViewModel.syncReporteAdminVendedorUbicacion()
 
         ventasViewModel.mensajeError.observe(this, {
             Util.toastMensaje(this, it)
@@ -73,21 +74,21 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
             .build()
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(camera))
 
-        ventasViewModel.getVentaUbicacion().observe(this, { t ->
+        ventasViewModel.getVentaUbicacionVendedor().observe(this) { t ->
             if (t != null) {
-                for (p: VentaUbicacion in t) {
+                for (p: VentaUbicacionVendedor in t) {
                     if (p.latitud.isNotEmpty() || p.longitud.isNotEmpty()) {
                         mMap.addMarker(
                             MarkerOptions()
                                 .position(LatLng(p.latitud.toDouble(), p.longitud.toDouble()))
-                                .title(p.pedidoCabId.toString())
+                                .title(p.id.toString())
                                 .icon(Util.bitmapDescriptorFromVector(this, R.drawable.ic_people))
                         )
                     }
                 }
             }
-        })
-        mMap.setOnMarkerClickListener(this@VendedorMapActivity)
+        }
+        mMap.setOnMarkerClickListener(this@AdminVendedoresMapActivity)
     }
 
     override fun onMarkerClick(m: Marker): Boolean {
@@ -102,37 +103,35 @@ class VendedorMapActivity : DaggerAppCompatActivity(), OnMapReadyCallback,
         val linearLayoutLoad: ConstraintLayout = view.findViewById(R.id.linearLayoutLoad)
         val linearLayoutPrincipal: LinearLayout = view.findViewById(R.id.linearLayoutPrincipal)
         val imageViewClose: ImageView = view.findViewById(R.id.imageViewClose)
+        val textViewTitle: TextView = view.findViewById(R.id.textViewTitle)
         val textView1: TextView = view.findViewById(R.id.textView1)
         val textView2: TextView = view.findViewById(R.id.textView2)
         val textView3: TextView = view.findViewById(R.id.textView3)
         val textView4: TextView = view.findViewById(R.id.textView4)
-//        val textView5: TextView = view.findViewById(R.id.textView5)
         builder.setView(view)
         val dialogSpinner = builder.create()
         dialogSpinner.show()
 
+        textViewTitle.text = String.format("Vendedor")
         imageViewClose.setOnClickListener { dialogSpinner.dismiss() }
 
         Handler().postDelayed({
-            ventasViewModel.getVentaUbicacionById(title.toInt()).observe(this, { p ->
+            ventasViewModel.getVentaUbicacionVendedorById(title.toInt()).observe(this) { p ->
                 if (p != null) {
                     Util.getTextStyleHtml(
-                        String.format("<strong>%s</strong>", p.nombreCliente), textView1
+                        String.format("<strong>%s</strong>", p.vendedor), textView1
                     )
                     Util.getTextStyleHtml(
-                        String.format("Dni: %s", p.nroDocCliente), textView2
+                        String.format("Total de Pedidos: %s", p.totalPedidos), textView2
                     )
                     Util.getTextStyleHtml(
-                        String.format("<strong>Dirección: </strong>%s", p.direccion), textView3
+                        String.format("Total: %s", p.total), textView3
                     )
-                    Util.getTextStyleHtml(
-                        String.format("<strong>Importe Total del Pedido: </strong>%s", p.total),
-                        textView4
-                    )
+                    textView4.visibility = View.GONE
                     linearLayoutLoad.visibility = View.GONE
                     linearLayoutPrincipal.visibility = View.VISIBLE
                 }
-            })
+            }
         }, 800)
     }
 }

@@ -14,4 +14,5 @@ open class VentaUbicacion {
     var latitud: String = ""
     var longitud: String = ""
     var total: Double = 0.0
+    var vendedor : String = "" // nuevo para reporte de adminitracion
 }

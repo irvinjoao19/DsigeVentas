@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/map"
+        android:icon="@drawable/ic_map"
+        android:orderInCategory="100"
+        android:title="@string/pedido_realizado" />
+    <item
+        android:id="@+id/resumenVD"
+        android:icon="@drawable/ic_diagram"
+        android:orderInCategory="200"
+        android:title="@string/resumen_ventas_diarias" />
+    <item
+        android:id="@+id/resumenV"
+        android:icon="@drawable/ic_diagram"
+        android:orderInCategory="300"
+        android:title="@string/resumen_por_vendedor" />
+</menu>

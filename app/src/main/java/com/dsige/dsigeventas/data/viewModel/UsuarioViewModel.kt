@@ -89,17 +89,14 @@ internal constructor(private val roomRepository: AppRepository, private val retr
     }
 
     fun logout(login: String) {
-        var mensaje = ""
         roomRepository.getLogout(login)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : Observer<Mensaje> {
-                override fun onSubscribe(d: Disposable) {
-
-                }
-
+                override fun onSubscribe(d: Disposable) {}
+                override fun onComplete() {}
                 override fun onNext(m: Mensaje) {
-                    mensaje = m.mensaje
+                    deleteUser(m.mensaje)
                 }
 
                 override fun onError(t: Throwable) {
@@ -115,10 +112,6 @@ internal constructor(private val roomRepository: AppRepository, private val retr
                         mensajeError.postValue(t.message)
                     }
                 }
-
-                override fun onComplete() {
-                    deleteUser(mensaje)
-                }
             })
     }
 
@@ -128,15 +121,10 @@ internal constructor(private val roomRepository: AppRepository, private val retr
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CompletableObserver {
-                override fun onSubscribe(d: Disposable) {
-                }
-
+                override fun onSubscribe(d: Disposable) {}
+                override fun onError(e: Throwable) {}
                 override fun onComplete() {
                     mensajeSuccess.value = mensaje
-                }
-
-                override fun onError(e: Throwable) {
-                    mensajeError.value = e.toString()
                 }
             })
     }

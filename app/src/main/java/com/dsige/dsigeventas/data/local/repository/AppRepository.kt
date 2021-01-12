@@ -119,7 +119,7 @@ interface AppRepository {
     fun deletePedidoOnline(p: Pedido): Observable<Mensaje>
 
     //todo reporte vendedor
-    fun syncReporteVenta(id: Int): Observable<List<VentaVendedor>>
+    fun syncReporteVendedor(id: Int): Observable<List<VentaVendedor>>
     fun syncReporteSupervisor(id: Int): Observable<List<VentaSupervisor>>
     fun syncReporteMes(id: Int): Observable<List<VentaMes>>
 
@@ -128,5 +128,18 @@ interface AppRepository {
     fun insertVentaUbicacion(t: List<VentaUbicacion>): Completable
     fun getVentaUbicacion(): LiveData<List<VentaUbicacion>>
     fun getVentaUbicacionById(id: Int): LiveData<VentaUbicacion>
+    fun syncReporteCabecera(): Observable<VentaCabecera>
+    fun syncReporteAdminBody(tipo: Int): Observable<List<VentaAdmin>>
 
+    fun syncReporteAdminSupervisor1(id: Int, local: Int): Observable<List<VentaUbicacion>>
+    fun syncReporteAdminSupervisor2(id: Int, local: Int): Observable<List<VentaMes>>
+    fun syncReporteAdminSupervisor3(id: Int, local: Int): Observable<List<VentaAdminVendedor>>
+
+    fun syncReporteAdminVendedor1(id: Int, local: Int): Observable<List<VentaUbicacion>>
+    fun syncReporteAdminVendedor2(id: Int, local: Int): Observable<List<VentaMes>>
+    fun deleteReporteAdminVendedorUbicacion(): Completable
+    fun insertVentaUbicacionVendedor(t: List<VentaUbicacionVendedor>): Completable
+    fun syncReporteAdminVendedorUbicacion(): Observable<List<VentaUbicacionVendedor>>
+    fun getVentaUbicacionVendedor(): LiveData<List<VentaUbicacionVendedor>>
+    fun getVentaUbicacionVendedorById(id: Int): LiveData<VentaUbicacionVendedor>
 }
