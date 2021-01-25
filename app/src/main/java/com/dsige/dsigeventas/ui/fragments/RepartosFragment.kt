@@ -178,17 +178,17 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
             .observe(viewLifecycleOwner, Observer(repartoMapAdapter::submitList))
         repartoViewModel.search.value = null
 
-        repartoViewModel.mensajeError.observe(viewLifecycleOwner, Observer {
+        repartoViewModel.mensajeError.observe(viewLifecycleOwner, {
             closeLoad()
             Util.toastMensaje(context!!, it)
         })
 
-        repartoViewModel.mensajeSuccess.observe(viewLifecycleOwner, Observer {
+        repartoViewModel.mensajeSuccess.observe(viewLifecycleOwner, {
             closeLoad()
             Util.toastMensaje(context!!, it)
         })
 
-        repartoViewModel.goMap.observe(viewLifecycleOwner, Observer {
+        repartoViewModel.goMap.observe(viewLifecycleOwner, {
             closeLoad()
             startActivity(Intent(context, RepartoGeneralMapActivity::class.java))
         })
@@ -227,11 +227,9 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
                     }
                 })
                 recyclerView.adapter = localAdapter
-                repartoViewModel.getLocales().observe(this, Observer { e ->
-                    if (e != null) {
-                        localAdapter.addItems(e)
-                    }
-                })
+                repartoViewModel.getLocales().observe(this) {
+                    localAdapter.addItems(it)
+                }
             }
             2 -> {
                 val distritoAdapter =
@@ -244,24 +242,12 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
                     })
                 recyclerView.adapter = distritoAdapter
                 clienteViewModel.getDistritosById("15", "1")
-                    .observe(this, Observer { d ->
-                        if (d != null) {
-                            distritoAdapter.addItems(d)
-                        }
-                    })
+                    .observe(this) {
+                        distritoAdapter.addItems(it)
+                    }
                 editTextSearch.addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
-                    override fun onTextChanged(
-                        charSequence: CharSequence, i: Int, i1: Int, i2: Int
-                    ) {
-
-                    }
-
+                    override fun beforeTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
+                    override fun onTextChanged(c: CharSequence, i: Int, i1: Int, i2: Int) {}
                     override fun afterTextChanged(editable: Editable) {
                         distritoAdapter.getFilter().filter(editable)
                     }
@@ -282,10 +268,8 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
         }
     }
 
-    private fun load(title : String) {
-        builder = AlertDialog.Builder(
-            ContextThemeWrapper(context, R.style.AppTheme)
-        )
+    private fun load(title: String) {
+        builder = AlertDialog.Builder(ContextThemeWrapper(context, R.style.AppTheme))
         @SuppressLint("InflateParams") val view =
             LayoutInflater.from(context).inflate(R.layout.dialog_login, null)
         builder.setView(view)
@@ -424,7 +408,7 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
         Handler().postDelayed({
 
             repartoViewModel.getRepartoById(s.repartoId)
-                .observe(this, Observer { r ->
+                .observe(viewLifecycleOwner) { r ->
                     if (r != null) {
                         textViewRuc.text = r.numeroDocumento
                         textViewDoc.setText(
@@ -444,10 +428,10 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
                         linearLayoutLoad.visibility = View.GONE
                         linearLayoutPrincipal.visibility = View.VISIBLE
                     }
-                })
+                }
 
             repartoViewModel.getDetalleRepartoById(s.repartoId)
-                .observe(this, Observer { p ->
+                .observe(this, { p ->
                     if (p.size != 0) {
                         updateReparto(s.repartoId, p)
                         repartoDetalleAdapter.submitList(p)
@@ -557,7 +541,7 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
                     }
                 })
                 recyclerView.adapter = estadoAdapter
-                repartoViewModel.getEstados().observe(this, Observer { e ->
+                repartoViewModel.getEstados().observe(this, { e ->
                     if (e != null) {
                         estadoAdapter.addItems(e)
                     }
@@ -573,7 +557,7 @@ class RepartosFragment : DaggerFragment(), View.OnClickListener, TextView.OnEdit
                     }
                 })
                 recyclerView.adapter = grupoAdapter
-                repartoViewModel.getGrupos().observe(this, Observer { e ->
+                repartoViewModel.getGrupos().observe(this, { e ->
                     if (e != null) {
                         grupoAdapter.addItems(e)
                     }

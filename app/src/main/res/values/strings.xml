@@ -228,4 +228,5 @@
     <string name="pedido_realizado">Ubicacion de Pedidos Realizados</string>
     <string name="resumen_ventas_diarias">Resumen de Ventas Diarias</string>
     <string name="resumen_por_vendedor">Resumen por Vendedor</string>
+    <string name="title_lista_repartos">Lista Repartos</string>
 </resources>

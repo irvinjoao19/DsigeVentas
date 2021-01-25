@@ -155,7 +155,7 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         editTextLocal.setOnClickListener(this)
         fab.setOnClickListener(this)
 
-        repartoViewModel.getReparto().observe(viewLifecycleOwner, Observer { count ->
+        repartoViewModel.getReparto().observe(viewLifecycleOwner, { count ->
             mMap.clear()
             if (count.isNotEmpty()) {
                 waypoints = "waypoints=optimize:true|"
@@ -185,34 +185,30 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             }
         })
 
-        repartoViewModel.getTotalReparto().observe(viewLifecycleOwner, Observer { c ->
+        repartoViewModel.getTotalReparto().observe(viewLifecycleOwner) { c ->
             textViewAsignados.setText(
                 Util.getTextHTML("<strong>Asignados: </string>$c"),
                 TextView.BufferType.SPANNABLE
             )
-        })
-
-        repartoViewModel.getTotalEntregado().observe(viewLifecycleOwner, Observer { c ->
+        }
+        repartoViewModel.getTotalEntregado().observe(viewLifecycleOwner) { c ->
             textViewEntregado.setText(
                 Util.getTextHTML("<strong>Entregados: </string>$c"),
                 TextView.BufferType.SPANNABLE
             )
-        })
-
-        repartoViewModel.getTotalDevuelto().observe(viewLifecycleOwner, Observer { c ->
+        }
+        repartoViewModel.getTotalDevuelto().observe(viewLifecycleOwner) { c ->
             textViewDevuelto.setText(
                 Util.getTextHTML("<strong>Devueltos: </string>$c"),
                 TextView.BufferType.SPANNABLE
             )
-        })
-
-        repartoViewModel.getTotalParciales().observe(viewLifecycleOwner, Observer { c ->
+        }
+        repartoViewModel.getTotalParciales().observe(viewLifecycleOwner) { c ->
             textViewParciales.setText(
                 Util.getTextHTML("<strong>Parciales: </string>$c"),
                 TextView.BufferType.SPANNABLE
             )
-        })
-
+        }
         repartoViewModel.tipo.value = 1
     }
 
@@ -268,17 +264,9 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
         isFirstTime = false
     }
 
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-
-    }
-
-    override fun onProviderEnabled(provider: String?) {
-
-    }
-
-    override fun onProviderDisabled(provider: String?) {
-
-    }
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+    override fun onProviderEnabled(provider: String?) {}
+    override fun onProviderDisabled(provider: String?) {}
 
     @SuppressLint("StaticFieldLeak")
     private inner class FetchURL : AsyncTask<String, Void, String>() {
@@ -483,10 +471,8 @@ class MapsFragment : DaggerFragment(), OnMapReadyCallback, LocationListener,
             }
         })
         recyclerView.adapter = localAdapter
-        repartoViewModel.getLocales().observe(this, Observer { e ->
-            if (e != null) {
-                localAdapter.addItems(e)
-            }
-        })
+        repartoViewModel.getLocales().observe(this) {
+            localAdapter.addItems(it)
+        }
     }
 }

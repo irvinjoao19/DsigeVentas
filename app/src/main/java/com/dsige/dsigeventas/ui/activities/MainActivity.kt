@@ -46,7 +46,7 @@ class MainActivity : DaggerAppCompatActivity() {
                         bottomNavigation.menu.removeItem(R.id.client)
                         bottomNavigation.menu.removeItem(R.id.product)
                         bottomNavigation.menu.removeItem(R.id.pedido)
-                        fragmentByDefault(MapsFragment.newInstance("", ""))
+                        fragmentByDefault(RepartosFragment.newInstance("", ""))
                     }
                     "Vendedor" -> {
                         bottomNavigation.menu.removeItem(R.id.map)
